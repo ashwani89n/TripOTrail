@@ -6,21 +6,22 @@ TripOTrail is a comprehensive web application designed to streamline the trip ma
 
 ## Features: 
 Planning Phase
-[]Discovery Tools: The platform facilitates the discovery of attractions, accommodations, and dining options through relevant APIs. 
- Destination Management: Users can add destinations, create timelines, and establish budgets for effective journey design. 
- Document Management: Users can upload essential travel documents and set alerts for important reminders. 
- Collaborative Planning: Travelers can invite others to participate in planning, fostering group input and shared itinerary adjustments. Tracking Phase
- Real-Time Monitoring: Users can monitor their planned destinations and activities in real-time. 
- Journey Overview: After the trip, users receive a comprehensive overview detailing all visitedl ocations and experiences. 
- Expense Tracking: Allows users to track spending and streamline bill-splitting . 
- Customizable Itineraries: Users can adapt their plans based on real-time insights.  Notifications: Alerts for changes to reservations, local events, or weather updates keep travelers informed. 
+[x] Discovery Tools: The platform facilitates the discovery of attractions, accommodations, and dining options through relevant APIs. 
+[x] Destination Management: Users can add destinations, create timelines, and establish budgets for effective journey design. 
+[x] Document Management: Users can upload essential travel documents and set alerts for important reminders. 
+[x] Collaborative Planning: Travelers can invite others to participate in planning, fostering group input and shared itinerary adjustments. Tracking Phase
+[x] Real-Time Monitoring: Users can monitor their planned destinations and activities in real-time. 
+[x] Journey Overview: After the trip, users receive a comprehensive overview detailing all visitedl ocations and experiences. 
+[x] Expense Tracking: Allows users to track spending and streamline bill-splitting . 
+[x] Customizable Itineraries: Users can adapt their plans based on real-time insights. 
+[x] Notifications: Alerts for changes to reservations, local events, or weather updates keep travelers informed. 
 
 ## Project Tech Stack
- Frontend: React 
- Backend: Node.js 
- Database: PostgreSQL
- Version Control: GitHub
- Wireframes: Figma
+[x] Frontend: React 
+[x] Backend: Node.js 
+[x] Database: PostgreSQL
+[x] Version Control: GitHub
+[x] Wireframes: Figma
  
 Time spent: 72 hours spent in total
 
