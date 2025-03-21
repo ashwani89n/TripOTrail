@@ -24,6 +24,12 @@ Here's a walkthrough of implemented features:
 
 <img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
+## API Documentation
+
+Here's a walkthrough of api requests and responses:
+
+<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_API_Documentation.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
 ## Entity Relationship Diagram
 
 <img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_ER_Diagram.png' title='Screenshot' width='' alt='Screenshot' />
