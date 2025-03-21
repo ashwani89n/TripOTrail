@@ -18,11 +18,15 @@ Planning Phase
  
 Time spent: 72 hours spent in total
 
-## ChatBot Screenshots
+## Wireframes
 
 Here's a walkthrough of implemented features:
 
 <img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+## Entity Relationship Diagram
+
+<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_ER_Diagram.png' title='Screenshot' width='' alt='Screenshot' />
 
 GIF created with Licecap Tool
 
