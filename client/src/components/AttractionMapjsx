@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+import { APIProvider, Map, AdvancedMarker, InfoWindow } from '@vis.gl/react-google-maps';
+
+const AttractionMap = () => {
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  const [attractions, setAttractions] = useState([]);
+  const [selectedAttraction, setSelectedAttraction] = useState(null);
+  const [mapCenter, setMapCenter] = useState({ lat: 0, lng: 0 });
+  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+
+  const handleSearch = async () => {
+    try {
+      // Geocode start and end points
+      const [startGeo, endGeo] = await Promise.all([
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(start)}&key=${apiKey}`),
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(end)}&key=${apiKey}`)
+      ]);
+      
+      const [startData, endData] = await Promise.all([startGeo.json(), endGeo.json()]);
+      const startLocation = startData.results[0].geometry.location;
+      const endLocation = endData.results[0].geometry.location;
+
+      // Calculate midpoint for search
+      const midpoint = {
+        lat: (startLocation.lat + endLocation.lat) / 2,
+        lng: (startLocation.lng + endLocation.lng) / 2
+      };
+      setMapCenter(midpoint);
+
+      // Find attractions near midpoint
+      const placesResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?` +
+        `location=${midpoint.lat},${midpoint.lng}&radius=50000&` +
+        `type=tourist_attraction&key=${apiKey}`
+      );
+      const placesData = await placesResponse.json();
+
+      // Enrich with details and photos
+      const enrichedAttractions = await Promise.all(
+        placesData.results.map(async place => {
+          const detailsResponse = await fetch(
+            `https://maps.googleapis.com/maps/api/place/details/json?` +
+            `place_id=${place.place_id}&` +
+            `fields=name,formatted_address,rating,photos&key=${apiKey}`
+          );
+          const details = await detailsResponse.json();
+          return {
+            ...place,
+            ...details.result,
+            photoUrl: details.result.photos?.[0]?.photo_reference ?
+              `https://maps.googleapis.com/maps/api/place/photo?` +
+              `maxwidth=400&photo_reference=${details.result.photos[0].photo_reference}&key=${apiKey}` :
+              null
+          };
+        })
+      );
+
+      setAttractions(enrichedAttractions);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  return (
+    <></>
+  );
+};
+
+export default AttractionMap;
+
+// import React from 'react'
+
+// const PickSpots = () => {
+//   return (
+//     <div > 
+//         <div className="text-center mt-10 mb-16">
+//           <h3 className="text-topHeader text-2xl font-kaushan">
+//             {" "}
+//             <span className="text-white font-aboreto font-semibold">PICK</span> Your Spots
+//           </h3>
+//           <p className="text-subTitle font-inria text-lg mt-1 mb-1">
+//             Handpick the sights, bites, and stays for an unforgettale journey.
+//           </p>
+//         </div>
+//         </div>
+//   )
+// }
+
+// export default PickSpots
