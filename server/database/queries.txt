@@ -40,8 +40,6 @@ CREATE TABLE Trips (
 );
 
 
-drop table destinations;
-
 CREATE TABLE destinations (
     destination_id SERIAL PRIMARY KEY,
     trip_id INT NOT NULL,
@@ -49,9 +47,9 @@ CREATE TABLE destinations (
     address TEXT NOT NULL,
     image TEXT, 
     is_added BOOLEAN DEFAULT TRUE,
-    duration INTERVAL NOT NULL, 
-    start_time TIME NOT NULL, 
-    cost DECIMAL(10,2) NOT NULL, 
+    duration INTERVAL, 
+    start_time TIME, 
+    cost DECIMAL(10,2), 
 
     FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
 );
