@@ -18,7 +18,7 @@ const PlanTrip = () => {
   const [destinationPoint, setDestinationPoint] = useState();
   const [startDt, setStartDt] = useState(new Date());
   const [endDt, setEndDt] = useState(new Date());
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
 
   // const handleNext = () => {
   //   setPage((prev) => prev + 1);

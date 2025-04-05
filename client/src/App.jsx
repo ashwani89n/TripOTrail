@@ -8,10 +8,15 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PlanTrip from './pages/PlanTrip';
 import MyTrip from './pages/MyTrip';
+import Register from './components/Register';
+import Login from './components/Login';
+
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
         <Route path="/plan" element={<PlanTrip />} />
         <Route path="/myTrip" element={<MyTrip />} />

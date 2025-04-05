@@ -6,6 +6,8 @@ import { RiMenu3Line } from "react-icons/ri";
 import { FaSquareInstagram } from "react-icons/fa6";
 import { IoIosMail, IoLogoWhatsapp } from "react-icons/io";
 import { PiInstagramLogoFill } from "react-icons/pi";
+import { CiUser } from "react-icons/ci";
+
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -48,7 +50,7 @@ const Header = () => {
         </div>
 
         {/* Hamburger Menu Icon (visible only on mobile) */}
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <button onClick={toggleMobileMenu} className="text-white pr-4 pt-2">
             {isMobileMenuOpen ? (
               <FaTimes
@@ -113,11 +115,16 @@ const Header = () => {
                 </Link>
               </li>
             </ul>
+            
           </div>
-
-          {/* Buttons (Register/Login) */}
-         
+          
+          
         </nav>
+        <div className="hidden md:block ">
+            <Link to="/register" >
+              <CiUser className="text-white w-7 h-9 mr-5 pt-1" />
+            </Link>
+          </div>
       </div>
 
       {/* Mobile Sidebar Menu (Vertical Navigation) */}
