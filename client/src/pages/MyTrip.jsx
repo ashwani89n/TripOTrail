@@ -10,7 +10,10 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import tempTripImage from "../images/tempTripImage.png";
 import TripJeep from "../images/TripJeep.png";
 import destinationPin from "../images/destinationPin.png";
-
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import BudgetCharts from "../components/BudgetCharts";
+ChartJS.register(ArcElement, Tooltip, Legend);
 const MyTrip = () => {
   const [myTrips, setMyTrips] = useState([]);
   const [error, setError] = useState({});
@@ -31,7 +34,7 @@ const MyTrip = () => {
       const response = await axios.get(`/api/trips`, {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQzOTU3OTg4LCJleHAiOjE3NDM5NjE1ODh9.HikGzXf3-ly5-5Wdz981IqJonhpudrW9glpJLfcQKRo",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQzOTYyNTMxLCJleHAiOjE3NDM5NjYxMzF9.QiH67NPIIj07l4vRNEjGHNCgHX1YiAhuOqxBnpF5T9A",
         },
       });
       console.log(response.data);
@@ -79,11 +82,11 @@ const MyTrip = () => {
 
           <div className="flex mt-24 flex-row gap-10 justify-evenly">
             {activeTrips[activeIndex] && (
-              <div className="w-[380px] h-[330px] bg-darkBG">
+              <div className="w-[380px] h-[fit] bg-darkBG">
                 <div className="bg-topHeader h-[38px] text-xl w-[80%] mx-auto relative top-[-5%] text-center text-white font-inria font-semibold flex items-center justify-center">
                   Active
                 </div>
-                <div className="text-white font-aldrich">
+                <div className="text-white font-aldrich mb-2">
                   {formatDate(activeTrips[activeIndex].start_date)}
                 </div>
 
@@ -91,22 +94,34 @@ const MyTrip = () => {
                   <img
                     src={tempTripImage}
                     alt=""
-                    className="w-[170px] h-[220px]"
+                    className="w-[170px] h-[100%]"
                   />
                   <div className="text-topHeader flex flex-col w-full">
                     <h3>{activeTrips[activeIndex].title}</h3>
-                    <div className="flex flex-row justify-evenly gap-2 items-center ">
-                      <img src={TripJeep} />
+                    <div className="flex flex-row justify-evenly gap-2 items-center  ">
+                      <div>
+                        <img src={TripJeep} />
+                        <h3 className=" text-white text-[6px]">
+                          {activeTrips[activeIndex].start_point}
+                        </h3>
+                      </div>
+
                       <div className="border-t-2 border-topHeader border-dashed w-[90%]"></div>
-                      <img src={destinationPin} />
+                      <div>
+                        <img src={destinationPin} />
+                        <h3 className=" text-white text-[6px]">{activeTrips[activeIndex].destination}</h3>
+                      </div>
                     </div>
-                    <div className="flex flex-row justify-between gap-2 items-center text-white text-[6px]">
-                      <h3>{activeTrips[activeIndex].start_point}</h3>
-                      <h3>{activeTrips[activeIndex].destination}</h3>
-                    </div>
+                    <div className="flex flex-row justify-between gap-2 items-center"></div>
                     <div className="flex flex-row mt-3">
                       <div>
                         <h3 className="font-aldrich text-center">Budget</h3>
+                        <div>
+                          <BudgetCharts
+                            budget={activeTrips[activeIndex].budget}
+                            expense={activeTrips[activeIndex].expense}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -123,7 +138,7 @@ const MyTrip = () => {
               </div>
             )}
             {upcomingTrips[upcomingIndex] && (
-              <div className="w-[380px] h-[330px] bg-darkBG">
+              <div className="w-[380px] h-[fit] bg-darkBG">
                 <div className="bg-topHeader h-[38px] text-xl w-[80%] mx-auto relative top-[-5%] text-center text-white font-inria font-semibold flex items-center justify-center">
                   Upcoming
                 </div>
@@ -141,14 +156,19 @@ const MyTrip = () => {
                     <h3>
                       {upcomingTrips[upcomingIndex].title} {upcomingIndex}
                     </h3>
-                    <div className="flex flex-row justify-evenly gap-2 items-center ">
-                      <img src={TripJeep} />
+                    <div className="flex flex-row justify-evenly gap-2 items-center  ">
+                      <div>
+                        <img src={TripJeep} />
+                        <h3 className=" text-white text-[6px]">
+                          {activeTrips[activeIndex].start_point}
+                        </h3>
+                      </div>
+
                       <div className="border-t-2 border-topHeader border-dashed w-[90%]"></div>
-                      <img src={destinationPin} />
-                    </div>
-                    <div className="flex flex-row justify-between gap-2 items-center text-white text-[6px]">
-                      <h3>{upcomingTrips[upcomingIndex].start_point}</h3>
-                      <h3>{upcomingTrips[upcomingIndex].destination}</h3>
+                      <div>
+                        <img src={destinationPin} />
+                        <h3 className=" text-white text-[6px]">{activeTrips[activeIndex].destination}</h3>
+                      </div>
                     </div>
                     <div className="flex flex-row mt-3">
                       <div>
@@ -187,14 +207,19 @@ const MyTrip = () => {
                     <h3>
                       {pastTrips[pastIndex].title} {upcomingIndex}
                     </h3>
-                    <div className="flex flex-row justify-evenly gap-2 items-center ">
-                      <img src={TripJeep} />
+                    <div className="flex flex-row justify-evenly gap-2 items-center  ">
+                      <div>
+                        <img src={TripJeep} />
+                        <h3 className=" text-white text-[6px]">
+                          {activeTrips[activeIndex].start_point}
+                        </h3>
+                      </div>
+
                       <div className="border-t-2 border-topHeader border-dashed w-[90%]"></div>
-                      <img src={destinationPin} />
-                    </div>
-                    <div className="flex flex-row justify-between gap-2 items-center text-white text-[6px]">
-                      <h3>{pastTrips[pastIndex].start_point}</h3>
-                      <h3>{pastTrips[pastIndex].destination}</h3>
+                      <div>
+                        <img src={destinationPin} />
+                        <h3 className=" text-white text-[6px]">{activeTrips[activeIndex].destination}</h3>
+                      </div>
                     </div>
                     <div className="flex flex-row mt-3">
                       <div>

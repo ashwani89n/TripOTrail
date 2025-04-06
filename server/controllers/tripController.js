@@ -2,6 +2,7 @@ const pool = require("../database/db");
 const dayjs = require("dayjs");
 
 exports.getTrips = async (req, res) => {
+    console.log("✅ getTrips called");
   try {
     const userId = req.user.id;
     const tripResult = await pool.query(
@@ -12,7 +13,7 @@ exports.getTrips = async (req, res) => {
 
     for (const trip of tripResult.rows) {
 
-      const { id: tripId } = trip;
+      const { trip_id: tripId } = trip;
       const budgetResult = await pool.query(
        `SELECT category, SUM(amount) AS total
          FROM budget
@@ -23,6 +24,7 @@ exports.getTrips = async (req, res) => {
       const budget = {};
       let totalBudget = 0;
       for (const row of budgetResult.rows) {
+        console.log(row)
         const amount = parseFloat(row.total);
         budget[row.category] = amount;
         totalBudget += amount;
@@ -36,9 +38,12 @@ exports.getTrips = async (req, res) => {
          GROUP BY category`,
         [tripId]
       );
+      console.log(tripId)
+      console.log("🧪 expenseResult.rows:", expenseResult.rows);
       const expense = {};
       let totalExpense = 0;
       for (const row of expenseResult.rows) {
+        console.log(row)
         const amount = parseFloat(row.total);
         expense[row.category] = amount;
         totalExpense += amount;
