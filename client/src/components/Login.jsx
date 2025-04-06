@@ -29,7 +29,7 @@ const Login = () => {
             const response = await axios.post(`/api/auth/login`, data, {
               headers: {
                 Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzk5MjE3LCJleHAiOjE3NDM4MDI4MTd9.-ny5ZMnaPeeM2iU3Ltgv9TmQjydXP1tlEm1xVCvrbRo",
+                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQzOTU3OTg4LCJleHAiOjE3NDM5NjE1ODh9.HikGzXf3-ly5-5Wdz981IqJonhpudrW9glpJLfcQKRo",
               },
             });
             navigate("/");
