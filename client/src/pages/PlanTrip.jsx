@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Header from "../components/Header";
-import { RiCompass3Fill } from "react-icons/ri";
+
 import { CiCompass1 } from "react-icons/ci";
 import { FaListCheck } from "react-icons/fa6";
 import { TbCarCrash } from "react-icons/tb";
@@ -16,15 +16,18 @@ const PlanTrip = () => {
   const [tripId, setTripId] = useState();
   const [startPoint, setStartPoint] = useState();
   const [destinationPoint, setDestinationPoint] = useState();
+  const [startDt, setStartDt] = useState(new Date());
+  const [endDt, setEndDt] = useState(new Date());
   const [page, setPage] = useState(1);
-  const handleNext = () => {
-    setPage((prev) => prev + 1);
-    console.log(page);
-  };
-  const handlePrevious = () => {
-    setPage((prev) => prev - 1);
-    console.log(page);
-  };
+
+  // const handleNext = () => {
+  //   setPage((prev) => prev + 1);
+  //   // console.log(page);
+  // };
+  // const handlePrevious = () => {
+  //   setPage((prev) => prev - 1);
+  //   // console.log(page);
+  // };
   return (
     <tripContext.Provider
       value={{
@@ -34,6 +37,8 @@ const PlanTrip = () => {
         setDestinationPoint,
         startPoint,
         setStartPoint,
+        startDt, setStartDt,
+        endDt, setEndDt,
       }}
     >
       <div className="bg-darkBG min-h-screen flex flex-col">
@@ -95,8 +100,8 @@ const PlanTrip = () => {
           </div>
         </div>
         {page === 0 && <SetSecene onClickNext={setPage} />}
-        {page === 1 && <PickSpots />}
-        {page > 0 && (
+        {page === 1 && <PickSpots onClickNextPrev={setPage}/>}
+        {/* {page > 0 && (
           <div className="flex justify-end pb-20 pr-10 mt-10 gap-5">
             <button
               className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
@@ -111,7 +116,7 @@ const PlanTrip = () => {
               Next
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </tripContext.Provider>
   );

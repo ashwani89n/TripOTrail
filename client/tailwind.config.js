@@ -13,7 +13,11 @@ export default {
         subHeaderBG:"rgba(255, 255, 255, 0.27)",
         subTitle:"rgba(148, 148, 148, 1)",
         flightIterinary: "rgba(255, 253, 253, 0.5)",
-        textInputBG:"rgba(255, 253, 253, 0.13)"
+        textInputBG:"rgba(255, 253, 253, 0.13)",
+        card:"rgba(68, 68, 68, 0.2)",
+        list:"rgba(28, 28, 28, 1)",
+        textCard:"rgba(141,141,141,1)",
+        topHeaderLite:"rgba(223, 128, 20, 0.31)"
          // Add your custom color
       },
       fontSize: {

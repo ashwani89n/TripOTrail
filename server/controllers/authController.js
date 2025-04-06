@@ -13,6 +13,9 @@ exports.register = async (req, res) => {
         );
         res.status(201).json(result.rows[0]);
     } catch (error) {
+        if (error.code === '23505' && error.constraint === 'users_email_key') {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
         res.status(500).json({ error: error.message });
     }
 };

@@ -6,8 +6,11 @@ import {
   InfoWindow,
 } from "@vis.gl/react-google-maps";
 import { tripContext } from "../context/useTripDataContext";
+import "../components/styles/PickSpots.css";
+import noSpotsChosen from "../assets/noSpots.png";
+import axios from "axios";
 
-const PickSpots = () => {
+const PickSpots = ({onClickNextPrev}) => {
   const [start, setStart] = useState(
     "2470 Camellia Lane Northeast, Atlanta, GA, USA"
   );
@@ -17,12 +20,94 @@ const PickSpots = () => {
   const [attractions, setAttractions] = useState([]);
   const [selectedAttraction, setSelectedAttraction] = useState([]);
   const apiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
-  const { tripId, destinationPoint, startPoint } = useContext(tripContext);
+  const { tripId, destinationPoint, startPoint, startDt, endDt } =
+    useContext(tripContext);
+  const [error, setError] = useState("");
+  const [selectedSpotsData, setSelectedSpotsData] = useState([]);
+  const [data, setData] = useState({
+      selected_spots: [
+        {
+          name: "",
+          address: "",
+          image: "",
+          is_added: true,
+          duration: "",
+          cost: 0
+        }
+      ],
+      budget: {
+        transport: 0,
+        food: 0,
+        accommodation: 0,
+        activities: 0
+      },
+      team_members: [
+        {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          profile_picture: "https://example.com/johndoe_profile.jpg"
+        }
+      ],
+      status: ""
+  });
+
   const mapRef = useRef(null);
   let selectingAttractions = [];
   const handleSelectSpots = (item) => {
-    setSelectedAttraction((prev) => [...prev, item]);
+    setSelectedAttraction((prev) => {
+      if (!prev.find((a) => a.id === item.id)) {
+        return [...prev, item];
+      }
+      return prev;
+    });
   };
+
+    const handleNext = async() => {
+      // Send data to the server.. send data only when item.enabled = tru
+      setSelectedSpotsData(selectedAttraction
+      .filter((item) => item.enabled) 
+      .map((item) => ({
+        name: item.name,
+        address: item.address,
+        image: item.photoUrl,
+        is_added: true,      
+      })));
+
+    if (!selectedSpotsData || selectedSpotsData.length === 0) {
+      setError("Please select destinations to proceed");
+      return;
+    } else {
+      setError("");
+      console.log("data:", data);
+    }
+
+
+    const response = await axios
+      .post(
+        `/api/trips/${tripId}/destinations`,
+        {
+          ...data,
+          selected_spots: selectedSpotsData,
+        },
+        {
+          headers: {
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzk5MjE3LCJleHAiOjE3NDM4MDI4MTd9.-ny5ZMnaPeeM2iU3Ltgv9TmQjydXP1tlEm1xVCvrbRo",
+          },
+        }
+      )
+      .then(function (response) {
+        onClickNextPrev((prev) => prev + 1);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+
+    };
+    const handlePrevious = () => {
+      onClickNextPrev((prev) => prev - 1);
+    };
 
   const handleSearch = async () => {
     try {
@@ -65,6 +150,7 @@ const PickSpots = () => {
               rating: place.rating,
               address: place.vicinity,
               photoUrl: photoRef,
+              enabled: true,
             });
           }
         }
@@ -76,49 +162,218 @@ const PickSpots = () => {
     }
   };
 
+
   useEffect(() => {
-    handleSearch();
-  }, [tripId]);
+    if (!window.google || !window.google.maps) {
+      const interval = setInterval(() => {
+        if (window.google && window.google.maps) {
+          clearInterval(interval);
+          handleSearch();
+        }
+      }, 2000);
+      return () => clearInterval(interval);
+    } else {
+      handleSearch();
+    }
+  }, [tripId, start, end]);
+
   useEffect(() => {
     console.log("selected ", selectedAttraction);
   }, [selectedAttraction]);
 
+  const formatDate = (date) => {
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
+
+    // Get day suffix (st, nd, rd, th)
+    const getDaySuffix = (day) => {
+      if (day > 3 && day < 21) return "th"; // Covers 11th to 20th
+      switch (day % 10) {
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
+      }
+    };
+
+    return `${day}${getDaySuffix(day)} ${month}, ${year}`;
+  };
+
+  const calculateTripDays = (startDt, endDt) => {
+    const startDate = new Date(startDt);
+    const endDate = new Date(endDt);
+    const daysCount =
+      Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+    const dayOneWeekday = startDate.toLocaleString("en-US", {
+      weekday: "long",
+    });
+
+    return {
+      // dayInfo: `Day 1-${daysCount}, ${dayOneWeekday}`,
+      daysCount: daysCount,
+      dayOneWeekday: dayOneWeekday,
+      formattedDate: formatDate(startDate),
+    };
+  };
+
+  const { daysCount, dayOneWeekday, formattedDate } = calculateTripDays(startDt, endDt);
+
   return (
-    <APIProvider apiKey={apiKey}>
-      <div style={{ padding: "1rem" }}>
-        <button onClick={handleSearch} className="text-white">
-          Find Attractions
-        </button>
-        <p>{tripId}</p>
-        <p>{destinationPoint}</p>
-        <p>{startPoint}</p>
-        <div className="flex">
-          <div className="w-3/4">
-            <div className="grid-cols-4 gap-3 grid">
-              {attractions.map((item) => (
-                <div
-                  className="w-[127px] h-[173px] "
-                  onClick={() => handleSelectSpots(item)}
-                >
-                  <div className="w-[100%] flex flex-col">
-                    <img src={item.photoUrl} alt="" />
-                    <p className="text-topHeader text-[10px]">{item.name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="w-1/4 text-white">
-            {selectedAttraction &&
-              selectedAttraction.map((item) => (
-                <ul>
-                  <li>{item.name}</li>
-                </ul>
-              ))}
-          </div>
+    <>
+      <div>
+        <div className="text-center mt-10 mb-16">
+          <h3 className="text-topHeader text-2xl font-kaushan">
+            {" "}
+            <span className="text-white font-aboreto font-semibold">
+              PICK
+            </span>{" "}
+            Your Spots
+          </h3>
+          <p className="text-subTitle font-inria text-lg mt-1">
+            Handpick the sights, bites, and stays for an unforgettale journey.
+          </p>
         </div>
       </div>
-    </APIProvider>
+      {error && (
+        <div className="flex bg-topHeader mx-10 rounded-md mb-10 justify-center items-center">
+          <p className="p-2 text-white font-normal text-lg font-inria">
+            {error}
+          </p>
+        </div>
+      )}
+      <APIProvider apiKey={apiKey}>
+        <div className="flex flex-col md:flex-row justify-center items-start gap-6 p-5 mb--10">
+          <div className="w-full lg:w-1/2 bg-card text-center p-5 rounded-l">
+            <div className="flex flex-row gap-2 mb-4 text-textCard">
+              <input
+                className="bg-textInputBG w-[70%] h-[31px] rounded-md pl-3 italic"
+                placeholder="Search by location..."
+              ></input>
+              <button
+                disabled
+                className="bg-topHeader w-[30%]  text-white h-[31px] px-4 rounded-md text-[12px]"
+              >
+                Category: <span className="text-black">Attractions</span>
+              </button>
+              {/* <select className="bg-topHeader w-[30%] text-white h-[31px] rounded-lg px-2 pr-2 cursor-not-allowed">
+              <option className="text-textCard" value="4">4 & above</option>
+              </select> */}
+            </div>
+            <div className="h-[580px] overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between gap-3">
+                {attractions
+                  .filter((item) => item.photoUrl)
+                  .map((item) => (
+                    <div
+                      className="w-full h-[280px] bg-headerBG rounded-lg overflow-hidden cursor-pointer transition-transform transform hover:scale-10 hover:border-[1px] hover:border-subTitle"
+                      key={item.id}
+                      onClick={() => handleSelectSpots(item)}
+                    >
+                      <img
+                        src={item.photoUrl}
+                        alt={item.name}
+                        className="w-full h-[200px] object-cover"
+                      />
+                      <div className="p-2">
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm text-white truncate font-aldrich">
+                            <span className="text-topHeader">
+                              {item.name.split(" ")[0]}
+                            </span>{" "}
+                            {item.name.split(" ").slice(1).join(" ")}
+                          </p>
+                          <div className="flex flex-row">
+                            <p className="text-textCard text-[10px] pr-1 font-light">
+                              {item.rating}
+                            </p>
+                            <div className="text-topHeader text-[10px]"> ★</div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-textCard mt-1 text-left">
+                          {item.address}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-1/2 bg-card text-white p-5 rounded-l h-full">
+            <div className="h-[626px] overflow-y-auto custom-scrollbar justify-center">
+              <div className="text-white mx-5 my-5">
+              <p className="text-white text-xl font-aldrich">
+              Day 1 - {daysCount}<span className="font-light text-textCard text-[20px]"> | </span><span className="text-topHeader font-semibold">{dayOneWeekday}</span></p>
+                <p className="text-textCard text-md font-light">{formattedDate}</p>
+              </div>
+              <ul className="space-y-2">
+                {selectedAttraction.length > 0 ? (
+                  selectedAttraction.map((item, index) => (
+                    <li
+                      key={index}
+                      className="bg-list p-3 rounded-lg text-sm flex justify-between items-center"
+                    >
+                      <div className="flex flex-row gap-2">
+                      <img className="w-[35px] h-[26px]" src={item.photoUrl}></img>
+                      <span className="truncate mr-4 text-textCard italic">
+                        {item.name}
+                      </span>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={item.enabled}
+                          onChange={() => {
+                            setSelectedAttraction(prev =>
+                              prev.map((attraction, i) =>
+                                i === index
+                                  ? { ...attraction, enabled: !attraction.enabled }
+                                  : attraction
+                              )
+                            );
+                          }}
+                        />
+                        <div className="w-10 h-4 bg-textCard peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-topHeader rounded-full peer-checked:bg-topHeader transition-colors"></div>
+                        <div className="absolute left-[2px] h-4 w-4 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-[1.5rem]"></div>
+                      </label>
+                    </li>
+                  ))
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center mt-20">
+                    <img
+                      src={noSpotsChosen}
+                      className="w-[300px] h-[300px] object-contain"
+                    ></img>
+                    <p className="text-textCard text-md font-light">Still undecided? Start narrowing down your bucket list today!</p>
+                  </div>
+                )}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end pb-20 pr-10 mt-10 gap-5">
+            <button
+              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
+              onClick={handlePrevious}
+            >
+              Previous
+            </button>
+            <button
+              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold  rounded-lg items-center"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          </div>
+      </APIProvider>
+    </>
   );
 };
 
