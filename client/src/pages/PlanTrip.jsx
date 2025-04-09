@@ -20,7 +20,7 @@ const PlanTrip = () => {
   const [destinationPoint, setDestinationPoint] = useState();
   const [startDt, setStartDt] = useState(new Date());
   const [endDt, setEndDt] = useState(new Date());
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(2);
   const [startCoordinates, setStartCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);

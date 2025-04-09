@@ -10,65 +10,69 @@ import AlarmClock from "../images/AlarmClock.png";
 import Moneybox from "../images/MoneyBox.png";
 import DestinationPin from "../images/CabBackView.png";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
 
-const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
-  // const MapJourney = ({ onClickNextPrev }) => {
+// const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
+const MapJourney = ({ onClickNextPrev }) => {
   const markerRefs = useRef([]);
   const [mapInstance, setMapInstance] = useState(null);
-  //   const [selectedAttraction, setSelectedAttraction] = useState([
-  //     {
-  //       address: "",
-  //       image: "",
-  //       is_added: true,
-  //       latitude: 33.8227293,
-  //       longitude: -84.3717113,
-  //       name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
-  //       order_index: 1,
-  //       position: "start",
-  //     },
-  //     {
-  //       address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
-  //       image:
-  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
-  //       is_added: true,
-  //       latitude: 33.8168204,
-  //       longitude: -84.3756841,
-  //       name: "Lumière",
-  //       order_index: 2,
-  //       position: "between",
-  //     },
-  //     {
-  //       address: "2115 Piedmont Road Northeast, Atlanta",
-  //       image:
-  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
-  //       is_added: true,
-  //       latitude: 33.8127915,
-  //       longitude: -84.3657056,
-  //       name: "Gurl Mobb Museum",
-  //       order_index: 3,
-  //       position: "between",
-  //     },
-  //     {
-  //       address: "70 Lakeview Avenue Northeast, Atlanta",
-  //       image: "",
-  //       is_added: true,
-  //       latitude: 33.82599239999999,
-  //       longitude: -84.3845322,
-  //       name: "Duck Pond Park",
-  //       order_index: 4,
-  //       position: "between",
-  //     },
-  //     {
-  //       address: "",
-  //       image: "",
-  //       is_added: true,
-  //       latitude: 33.8236359,
-  //       longitude: -84.37147019999999,
-  //       name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
-  //       order_index: 5,
-  //       position: "end",
-  //     },
-  //   ]);
+  const [selectedAttraction, setSelectedAttraction] = useState([
+    {
+      address: "",
+      image: "",
+      is_added: true,
+      latitude: 33.8227293,
+      longitude: -84.3717113,
+      name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
+      order_index: 1,
+      position: "start",
+    },
+    {
+      address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
+      image:
+        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
+      is_added: true,
+      latitude: 33.8168204,
+      longitude: -84.3756841,
+      name: "Lumière",
+      order_index: 2,
+      position: "between",
+    },
+    {
+      address: "2115 Piedmont Road Northeast, Atlanta",
+      image:
+        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
+      is_added: true,
+      latitude: 33.8127915,
+      longitude: -84.3657056,
+      name: "Gurl Mobb Museum",
+      order_index: 3,
+      position: "between",
+    },
+    {
+      address: "70 Lakeview Avenue Northeast, Atlanta",
+      image: "",
+      is_added: true,
+      latitude: 33.82599239999999,
+      longitude: -84.3845322,
+      name: "Duck Pond Park",
+      order_index: 4,
+      position: "between",
+    },
+    {
+      address: "",
+      image: "",
+      is_added: true,
+      latitude: 33.8236359,
+      longitude: -84.37147019999999,
+      name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
+      order_index: 5,
+      position: "end",
+    },
+  ]);
 
   const [error, setError] = useState("");
   const {
@@ -91,9 +95,9 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
   const directionsServiceRef = useRef(null);
   const directionsRendererRef = useRef(null);
   const [inputValues, setInputValues] = useState({});
-  const [startTime, setStartTime] = useState({
-    hour:"00", minute: "00",
-  })
+  //   const [startTime, setStartTime] = useState({
+  //     hour:"00", minute: "00",
+  //   })
 
   const calculateTripDays = (startDt, endDt) => {
     const startDate = new Date(startDt);
@@ -120,7 +124,24 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
   };
 
   const { daysCount, dayDetails } = calculateTripDays(startDt, endDt);
+  const [accommodationDetails, setAccommodationDetails] = useState(
+    Array(daysCount - 1)
+      .fill(null)
+      .map(() => ({
+        name: "",
+        cost: "",
+        location: "",
+        coordinates: null,
+      }))
+  );
+  const [activeAccommodationDay, setActiveAccommodationDay] = useState(null);
+  const [accommodations, setAccommodations] = useState(
+    Array(daysCount - 1).fill(false)
+  );
 
+  const [startTimes, setStartTimes] = useState(
+    Array(daysCount).fill("") // Empty start times for each day
+  );
   const [dayMap, setDayMap] = useState(() => {
     const map = {};
     for (let i = 1; i <= daysCount; i++) {
@@ -229,8 +250,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
       };
     });
     setInputValues(initialInputs);
-    setStartTime({ hour: "00", minute: "00" });
-
+    // setStartTime({ hour: "00", minute: "00" });
   }, [selectedAttraction]);
 
   useEffect(() => {
@@ -458,6 +478,54 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
     calculateDirections();
   };
 
+  const toggleAccommodation = (day) => {
+    if (day === daysCount) return;
+    const updatedAccommodations = [...accommodations];
+    updatedAccommodations[day - 1] = !updatedAccommodations[day - 1];
+    setAccommodations(updatedAccommodations);
+
+    // Reset values if turned off
+    if (!updatedAccommodations[day - 1]) {
+      setAccommodationValue("");
+      setAccommodationCost("");
+    }
+  };
+
+  const {
+    ready: accommodationReady,
+    value: accommodationValue,
+    suggestions: { status: accommodationStatus, data: accommodationData },
+    setValue: setAccommodationValue,
+    clearSuggestions: clearAccommodationSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      types: ["establishment"], // You can modify this based on the type of accommodation
+    },
+    debounce: 300,
+  });
+
+  const handleAccommodationSelect = async (address, day) => {
+    setAccommodationValue(address);
+    clearAccommodationSuggestions();
+
+    try {
+      const results = await getGeocode({ address });
+      const { lat, lng } = await getLatLng(results[0]);
+
+      const updated = [...accommodationDetails];
+      updated[day - 1] = {
+        ...updated[day - 1],
+        name: address,
+        location: address,
+        coordinates: { lat, lng },
+      };
+      setAccommodationDetails(updated);
+      setActiveAccommodationDay(null); // hide suggestions
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
+
   return (
     <div>
       <div>
@@ -484,14 +552,14 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
       )}
       <div className="flex flex-col md:flex-row justify-center items-start gap-4 p-5 mb--10">
         <div className="w-full lg:w-1/2 bg-card p-4 rounded-l">
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between ">
             <div className="flex flex-row justify-center text-xl p-2 text-white rounded-lg mb-2 font-aldrich">
               <span className="text-topHeader">
                 {`${title.split(" ")[0]}`}&nbsp;
               </span>
               {title.split(" ").slice(1).join(" ")}
             </div>
-            <div className="flex items-center gap-2 text-white pr-2 font-semibold">
+            {/* <div className="flex items-center gap-2 text-white pr-2 font-semibold">
               <span className="text-topHeader">Start</span>Time
               <input
                 type="text"
@@ -513,11 +581,11 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                 onChange={(prev)=>({...prev, minute:e.target.value})}
               />
               Hrs
-            </div>
+            </div> */}
           </div>
-          <div className="overflow-y-auto custom-scrollbar">
+          <div className="overflow-y-auto custom-scrollbar h-[520px] ">
             <DragDropContext onDragEnd={onDragEnd}>
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-5">
                 {Array.from({ length: daysCount }, (_, i) => i + 1).map(
                   (day) => (
                     <Droppable key={day} droppableId={day.toString()}>
@@ -525,26 +593,73 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                         <div
                           ref={provided.innerRef}
                           {...provided.droppableProps}
-                          className={`bg-darkBG p-4 rounded shadow-md rounded-lg ${
+                          className={`bg-darkBG p-4 rounded shadow-md rounded-lg  ${
                             snapshot.isDraggingOver ? "bg-blue-100" : ""
                           }`}
                         >
-                          <div className="text-white mx-3 my-4">
-                            <p className="text-white text-[18px] font-aldrich">
-                              Day {day} - {daysCount}
-                              <span className="font-light text-textCard text-[20px]">
-                                {" "}
-                                |{" "}
-                              </span>
-                              <span className="text-topHeader font-semibold">
-                                {dayDetails[day - 1].weekday}
-                              </span>
-                            </p>
-                            <p className="text-textCard text-md font-light">
-                              {dayDetails[day - 1].formatted}
-                            </p>
+                          <div className="flex flex-row text-white mx-3 my-4">
+                            <div className="flex flex-col w-full justify-between">
+                              <p className="text-white text-[18px] font-aldrich">
+                                Day {day}{" "}
+                                <span className="font-light text-textCard text-[20px]">
+                                  {" "}
+                                  |{" "}
+                                </span>
+                                <span className="text-topHeader font-semibold">
+                                  {dayDetails[day - 1].weekday}
+                                </span>
+                              </p>
+                              <p className="text-textCard text-md font-light">
+                                {dayDetails[day - 1].formatted}
+                              </p>
+                            </div>
+                            <div className="flex flex-row gap-2 mb-3">
+                              <div className="flex items-center gap-1 text-white pr-2 mb-2 font-semibold">
+                                <span className="text-topHeader">Start</span>
+                                Time
+                              </div>
+                              <input
+                                type="text"
+                                className="bg-textCardDark text-textCard font-light rounded-lg px-2 w-10 h-7"
+                                maxLength={2}
+                                placeholder="HH"
+                                name="start-hour"
+                                value={startTimes[day - 1]?.hour || "0"}
+                                onChange={(e) =>
+                                  setStartTimes((prev) => {
+                                    const updatedStartTimes = [...prev];
+                                    updatedStartTimes[day - 1] = {
+                                      ...updatedStartTimes[day - 1],
+                                      hour: e.target.value,
+                                    };
+                                    return updatedStartTimes;
+                                  })
+                                }
+                              />
+                              :
+                              <input
+                                type="text"
+                                className="bg-textCardDark text-textCard font-light rounded-lg w-10 h-7 px-2"
+                                maxLength={2}
+                                placeholder="MM"
+                                name="start-minute"
+                                value={startTimes[day - 1]?.minute || "0"}
+                                onChange={(e) =>
+                                  setStartTimes((prev) => {
+                                    const updatedStartTimes = [...prev];
+                                    updatedStartTimes[day - 1] = {
+                                      ...updatedStartTimes[day - 1],
+                                      minute: e.target.value,
+                                    };
+                                    return updatedStartTimes;
+                                  })
+                                }
+                              />
+                              Hrs
+                            </div>
                           </div>
-                          <ul className="space-y-3">
+
+                          <ul className="space-y-5">
                             {dayMap[day]?.map((item, index) => (
                               <Draggable
                                 key={item.name}
@@ -559,7 +674,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                     {...provided.dragHandleProps}
                                     className="flex flex-row gap-2"
                                   >
-                                    <div className="bg-list p-2 pr-4 rounded-lg w-[55%] text-sm justify-between flex flex-row">
+                                    <div className="bg-list p-3 pr-4 rounded-lg w-[55%] text-sm justify-between flex flex-row">
                                       <div className="flex flex-row gap-2 justify-between">
                                         <img
                                           className="w-[35px] h-[26px]"
@@ -666,6 +781,97 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                             ))}
                             {provided.placeholder}
                           </ul>
+                          {/* Add Accommodation Section */}
+                          {day !== daysCount && (
+                            <div className="flex flex-row gap-2 mt-3">
+                              {/* Accommodation Name & Checkbox */}
+                              <div className="bg-list p-2 pr-4 rounded-lg w-full text-sm justify-between flex flex-row items-start">
+                                <div className="relative w-full">
+                                  {" "}
+                                  {/* 👈 Wrap input and suggestions */}
+                                  <input
+                                    type="text"
+                                    placeholder="Accommodation Name"
+                                    value={
+                                      accommodationDetails[day - 1]?.name || ""
+                                    }
+                                    disabled={!accommodations[day - 1]}
+                                    onFocus={() =>
+                                      setActiveAccommodationDay(day)
+                                    }
+                                    onChange={(e) => {
+                                      const updated = [...accommodationDetails];
+                                      updated[day - 1].name = e.target.value;
+                                      setAccommodationDetails(updated);
+                                      setAccommodationValue(e.target.value); // for suggestions
+                                    }}
+                                    className="bg-textCardDark p-2 w-full rounded-lg text-textCard"
+                                  />
+                                  {/* Suggestions aligned with input */}
+                                  {activeAccommodationDay === day &&
+                                    accommodationStatus === "OK" && (
+                                      <ul className="absolute z-10 left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg w-full max-h-48 overflow-y-auto">
+                                        {accommodationData.map(
+                                          ({ place_id, description }) => (
+                                            <li
+                                              key={place_id}
+                                              onClick={() => {
+                                                handleAccommodationSelect(
+                                                  description,
+                                                  day
+                                                );
+                                              }}
+                                              className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                                            >
+                                              {description}
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    )}
+                                </div>
+
+                                {/* Toggle Switch */}
+                                <label className="relative inline-flex items-center cursor-pointer ml-2 mt-2">
+                                  <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={accommodations[day - 1]}
+                                    onChange={() => toggleAccommodation(day)}
+                                  />
+                                  <div className="w-8 h-3 bg-textCard peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-topHeader rounded-full peer-checked:bg-topHeader transition-colors"></div>
+                                  <div className="absolute h-3 w-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-[1.5rem]"></div>
+                                </label>
+                              </div>
+
+                              {/* Budget input */}
+                              <div className="bg-list rounded-lg w-[32%] text-sm flex flex-row justify-start p-2 text-textCard">
+                                <img
+                                  src={Moneybox}
+                                  className="w-8 h-6 my-1"
+                                  alt="Money Icon"
+                                />
+                                <div className="flex items-center">
+                                  $&nbsp;
+                                  <input
+                                    type="text"
+                                    className="bg-textCardDark rounded-lg w-full h-7 px-2"
+                                    maxLength={4}
+                                    name="cost"
+                                    placeholder="Budget"
+                                    value={
+                                      accommodationDetails[day - 1]?.cost || ""
+                                    }
+                                    onChange={(e) => {
+                                      const updated = [...accommodationDetails];
+                                      updated[day - 1].cost = e.target.value;
+                                      setAccommodationDetails(updated);
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </Droppable>
