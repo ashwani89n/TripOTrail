@@ -15,79 +15,83 @@ import usePlacesAutocomplete, {
   getLatLng,
 } from "use-places-autocomplete";
 
-// const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
-const MapJourney = ({ onClickNextPrev }) => {
+const MapJourney = ({
+  onClickNextPrev,
+  selectedAttraction,
+  sendDataToParent,
+}) => {
+  // const MapJourney = ({ onClickNextPrev , sendDataToParent}) => {
   const markerRefs = useRef([]);
   const [mapInstance, setMapInstance] = useState(null);
-  const [selectedAttraction, setSelectedAttraction] = useState([
-    {
-      address: "",
-      image: "",
-      is_added: true,
-      latitude: 33.8227293,
-      longitude: -84.3717113,
-      name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
-      order_index: 1,
-      position: "start",
-    },
-    {
-      address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
-      image:
-        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
-      is_added: true,
-      latitude: 33.8168204,
-      longitude: -84.3756841,
-      name: "Lumière",
-      order_index: 2,
-      position: "between",
-    },
-    {
-      address: "2115 Piedmont Road Northeast, Atlanta",
-      image:
-        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
-      is_added: true,
-      latitude: 33.8127915,
-      longitude: -84.3657056,
-      name: "Gurl Mobb Museum",
-      order_index: 3,
-      position: "between",
-    },
-    {
-      address: "70 Lakeview Avenue Northeast, Atlanta",
-      image: "",
-      is_added: true,
-      latitude: 33.82599239999999,
-      longitude: -84.3845322,
-      name: "Duck Pond Park",
-      order_index: 4,
-      position: "between",
-    },
-    {
-      address: "",
-      image: "",
-      is_added: true,
-      latitude: 33.8236359,
-      longitude: -84.37147019999999,
-      name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
-      order_index: 5,
-      position: "end",
-    },
-  ]);
+  //   const [selectedAttraction, setSelectedAttraction] = useState([
+  //     {
+  //       address: "",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.8227293,
+  //       longitude: -84.3717113,
+  //       name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
+  //       order_index: 1,
+  //       position: "start",
+  //     },
+  //     {
+  //       address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
+  //       image:
+  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
+  //       is_added: true,
+  //       latitude: 33.8168204,
+  //       longitude: -84.3756841,
+  //       name: "Lumière",
+  //       order_index: 2,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "2115 Piedmont Road Northeast, Atlanta",
+  //       image:
+  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
+  //       is_added: true,
+  //       latitude: 33.8127915,
+  //       longitude: -84.3657056,
+  //       name: "Gurl Mobb Museum",
+  //       order_index: 3,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "70 Lakeview Avenue Northeast, Atlanta",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.82599239999999,
+  //       longitude: -84.3845322,
+  //       name: "Duck Pond Park",
+  //       order_index: 4,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.8236359,
+  //       longitude: -84.37147019999999,
+  //       name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
+  //       order_index: 5,
+  //       position: "end",
+  //     },
+  //   ]);
 
   const [error, setError] = useState("");
   const {
     tripId,
     destinationPoint,
     startPoint,
-    // startDt,
-    // endDt,
+    startDt,
+    endDt,
     startCoordinates,
     destinationCoordinates,
     title,
   } = useContext(tripContext);
 
-  const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
-  const endDt = "Tue Apr 10 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
+  //   const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
+  //   const endDt = "Tue Apr 09 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
 
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   const [attractions, setAttractions] = useState(selectedAttraction);
@@ -169,25 +173,28 @@ const MapJourney = ({ onClickNextPrev }) => {
     const [movedItem] = updatedDayMap[sourceDay].splice(source.index, 1);
     updatedDayMap[destDay].splice(destination.index, 0, movedItem);
 
-    // Reindex all items across all days
-    const allBetween = Object.values(updatedDayMap).flat();
-    const reindexed = allBetween.map((item, idx) => ({
+    // Flatten all items in order across days
+    const allBetween = Object.values(updatedDayMap)
+      .flat()
+      .filter((item) => item.is_added);
+
+    const reindexedBetween = allBetween.map((item, idx) => ({
       ...item,
-      order_index: idx + 2,
+      order_index: idx + 2, // Start is 1, end is last+1
+      position: "between",
     }));
 
-    // Final updated attraction list
-    const updatedAttractions = [
-      attractions.find((p) => p.position === "start"),
-      ...reindexed,
-      attractions.find((p) => p.position === "end"),
+    const start = attractions.find((a) => a.position === "start");
+    const end = attractions.find((a) => a.position === "end");
+
+    const finalAttractions = [
+      { ...start, order_index: 1, position: "start" },
+      ...reindexedBetween,
+      { ...end, order_index: reindexedBetween.length + 2, position: "end" },
     ];
 
-    // Update states and map
     setDayMap(updatedDayMap);
-    setAttractions(updatedAttractions);
-    updateMapMarkers(updatedAttractions, mapInstance);
-    calculateDirections(); // Recalculate path based on new order
+    setAttractions(finalAttractions);
   };
 
   const updateMapMarkers = (updatedAttractions, mapInstance) => {
@@ -244,8 +251,8 @@ const MapJourney = ({ onClickNextPrev }) => {
     const initialInputs = {};
     selectedAttraction.forEach((item) => {
       initialInputs[item.name] = {
-        durationHour: "00",
-        durationMinute: "00",
+        durationHour: "",
+        durationMinute: "",
         cost: "0",
       };
     });
@@ -393,52 +400,196 @@ const MapJourney = ({ onClickNextPrev }) => {
     onClickNextPrev((prev) => prev - 1);
   };
 
+  //   const handleNext = () => {
+  //     // Validate top start time
+
+  //     // const startHH = document
+  //     //   .querySelector('input[name="start-hour"]')
+  //     //   ?.value.trim();
+  //     // const startMM = document
+  //     //   .querySelector('input[name="start-minute"]')
+  //     //   ?.value.trim();
+  //     // if (!startHH || !startMM) {
+  //     //   setError("Please enter Start Time");
+  //     //   return;
+  //     // } else if (parseInt(startHH, 10) > 24 || parseInt(startMM, 10) > 60) {
+  //     //   setError("Please enter a valid Start Time");
+  //     //   return;
+  //     // }
+
+  //     const items = Array.from(document.querySelectorAll("li[data-id]"));
+
+  //     for (const li of items) {
+  //       const id = li.getAttribute("data-id");
+
+  //       const durHH = li
+  //         .querySelector('input[name="duration-hour"]')
+  //         ?.value.trim();
+  //       const durMM = li
+  //         .querySelector('input[name="duration-minute"]')
+  //         ?.value.trim();
+  //       const cost = li.querySelector('input[name="cost"]')?.value.trim();
+
+  //       const durHHValue = parseInt(durHH, 10);
+  //       const durMMValue = parseInt(durMM, 10);
+  //       const costValue = parseInt(cost, 10);
+
+  //       if (!durHH || !durMM || durHHValue > 24 || durMMValue > 60) {
+  //         const label = li.querySelector("span")?.textContent?.trim() || id;
+  //         setError(`Please enter valid Duration of spend for "${label}"`);
+  //         return;
+  //       } else if (!cost || costValue === 0) {
+  //         const label = li.querySelector("span")?.textContent?.trim() || id;
+  //         setError(`Please enter Budget for "${label}"`);
+  //         return;
+  //       }
+  //     }
+  //     // onClickNextPrev((prev) => prev + 1);
+  //   };
+
   const handleNext = () => {
-    // Validate top start time
+    let finalData = [];
+    for (let day = 1; day <= daysCount; day++) {
+      const startTime = startTimes[day - 1];
 
-    const startHH = document
-      .querySelector('input[name="start-hour"]')
-      ?.value.trim();
-    const startMM = document
-      .querySelector('input[name="start-minute"]')
-      ?.value.trim();
-    if (!startHH || !startMM) {
-      setError("Please enter Start Time");
-      return;
-    } else if (parseInt(startHH, 10) > 24 || parseInt(startMM, 10) > 60) {
-      setError("Please enter a valid Start Time");
-      return;
-    }
-
-    const items = Array.from(document.querySelectorAll("li[data-id]"));
-
-    for (const li of items) {
-      const id = li.getAttribute("data-id");
-
-      const durHH = li
-        .querySelector('input[name="duration-hour"]')
-        ?.value.trim();
-      const durMM = li
-        .querySelector('input[name="duration-minute"]')
-        ?.value.trim();
-      const cost = li.querySelector('input[name="cost"]')?.value.trim();
-
-      const durHHValue = parseInt(durHH, 10);
-      const durMMValue = parseInt(durMM, 10);
-      const costValue = parseInt(cost, 10);
-
-      if (!durHH || !durMM || durHHValue > 24 || durMMValue > 60) {
-        const label = li.querySelector("span")?.textContent?.trim() || id;
-        setError(`Please enter valid Duration of spend for "${label}"`);
-        return;
-      } else if (!cost || costValue === 0) {
-        const label = li.querySelector("span")?.textContent?.trim() || id;
-        setError(`Please enter Budget for "${label}"`);
+      // Validate start time
+      if (!startTime?.hour || !startTime?.minute) {
+        setError(`Please enter Start Time for Day ${day}`);
         return;
       }
+      if (parseInt(startTime.hour) > 24 || parseInt(startTime.minute) > 59) {
+        setError(`Invalid Start Time for Day ${day}`);
+        return;
+      }
+
+      const daySpots = dayMap[day] || [];
+      const spots = [];
+
+      for (const item of daySpots) {
+        if (!item.is_added) continue;
+
+        const input = inputValues[item.name] || {};
+        const durationHour = input.durationHour || "0";
+        const durationMinute = input.durationMinute || "0";
+        const cost = input.cost;
+
+        if (
+          !durationHour ||
+          !durationMinute ||
+          parseInt(durationHour) > 24 ||
+          parseInt(durationMinute) > 59
+        ) {
+          setError(
+            `Please enter Duration of spend for '${item.name}' on Day ${day}`
+          );
+          return;
+        }
+        // if (!cost || parseFloat(cost) === 0) {
+        //   setError(`Please enter Budget for '${item.name}' on Day ${day}`);
+        //   return;
+        // }
+
+        spots.push({
+          name: item.name,
+          address: item.address,
+          image: item.image,
+          category: "spot",
+          duration: `${durationHour}:${durationMinute}`,
+          cost: parseFloat(cost),
+        });
+      }
+
+      if (spots.length === 0) {
+        setError(`Please drop atleast one destination for Day ${day}`);
+        return;
+      }
+      let accommodationObj = null;
+      // Accommodation check
+      if (day !== daysCount && accommodations[day - 1]) {
+        const acc = accommodationDetails[day - 1];
+
+        if (!acc.name) {
+          setError(`Please enter Accommodation Name for Day ${day}`);
+          return;
+        }
+        // if (!acc.cost || parseFloat(acc.cost) === 0) {
+        //   setError(`Please enter Accommodation Cost for Day ${day}`);
+        //   return;
+        // }
+
+        accommodationObj = {
+          name: acc.name,
+          address: acc.location,
+          image: "",
+          category: "accomodation",
+          duration: "00:00",
+          cost: parseFloat(acc.cost),
+        };
+
+        spots.push(accommodationObj);
+      }
+
+      // Optionally add start point for Day 1
+      if (day === 1) {
+        const start = attractions.find((a) => a.position === "start");
+        if (start?.is_added) {
+          spots.unshift({
+            name: start.name,
+            address: start.address,
+            image: start.image,
+            category: "start",
+            duration: "00:00",
+            cost: 0,
+          });
+        }
+      }
+
+      // Optionally add end point for last day
+      if (day === daysCount) {
+        const end = attractions.find((a) => a.position === "end");
+        if (end?.is_added) {
+          spots.push({
+            name: end.name,
+            address: end.address,
+            image: end.image,
+            category: "end",
+            duration: "00:00",
+            cost: 0,
+          });
+        }
+      }
+
+      // Inject previous day's accommodation as start of this day
+      if (day > 1 && accommodations[day - 2]) {
+        const prevAcc = accommodationDetails[day - 2];
+        if (prevAcc.name) {
+          spots.unshift({
+            name: prevAcc.name,
+            address: prevAcc.location,
+            image: "",
+            category: "accomodation",
+            duration: "00:00",
+            cost: parseFloat(prevAcc.cost || 0),
+          });
+        }
+      }
+
+      if (spots.length === 0) {
+        setError(`Please drop at least one destination for Day ${day}`);
+        return;
+      }
+      finalData.push({
+        day,
+        start_time: `${startTime.hour}:${startTime.minute}`,
+        selected_spots: spots,
+      });
     }
-    // onClickNextPrev((prev) => prev + 1);
+
+    sendDataToParent(finalData);
+    setError("");
+    onClickNextPrev((prev) => prev + 1);
   };
+
   const toggleCheckbox = (item) => {
     const updatedAttractions = attractions.map((attraction) => {
       if (attraction.name === item.name) {
@@ -447,35 +598,44 @@ const MapJourney = ({ onClickNextPrev }) => {
       return attraction;
     });
 
-    const start = updatedAttractions.find((p) => p.position === "start");
-    const end = updatedAttractions.find((p) => p.position === "end");
+    // Filter and sort valid attractions
+    const visible = updatedAttractions.filter((p) => p.is_added);
 
-    const betweenVisible = updatedAttractions
-      .filter((p) => p.position === "between" && p.is_added)
-      .map((p, idx) => ({ ...p, order_index: idx + 2 }));
+    // Get start/end from visible list
+    const start = visible.find((p) => p.position === "start");
+    const end = visible.find((p) => p.position === "end");
 
-    // Build final reindexed list
+    // Recompute order_index and ensure position is valid
     const reindexed = updatedAttractions.map((p) => {
-      if (p.position === "start") return { ...p, order_index: 1 };
-      if (p.position === "end")
-        return { ...p, order_index: betweenVisible.length + 2 };
+      if (p.name === start?.name) {
+        return { ...p, order_index: 1, position: "start" };
+      }
+      if (p.name === end?.name) {
+        return {
+          ...p,
+          order_index: visible.length,
+          position: "end",
+        };
+      }
 
-      const matching = betweenVisible.find((b) => b.name === p.name);
-      return matching ? matching : { ...p, order_index: "" };
+      const idx = visible.findIndex((b) => b.name === p.name);
+      return {
+        ...p,
+        order_index: p.is_added ? idx + 1 : "",
+        position: "between",
+      };
     });
 
     setAttractions(reindexed);
 
-    // Preserve full list in dayMap, just keep is_added toggle
+    // Update dayMap as well
     const newDayMap = { ...dayMap };
     Object.keys(newDayMap).forEach((key) => {
       newDayMap[key] = newDayMap[key].map((spot) =>
         spot.name === item.name ? { ...spot, is_added: !spot.is_added } : spot
       );
     });
-
     setDayMap(newDayMap);
-    calculateDirections();
   };
 
   const toggleAccommodation = (day) => {
@@ -487,7 +647,7 @@ const MapJourney = ({ onClickNextPrev }) => {
     // Reset values if turned off
     if (!updatedAccommodations[day - 1]) {
       setAccommodationValue("");
-      setAccommodationCost("");
+
     }
   };
 
@@ -624,7 +784,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                                 maxLength={2}
                                 placeholder="HH"
                                 name="start-hour"
-                                value={startTimes[day - 1]?.hour || "0"}
+                                value={startTimes[day - 1]?.hour}
                                 onChange={(e) =>
                                   setStartTimes((prev) => {
                                     const updatedStartTimes = [...prev];
@@ -643,7 +803,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                                 maxLength={2}
                                 placeholder="MM"
                                 name="start-minute"
-                                value={startTimes[day - 1]?.minute || "0"}
+                                value={startTimes[day - 1]?.minute}
                                 onChange={(e) =>
                                   setStartTimes((prev) => {
                                     const updatedStartTimes = [...prev];
@@ -672,7 +832,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    className="flex flex-row gap-2"
+                                    className="flex flex-row gap-2 border-none focus:outline-none"
                                   >
                                     <div className="bg-list p-3 pr-4 rounded-lg w-[55%] text-sm justify-between flex flex-row">
                                       <div className="flex flex-row gap-2 justify-between">
@@ -713,7 +873,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                                           name="duration-hour"
                                           value={
                                             inputValues[item.name]
-                                              ?.durationHour || "0"
+                                              ?.durationHour || ""
                                           }
                                           onChange={(e) =>
                                             setInputValues((prev) => ({
@@ -733,6 +893,10 @@ const MapJourney = ({ onClickNextPrev }) => {
                                           placeholder="MM"
                                           data-id={item.name}
                                           name="duration-minute"
+                                          value={
+                                            inputValues[item.name]
+                                              ?.durationMinute || ""
+                                          }
                                           onChange={(e) =>
                                             setInputValues((prev) => ({
                                               ...prev,
@@ -761,7 +925,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                                           data-id={item.name}
                                           name="cost"
                                           value={
-                                            inputValues[item.name]?.cost || "0"
+                                            inputValues[item.name]?.cost || ""
                                           }
                                           onChange={(e) =>
                                             setInputValues((prev) => ({
@@ -786,9 +950,7 @@ const MapJourney = ({ onClickNextPrev }) => {
                             <div className="flex flex-row gap-2 mt-3">
                               {/* Accommodation Name & Checkbox */}
                               <div className="bg-list p-2 pr-4 rounded-lg w-full text-sm justify-between flex flex-row items-start">
-                                <div className="relative w-full">
-                                  {" "}
-                                  {/* 👈 Wrap input and suggestions */}
+                                <div className="relative group w-full">
                                   <input
                                     type="text"
                                     placeholder="Accommodation Name"
@@ -807,10 +969,14 @@ const MapJourney = ({ onClickNextPrev }) => {
                                     }}
                                     className="bg-textCardDark p-2 w-full rounded-lg text-textCard"
                                   />
+                                  <div className="absolute left-5 z-10 w-max bg-topHeader text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    This is the end point for Day{day} and start
+                                    point for Day{day + 1}.
+                                  </div>
                                   {/* Suggestions aligned with input */}
                                   {activeAccommodationDay === day &&
                                     accommodationStatus === "OK" && (
-                                      <ul className="absolute z-10 left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg w-full max-h-48 overflow-y-auto">
+                                      <ul className="absolute z-10 left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg w-full max-h-40 overflow-y-auto">
                                         {accommodationData.map(
                                           ({ place_id, description }) => (
                                             <li
