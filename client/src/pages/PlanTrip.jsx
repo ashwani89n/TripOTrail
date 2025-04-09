@@ -11,6 +11,7 @@ import "./planTrip.css";
 import SetSecene from "../components/SetSecene";
 import PickSpots from "../components/PickSpots";
 import MapJourney from "../components/MapJourney";
+import LockJourney from "../components/LockJourney";
 import { tripContext } from "../context/useTripDataContext";
 
 const PlanTrip = () => {
@@ -19,7 +20,7 @@ const PlanTrip = () => {
   const [destinationPoint, setDestinationPoint] = useState();
   const [startDt, setStartDt] = useState(new Date());
   const [endDt, setEndDt] = useState(new Date());
-  const [page, setPage] = useState(2);
+  const [page, setPage] = useState(0);
   const [startCoordinates, setStartCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);
@@ -102,6 +103,7 @@ const PlanTrip = () => {
         {page === 0 && <SetSecene onClickNext={setPage} />}
         {page === 1 && <PickSpots onClickNextPrev={setPage} sendDataToParent ={setSelectedSpotsData}/>}
         {page === 2 && <MapJourney onClickNextPrev={setPage} selectedAttraction={selectedSpotsData}/>} 
+        {page === 3 && <LockJourney onClickNextPrev={setPage} />} 
       </div>
     </tripContext.Provider>
   );

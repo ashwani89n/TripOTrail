@@ -19,6 +19,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
     destinationCoordinates} =
     useContext(tripContext);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState('');
 
   // const mapRef = useRef(null);
   const handleSelectSpots = (item) => {
@@ -268,54 +269,6 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
 
   const { daysCount, dayOneWeekday, formattedDate } = calculateTripDays(startDt, endDt);
 
-  // function heuristic(a, b) {
-  //   return Math.sqrt(Math.pow(b.position.lat - a.position.lat, 2) + Math.pow(b.position.lng - a.position.lng, 2));
-  // }
-  
-  // function aStar(start, end, nodes) {
-  //   const openList = [start];
-  //   const closedList = [];
-  //   start.g = 0;
-  //   start.h = heuristic(start, end);
-  //   start.f = start.g + start.h;
-  //   start.parent = null;
-  
-  //   while (openList.length > 0) {
-  //     openList.sort((a, b) => a.f - b.f);
-  //     const current = openList.shift();
-  
-  //     if (current === end) {
-  //       const path = [];
-  //       let temp = current;
-  //       while (temp) {
-  //         path.push(temp);
-  //         temp = temp.parent;
-  //       }
-  //       return path.reverse();
-  //     }
-  
-  //     closedList.push(current);
-  
-  //     for (const neighbor of nodes) {
-  //       if (closedList.includes(neighbor)) continue;
-  
-  //       const tentativeG = current.g + heuristic(current, neighbor);
-  //       if (!openList.includes(neighbor)) {
-  //         openList.push(neighbor);
-  //       } else if (tentativeG >= neighbor.g) {
-  //         continue;
-  //       }
-  
-  //       neighbor.g = tentativeG;
-  //       neighbor.h = heuristic(neighbor, end);
-  //       neighbor.f = neighbor.g + neighbor.h;
-  //       neighbor.parent = current;
-  //     }
-  //   }
-  //   return []; // No path found
-  // }
-
-  
   return (
     <>
       <div>
@@ -346,6 +299,8 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
               <input
                 className="bg-textInputBG w-[70%] h-[31px] rounded-md pl-3 italic"
                 placeholder="Search by location..."
+                value={query}
+                onChange={(e)=> setQuery(e.target.value)}
               ></input>
               <button
                 disabled
@@ -353,14 +308,12 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
               >
                 Category: <span className="text-black">Attractions</span>
               </button>
-              {/* <select className="bg-topHeader w-[30%] text-white h-[31px] rounded-lg px-2 pr-2 cursor-not-allowed">
-              <option className="text-textCard" value="4">4 & above</option>
-              </select> */}
             </div>
             <div className="h-[580px] overflow-y-auto custom-scrollbar">
               <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between gap-3">
                 {attractions
-                  .filter((item) => item.photoUrl)
+                  .filter((item) => item.photoUrl && 
+                    (query.trim()?item.name.toLowerCase().includes(query.toLowerCase()):true))
                   .map((item) => (
                     <div
                       className="w-full h-[280px] bg-headerBG rounded-lg overflow-hidden cursor-pointer transition-transform transform hover:scale-10 hover:border-[1px] hover:border-subTitle"

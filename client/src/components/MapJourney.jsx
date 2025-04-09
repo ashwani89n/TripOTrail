@@ -12,114 +12,88 @@ import DestinationPin from "../images/CabBackView.png";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
-// const MapJourney = ({ onClickNextPrev }) => {
+  // const MapJourney = ({ onClickNextPrev }) => {
   const markerRefs = useRef([]);
   const [mapInstance, setMapInstance] = useState(null);
-  const [data, setData] = useState({
-    selected_spots: [
-      {
-        name: "",
-        address: "",
-        image: "",
-        latitude: "",
-        longitude: "",
-        is_added: true,
-        duration: "",
-        cost: 0,
-        position: "between",
-        order_index: 0,
-      },
-    ],
-    budget: {
-      transport: 0,
-      food: 0,
-      accommodation: 0,
-      activities: 0,
-    },
-    team_members: [
-      {
-        name: "John Doe",
-        email: "johndoe@example.com",
-        profile_picture: "https://example.com/johndoe_profile.jpg",
-      },
-    ],
-    status: "Unconfirm",
-  });
-  const [selectedAttraction, setSelectedAttraction] = useState([
-    {
-      address: "",
-      image: "",
-      is_added: true,
-      latitude: 33.8227293,
-      longitude: -84.3717113,
-      name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
-      order_index: 1,
-      position: "start",
-    },
-    {
-      address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
-      image:
-        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
-      is_added: true,
-      latitude: 33.8168204,
-      longitude: -84.3756841,
-      name: "Lumière",
-      order_index: 2,
-      position: "between",
-    },
-    {
-      address: "2115 Piedmont Road Northeast, Atlanta",
-      image:
-        "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
-      is_added: true,
-      latitude: 33.8127915,
-      longitude: -84.3657056,
-      name: "Gurl Mobb Museum",
-      order_index: 3,
-      position: "between",
-    },
-    {
-      address: "70 Lakeview Avenue Northeast, Atlanta",
-      image: "",
-      is_added: true,
-      latitude: 33.82599239999999,
-      longitude: -84.3845322,
-      name: "Duck Pond Park",
-      order_index: 4,
-      position: "between",
-    },
-    {
-      address: "",
-      image: "",
-      is_added: true,
-      latitude: 33.8236359,
-      longitude: -84.37147019999999,
-      name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
-      order_index: 5,
-      position: "end",
-    },
-  ]);
+  //   const [selectedAttraction, setSelectedAttraction] = useState([
+  //     {
+  //       address: "",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.8227293,
+  //       longitude: -84.3717113,
+  //       name: "2450 Camellia Lane Northeast, Atlanta, GA, USA",
+  //       order_index: 1,
+  //       position: "start",
+  //     },
+  //     {
+  //       address: "425 Peachtree Hills Avenue Northeast #29b, Atlanta",
+  //       image:
+  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcJMAgoSbkMzMQG3eKOmp44nIHcCVsDDiCia6jYWlVOIKFZ0OjGH95qWBDiRdU2hUriBmqyNyOf9euth-i0SI6hyAaPI7F_nk32lrnmBU7GMJZj-vTrIgfWToKr2mg_QkhePuByvVl8dN3Yr0TI1HFOg-0g-1oY_uNyDei5ClKsMvaqFYJ5rexBQdnuLr_nQGt6zrJYsIsZJ9KjtjjUo8vsGqyocc8p62kBs2NrSYCWN8nGM499dqfE8tMILJdWcg0Tv8UkcuslSxnRQEq1Ucl2i4Ohboba3H59Tgg5uUzjySnTpWdKHTKpKGy6sXuzIvipN0OYy57E&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=77989",
+  //       is_added: true,
+  //       latitude: 33.8168204,
+  //       longitude: -84.3756841,
+  //       name: "Lumière",
+  //       order_index: 2,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "2115 Piedmont Road Northeast, Atlanta",
+  //       image:
+  //         "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcIFuKjKKeCBLoPFeZTlvF_9UrwIeKeLIo19oLvv2vv5zSbEGMOfK4MblHFOr1kCy6GL5kusSK6B46M8AWqhZiLlmPf855FUAe0LZsfokFYk--kh6tngkHjXZSTsVsArwM7BD8R7uOfc5t8jwroqQwCkkr_OA3rd11qQKMyJnoK88VMke3P4eWmupSNG_8NYUGhB31XxOTInYY4wcKNN9dDUo3wwkrkWjkhe12LL-w46RQ9dgNDt6nvw0pfSTgXTtOnPQbfbKO6qDct2wQkOareoiRAHoq44w1o8LOY_8sc6aQF7wFn5btBGTLnKRgqMFyd9PgmVZtfGZy50KpaeBYe-yVfDdF9V0qEMjtkq-K2GJDaKxZ8NRCHJlIKBC8SeFAoFEav_WOoW5s6dZTJmS_FfwEVhiHFDjLD-2cHFa9WiGcAgFlyH6IWYbDKAqJwhmBRhyS69qiR7QJ4ez5hQfEOmPZa9WvKVdoX1fmOQ15XhofJlxpH3pkn3F-XfjntWiLlkM3oDCKEXyxQCyIqZIswWR_ClmewGl-O1gg1gPP4U8a6lR36acpl56nL8G1z1nVUHEgSAr5O_XE0zNXVu4oTNXcb0kMHsSdohs_sEYVVWVHwa_F8dnJG5UiKjrXS6_2fm5w&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=120123",
+  //       is_added: true,
+  //       latitude: 33.8127915,
+  //       longitude: -84.3657056,
+  //       name: "Gurl Mobb Museum",
+  //       order_index: 3,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "70 Lakeview Avenue Northeast, Atlanta",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.82599239999999,
+  //       longitude: -84.3845322,
+  //       name: "Duck Pond Park",
+  //       order_index: 4,
+  //       position: "between",
+  //     },
+  //     {
+  //       address: "",
+  //       image: "",
+  //       is_added: true,
+  //       latitude: 33.8236359,
+  //       longitude: -84.37147019999999,
+  //       name: "2470 Camellia Lane Northeast, Atlanta, GA, USA",
+  //       order_index: 5,
+  //       position: "end",
+  //     },
+  //   ]);
 
   const [error, setError] = useState("");
   const {
     tripId,
     destinationPoint,
     startPoint,
-    startDt,
-    endDt,
+    // startDt,
+    // endDt,
     startCoordinates,
     destinationCoordinates,
     title,
   } = useContext(tripContext);
 
-//   const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
-//   const endDt = "Tue Apr 10 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
+  const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
+  const endDt = "Tue Apr 10 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
 
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   const [attractions, setAttractions] = useState(selectedAttraction);
   const mapRef = useRef(null);
   const directionsServiceRef = useRef(null);
   const directionsRendererRef = useRef(null);
+  const [inputValues, setInputValues] = useState({});
+  const [startTime, setStartTime] = useState({
+    hour:"00", minute: "00",
+  })
 
   const calculateTripDays = (startDt, endDt) => {
     const startDate = new Date(startDt);
@@ -206,40 +180,58 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
     markerRefs.current = []; // Reset the marker references array
 
     // Add new markers based on the updated attraction list
-    updatedAttractions.forEach((place) => {
-      const markerContent = document.createElement("div");
+    updatedAttractions
+      .filter((place) => place.is_added)
+      .forEach((place) => {
+        const markerContent = document.createElement("div");
 
-      // Create the custom marker icon
-      const markerIcon = document.createElement("img");
-      markerIcon.src = DestinationPin; // Ensure to use the correct pin icon path
-      markerIcon.alt = `Attraction ${place.order_index}`;
-      markerIcon.style.width = "40px";
-      markerIcon.style.height = "40px";
-      markerContent.appendChild(markerIcon);
+        // Create the custom marker icon
+        const markerIcon = document.createElement("img");
+        markerIcon.src = DestinationPin; // Ensure to use the correct pin icon path
+        markerIcon.alt = `Attraction ${place.order_index}`;
+        markerIcon.style.width = "40px";
+        markerIcon.style.height = "40px";
+        markerContent.appendChild(markerIcon);
 
-      // Create index label to display attraction order
-      const indexLabel = document.createElement("span");
-      indexLabel.textContent = place.order_index;
-      indexLabel.style.position = "absolute";
-      indexLabel.style.top = "16px";
-      indexLabel.style.left = "50%";
-      indexLabel.style.transform = "translateX(-50%)";
-      indexLabel.style.fontSize = "10px";
-      indexLabel.style.color = "white";
-      indexLabel.style.fontWeight = "bold";
-      markerContent.appendChild(indexLabel);
+        // Create index label to display attraction order
+        const indexLabel = document.createElement("span");
+        indexLabel.textContent = place.order_index;
+        indexLabel.style.position = "absolute";
+        indexLabel.style.top = "16px";
+        indexLabel.style.left = "50%";
+        indexLabel.style.transform = "translateX(-50%)";
+        indexLabel.style.fontSize = "10px";
+        indexLabel.style.color = "white";
+        indexLabel.style.fontWeight = "bold";
+        markerContent.appendChild(indexLabel);
 
-      const marker = new window.google.maps.marker.AdvancedMarkerElement({
-        position: { lat: place.latitude, lng: place.longitude },
-        map: mapInstance,
-        content: markerContent,
-        title: `Attraction ${place.order_index}`,
+        const marker = new window.google.maps.marker.AdvancedMarkerElement({
+          position: { lat: place.latitude, lng: place.longitude },
+          map: mapInstance,
+          content: markerContent,
+          title: `Attraction ${place.order_index}`,
+        });
+
+        // Store the marker reference for later removal or updates
+        markerRefs.current.push(marker);
       });
-
-      // Store the marker reference for later removal or updates
-      markerRefs.current.push(marker);
-    });
   };
+
+  useEffect(() => {
+    if (!selectedAttraction) return;
+
+    const initialInputs = {};
+    selectedAttraction.forEach((item) => {
+      initialInputs[item.name] = {
+        durationHour: "00",
+        durationMinute: "00",
+        cost: "0",
+      };
+    });
+    setInputValues(initialInputs);
+    setStartTime({ hour: "00", minute: "00" });
+
+  }, [selectedAttraction]);
 
   useEffect(() => {
     const initializeMap = () => {
@@ -264,7 +256,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
         directionsRendererRef.current.setMap(newMapInstance);
 
         // Add markers once map is ready
-        updateMapMarkers(attractions, newMapInstance);
+        //updateMapMarkers(attractions, newMapInstance);
       }
     };
 
@@ -274,35 +266,37 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
       markerRefs.current = [];
 
       // Add new markers
-      attractions.forEach((place) => {
-        const markerContent = document.createElement("div");
-        const markerIcon = document.createElement("img");
-        markerIcon.src = DestinationPin; // Ensure to use the correct pin icon path
-        markerIcon.alt = `Attraction ${place.order_index}`;
-        markerIcon.style.width = "40px";
-        markerIcon.style.height = "40px";
-        markerContent.appendChild(markerIcon);
+      attractions
+        .filter((place) => place.is_added)
+        .forEach((place) => {
+          const markerContent = document.createElement("div");
+          const markerIcon = document.createElement("img");
+          markerIcon.src = DestinationPin; // Ensure to use the correct pin icon path
+          markerIcon.alt = `Attraction ${place.order_index}`;
+          markerIcon.style.width = "40px";
+          markerIcon.style.height = "40px";
+          markerContent.appendChild(markerIcon);
 
-        const indexLabel = document.createElement("span");
-        indexLabel.textContent = place.order_index;
-        indexLabel.style.position = "absolute";
-        indexLabel.style.top = "16px";
-        indexLabel.style.left = "50%";
-        indexLabel.style.transform = "translateX(-50%)";
-        indexLabel.style.fontSize = "10px";
-        indexLabel.style.color = "white";
-        indexLabel.style.fontWeight = "bold";
-        markerContent.appendChild(indexLabel);
+          const indexLabel = document.createElement("span");
+          indexLabel.textContent = place.order_index;
+          indexLabel.style.position = "absolute";
+          indexLabel.style.top = "16px";
+          indexLabel.style.left = "50%";
+          indexLabel.style.transform = "translateX(-50%)";
+          indexLabel.style.fontSize = "10px";
+          indexLabel.style.color = "white";
+          indexLabel.style.fontWeight = "bold";
+          markerContent.appendChild(indexLabel);
 
-        const marker = new window.google.maps.marker.AdvancedMarkerElement({
-          position: { lat: place.latitude, lng: place.longitude },
-          map,
-          content: markerContent,
-          title: `Attraction ${place.order_index}`,
+          const marker = new window.google.maps.marker.AdvancedMarkerElement({
+            position: { lat: place.latitude, lng: place.longitude },
+            map,
+            content: markerContent,
+            title: `Attraction ${place.order_index}`,
+          });
+
+          markerRefs.current.push(marker);
         });
-
-        markerRefs.current.push(marker);
-      });
     };
 
     if (!isGoogleMapsLoaded) {
@@ -336,7 +330,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
     const startPointData = attractions.find((p) => p.position === "start");
     const endPointData = attractions.find((p) => p.position === "end");
     const waypoints = attractions
-      .filter((p) => p.position === "between")
+      .filter((p) => p.position === "between" && p.is_added)
       .sort((a, b) => a.order_index - b.order_index)
       .map((place) => ({
         location: { lat: place.latitude, lng: place.longitude },
@@ -391,6 +385,9 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
     if (!startHH || !startMM) {
       setError("Please enter Start Time");
       return;
+    } else if (parseInt(startHH, 10) > 24 || parseInt(startMM, 10) > 60) {
+      setError("Please enter a valid Start Time");
+      return;
     }
 
     const items = Array.from(document.querySelectorAll("li[data-id]"));
@@ -406,22 +403,59 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
         ?.value.trim();
       const cost = li.querySelector('input[name="cost"]')?.value.trim();
 
-      const durHHValue = parseInt(durHH, 10); 
-      const durMMValue = parseInt(durMM, 10); 
+      const durHHValue = parseInt(durHH, 10);
+      const durMMValue = parseInt(durMM, 10);
       const costValue = parseInt(cost, 10);
 
       if (!durHH || !durMM || durHHValue > 24 || durMMValue > 60) {
         const label = li.querySelector("span")?.textContent?.trim() || id;
         setError(`Please enter valid Duration of spend for "${label}"`);
         return;
-      } 
-      else if(!cost || costValue === 0){
+      } else if (!cost || costValue === 0) {
         const label = li.querySelector("span")?.textContent?.trim() || id;
         setError(`Please enter Budget for "${label}"`);
         return;
       }
     }
     // onClickNextPrev((prev) => prev + 1);
+  };
+  const toggleCheckbox = (item) => {
+    const updatedAttractions = attractions.map((attraction) => {
+      if (attraction.name === item.name) {
+        return { ...attraction, is_added: !attraction.is_added };
+      }
+      return attraction;
+    });
+
+    const start = updatedAttractions.find((p) => p.position === "start");
+    const end = updatedAttractions.find((p) => p.position === "end");
+
+    const betweenVisible = updatedAttractions
+      .filter((p) => p.position === "between" && p.is_added)
+      .map((p, idx) => ({ ...p, order_index: idx + 2 }));
+
+    // Build final reindexed list
+    const reindexed = updatedAttractions.map((p) => {
+      if (p.position === "start") return { ...p, order_index: 1 };
+      if (p.position === "end")
+        return { ...p, order_index: betweenVisible.length + 2 };
+
+      const matching = betweenVisible.find((b) => b.name === p.name);
+      return matching ? matching : { ...p, order_index: "" };
+    });
+
+    setAttractions(reindexed);
+
+    // Preserve full list in dayMap, just keep is_added toggle
+    const newDayMap = { ...dayMap };
+    Object.keys(newDayMap).forEach((key) => {
+      newDayMap[key] = newDayMap[key].map((spot) =>
+        spot.name === item.name ? { ...spot, is_added: !spot.is_added } : spot
+      );
+    });
+
+    setDayMap(newDayMap);
+    calculateDirections();
   };
 
   return (
@@ -461,18 +495,22 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
               <span className="text-topHeader">Start</span>Time
               <input
                 type="text"
-                className="bg-textCardDark rounded-lg px-2 w-10 h-7"
+                className="bg-textCardDark text-textCard font-light rounded-lg px-2 w-10 h-7"
                 maxLength={2}
                 placeholder="HH"
                 name="start-hour"
+                value={startTime.hour}
+                onChange={(prev)=>({...prev, hour:e.target.value})}
               />
               :
               <input
                 type="text"
-                className="bg-textCardDark rounded-lg w-10 h-7 px-2"
+                className="bg-textCardDark text-textCard  font-light  rounded-lg w-10 h-7 px-2"
                 maxLength={2}
                 placeholder="MM"
                 name="start-minute"
+                value={startTime.minute}
+                onChange={(prev)=>({...prev, minute:e.target.value})}
               />
               Hrs
             </div>
@@ -528,7 +566,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                           src={item.image}
                                           alt=""
                                         />
-                                        <span className="truncate mr-4 text-textCard italic">
+                                        <span className="truncate w-full mr-4 text-textCard italic">
                                           {item.name}
                                         </span>
                                       </div>
@@ -537,12 +575,10 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                           type="checkbox"
                                           className="sr-only peer"
                                           checked={item.is_added}
-                                          onChange={() => {
-                                            // toggle checkbox logic here
-                                          }}
+                                          onChange={() => toggleCheckbox(item)}
                                         />
                                         <div className="w-8 h-3 bg-textCard peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-topHeader rounded-full peer-checked:bg-topHeader transition-colors"></div>
-                                        <div className="absolute left-[2px] h-3 w-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-[1.5rem]"></div>
+                                        <div className="absolute h-3 w-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-[1.5rem]"></div>
                                       </label>
                                     </div>
 
@@ -560,6 +596,19 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                           placeholder="HH"
                                           data-id={item.name}
                                           name="duration-hour"
+                                          value={
+                                            inputValues[item.name]
+                                              ?.durationHour || "0"
+                                          }
+                                          onChange={(e) =>
+                                            setInputValues((prev) => ({
+                                              ...prev,
+                                              [item.name]: {
+                                                ...prev[item.name],
+                                                durationHour: e.target.value,
+                                              },
+                                            }))
+                                          }
                                         />
                                         :
                                         <input
@@ -569,6 +618,15 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                           placeholder="MM"
                                           data-id={item.name}
                                           name="duration-minute"
+                                          onChange={(e) =>
+                                            setInputValues((prev) => ({
+                                              ...prev,
+                                              [item.name]: {
+                                                ...prev[item.name],
+                                                durationMinute: e.target.value,
+                                              },
+                                            }))
+                                          }
                                         />
                                         Hrs
                                       </div>
@@ -587,6 +645,18 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
                                           maxLength={4}
                                           data-id={item.name}
                                           name="cost"
+                                          value={
+                                            inputValues[item.name]?.cost || "0"
+                                          }
+                                          onChange={(e) =>
+                                            setInputValues((prev) => ({
+                                              ...prev,
+                                              [item.name]: {
+                                                ...prev[item.name],
+                                                cost: e.target.value,
+                                              },
+                                            }))
+                                          }
                                         />
                                       </div>
                                     </div>
