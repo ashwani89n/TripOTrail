@@ -38,8 +38,7 @@ const SetSecene = ({ onClickNext }) => {
   const [retTransport, setRetTransport] = useState("road");
   const [startLocation, setStartLocation] = useState("");
   const [destination, setDestination] = useState("");
-  const [startCoordinates, setStartCoordinates] = useState(null);
-  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
+
   const [startLocationOBFrom, setStartLocationOBFrom] = useState("");
   const [destinationOBFrom, setDestinationOBFrom] = useState("");
   const [startCoordinatesOBFrom, setStartCoordinatesOBFrom] = useState(null);
@@ -60,6 +59,8 @@ const SetSecene = ({ onClickNext }) => {
   const [departureMinuteRT, setDepartureMinuteRT] = useState("");
   const [arrivalHourRT, setArrivalHourRT] = useState("");
   const [arrivalMinuteRT, setArrivalMinuteRT] = useState("");
+ 
+
   const [error, setError] = useState("");
 
   const {
@@ -73,6 +74,9 @@ const SetSecene = ({ onClickNext }) => {
     setStartDt,
     endDt,
     setEndDt,
+    startCoordinates, setStartCoordinates,
+    destinationCoordinates, setDestinationCoordinates,
+    title, setTitle
   } = useContext(tripContext);
   const today = new Date();
 
@@ -91,7 +95,11 @@ const SetSecene = ({ onClickNext }) => {
     } else if (!data.destination) {
       setError("Please enter Destination");
       return;
-    } else if (!startDate) {
+    } else if( data.start_point.trim() == data.destination.trim()){
+      setError("Start Point and End Point cannot be the same");
+      return;
+    } 
+    else if (!startDate) {
       setError("Please enter Start Date");
       return;
     } else if (!endDate) {
@@ -187,7 +195,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MTU3NzEyLCJleHAiOjE3NDQxNjEzMTJ9.tmPStiDSCJ9iyzFEEFvBTD8Wi16B7EqYZLKxZlIYbEY",
           },
         }
       )
@@ -197,6 +205,7 @@ const SetSecene = ({ onClickNext }) => {
         setStartPoint(startValue);
         setStartDt(startDate);
         setEndDt(endDate);
+        setTitle(data.title);
         onClickNext(1);
       })
       .catch(function (error) {
@@ -207,6 +216,7 @@ const SetSecene = ({ onClickNext }) => {
   useEffect(() => {
     setObTransport("road");
     setRetTransport("road");
+    console.log(startCoordinates, destinationCoordinates);
   }, []);
 
   const YOUR_GOOGLE_API_KEY = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";

@@ -18,7 +18,8 @@ export default {
         card:"rgba(68, 68, 68, 0.2)",
         list:"rgba(28, 28, 28, 1)",
         textCard:"rgba(141,141,141,1)",
-        topHeaderLite:"rgba(223, 128, 20, 0.31)"
+        topHeaderLite:"rgba(223, 128, 20, 0.31)",
+        textCardDark:"rgb(40, 40, 40)"
          // Add your custom color
       },
       fontSize: {

@@ -8,51 +8,19 @@ import {
 import { tripContext } from "../context/useTripDataContext";
 import "../components/styles/PickSpots.css";
 import noSpotsChosen from "../assets/noSpots.png";
-import axios from "axios";
+// import axios from "axios";
 
-const PickSpots = ({onClickNextPrev}) => {
-  const [start, setStart] = useState(
-    "2470 Camellia Lane Northeast, Atlanta, GA, USA"
-  );
-  const [end, setEnd] = useState(
-    "509 Lindbergh Place Northeast, Atlanta, GA, USA"
-  );
+const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
   const [attractions, setAttractions] = useState([]);
   const [selectedAttraction, setSelectedAttraction] = useState([]);
+  const [selectedSpotsData, setSelectedSpotsData] = useState([]);
   const apiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
-  const { tripId, destinationPoint, startPoint, startDt, endDt } =
+  const { tripId, destinationPoint, startPoint, startDt, endDt , startCoordinates,
+    destinationCoordinates} =
     useContext(tripContext);
   const [error, setError] = useState("");
-  const [selectedSpotsData, setSelectedSpotsData] = useState([]);
-  const [data, setData] = useState({
-      selected_spots: [
-        {
-          name: "",
-          address: "",
-          image: "",
-          is_added: true,
-          duration: "",
-          cost: 0
-        }
-      ],
-      budget: {
-        transport: 0,
-        food: 0,
-        accommodation: 0,
-        activities: 0
-      },
-      team_members: [
-        {
-          name: "John Doe",
-          email: "johndoe@example.com",
-          profile_picture: "https://example.com/johndoe_profile.jpg"
-        }
-      ],
-      status: ""
-  });
 
-  const mapRef = useRef(null);
-  let selectingAttractions = [];
+  // const mapRef = useRef(null);
   const handleSelectSpots = (item) => {
     setSelectedAttraction((prev) => {
       if (!prev.find((a) => a.id === item.id)) {
@@ -61,47 +29,126 @@ const PickSpots = ({onClickNextPrev}) => {
       return prev;
     });
   };
+  
+  function calculateDistance(a, b) {
+    const dx = a.position.lat - b.position.lat;
+    const dy = a.position.lng - b.position.lng;
+    return Math.sqrt(dx * dx + dy * dy); // Replace with Haversine if needed
+  }
+  
+  function getTotalDistance(path) {
+    let total = 0;
+    for (let i = 0; i < path.length - 1; i++) {
+      total += calculateDistance(path[i], path[i + 1]);
+    }
+    return total;
+  }
+  
+  function permute(arr) {
+    if (arr.length <= 1) return [arr];
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+      const current = arr[i];
+      const remaining = [...arr.slice(0, i), ...arr.slice(i + 1)];
+      const remainingPermuted = permute(remaining);
+      for (const perm of remainingPermuted) {
+        result.push([current, ...perm]);
+      }
+    }
+    return result;
+  }
+  
+  function getOptimizedRoute(start, attractions, end) {
+    const allPermutations = permute(attractions);
+    let bestRoute = null;
+    let shortestDistance = Infinity;
+  
+    for (const order of allPermutations) {
+      const fullRoute = [start, ...order, end];
+      const distance = getTotalDistance(fullRoute);
+      if (distance < shortestDistance) {
+        shortestDistance = distance;
+        bestRoute = fullRoute;
+      }
+    }
+  
+    return bestRoute;
+  }
+  
 
     const handleNext = async() => {
-      // Send data to the server.. send data only when item.enabled = tru
-      setSelectedSpotsData(selectedAttraction
-      .filter((item) => item.enabled) 
-      .map((item) => ({
-        name: item.name,
-        address: item.address,
-        image: item.photoUrl,
-        is_added: true,      
-      })));
+      const nodes = [
+        { id: "start", name: startPoint, position: startCoordinates },
+        ...selectedAttraction.filter((item) => item.enabled === true).map((attraction) => ({
+          ...attraction,
+          id: attraction.name,
+        })),
+        { id: "end", name: destinationPoint, position: destinationCoordinates },
+      ];
 
-    if (!selectedSpotsData || selectedSpotsData.length === 0) {
+      const optimizedRoute = getOptimizedRoute(
+        { position: startCoordinates, name: startPoint},
+        selectedAttraction.filter((item) => item.enabled === true), 
+        { position: destinationCoordinates, name: destinationPoint }
+      );
+
+      console.log("optimized:", optimizedRoute);
+
+      if (optimizedRoute.length > 0) {
+        const finalizedSpots = [
+          ...optimizedRoute.map((spot, index) => ({
+            name: spot.name,
+            address: spot.address || "",
+            image: spot.photoUrl || "",
+            is_added: true,
+            latitude: spot.position.lat,
+            longitude: spot.position.lng,
+            position: index === 0 ? "start" : index === optimizedRoute.length - 1 ? "end" : "between",
+            order_index: index + 1,
+          })),
+        ];
+    
+        setSelectedSpotsData(finalizedSpots);
+        console.log(finalizedSpots);
+
+
+    if (!finalizedSpots || finalizedSpots.length === 0) {
       setError("Please select destinations to proceed");
       return;
     } else {
       setError("");
-      console.log("data:", data);
+      console.log("selected1:", finalizedSpots);
+      setSelectedSpotsData(finalizedSpots);
+      sendDataToParent(finalizedSpots);
+      onClickNextPrev((prev) => prev + 1);
+
     }
 
+    // const response = await axios
+    //   .post(
+    //     `/api/trips/${tripId}/destinations`,
+    //     {
+    //       ...data,
+    //       selected_spots: finalizedSpots,
+    //     },
+    //     {
+    //       headers: {
+    //         Authorization:
+    //           "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MDYzNjczLCJleHAiOjE3NDQwNjcyNzN9.eqqtcPpFn4BpYsbHIPWW2Fx_1me9VwBY_9GpTc4OwlQ",
+    //       },
+    //     }
+    //   )
+    //   .then(function (response) {
+    //     onClickNextPrev((prev) => prev + 1);
+    //     console.log(response.data);
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   });
 
-    const response = await axios
-      .post(
-        `/api/trips/${tripId}/destinations`,
-        {
-          ...data,
-          selected_spots: selectedSpotsData,
-        },
-        {
-          headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzk5MjE3LCJleHAiOjE3NDM4MDI4MTd9.-ny5ZMnaPeeM2iU3Ltgv9TmQjydXP1tlEm1xVCvrbRo",
-          },
-        }
-      )
-      .then(function (response) {
-        onClickNextPrev((prev) => prev + 1);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    }else {
+      setError("No optimal route found.");
+    }
 
 
     };
@@ -113,8 +160,8 @@ const PickSpots = ({onClickNextPrev}) => {
     try {
       const directionsService = new google.maps.DirectionsService();
       const route = await directionsService.route({
-        origin: start,
-        destination: end,
+        origin: startPoint,
+        destination: destinationPoint,
         travelMode: google.maps.TravelMode.DRIVING,
       });
 
@@ -164,6 +211,7 @@ const PickSpots = ({onClickNextPrev}) => {
 
 
   useEffect(() => {
+    console.log(startCoordinates, destinationCoordinates);
     if (!window.google || !window.google.maps) {
       const interval = setInterval(() => {
         if (window.google && window.google.maps) {
@@ -175,11 +223,8 @@ const PickSpots = ({onClickNextPrev}) => {
     } else {
       handleSearch();
     }
-  }, [tripId, start, end]);
+  }, [tripId]);
 
-  useEffect(() => {
-    console.log("selected ", selectedAttraction);
-  }, [selectedAttraction]);
 
   const formatDate = (date) => {
     const day = date.getDate();
@@ -215,7 +260,6 @@ const PickSpots = ({onClickNextPrev}) => {
     });
 
     return {
-      // dayInfo: `Day 1-${daysCount}, ${dayOneWeekday}`,
       daysCount: daysCount,
       dayOneWeekday: dayOneWeekday,
       formattedDate: formatDate(startDate),
@@ -224,6 +268,54 @@ const PickSpots = ({onClickNextPrev}) => {
 
   const { daysCount, dayOneWeekday, formattedDate } = calculateTripDays(startDt, endDt);
 
+  // function heuristic(a, b) {
+  //   return Math.sqrt(Math.pow(b.position.lat - a.position.lat, 2) + Math.pow(b.position.lng - a.position.lng, 2));
+  // }
+  
+  // function aStar(start, end, nodes) {
+  //   const openList = [start];
+  //   const closedList = [];
+  //   start.g = 0;
+  //   start.h = heuristic(start, end);
+  //   start.f = start.g + start.h;
+  //   start.parent = null;
+  
+  //   while (openList.length > 0) {
+  //     openList.sort((a, b) => a.f - b.f);
+  //     const current = openList.shift();
+  
+  //     if (current === end) {
+  //       const path = [];
+  //       let temp = current;
+  //       while (temp) {
+  //         path.push(temp);
+  //         temp = temp.parent;
+  //       }
+  //       return path.reverse();
+  //     }
+  
+  //     closedList.push(current);
+  
+  //     for (const neighbor of nodes) {
+  //       if (closedList.includes(neighbor)) continue;
+  
+  //       const tentativeG = current.g + heuristic(current, neighbor);
+  //       if (!openList.includes(neighbor)) {
+  //         openList.push(neighbor);
+  //       } else if (tentativeG >= neighbor.g) {
+  //         continue;
+  //       }
+  
+  //       neighbor.g = tentativeG;
+  //       neighbor.h = heuristic(neighbor, end);
+  //       neighbor.f = neighbor.g + neighbor.h;
+  //       neighbor.parent = current;
+  //     }
+  //   }
+  //   return []; // No path found
+  // }
+
+  
   return (
     <>
       <div>
@@ -358,7 +450,7 @@ const PickSpots = ({onClickNextPrev}) => {
             </div>
           </div>
         </div>
-        <div className="flex justify-end pb-20 pr-10 mt-10 gap-5">
+        <div className="flex justify-end pb-20 pr-10 gap-5">
             <button
               className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
               onClick={handlePrevious}
