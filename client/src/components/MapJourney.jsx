@@ -580,6 +580,8 @@ const MapJourney = ({
       }
       finalData.push({
         day,
+        weekDay: dayDetails[day - 1].weekday,
+        dayDate: dayDetails[day - 1].formatted,
         start_time: `${startTime.hour}:${startTime.minute}`,
         selected_spots: spots,
       });
@@ -719,29 +721,6 @@ const MapJourney = ({
               </span>
               {title.split(" ").slice(1).join(" ")}
             </div>
-            {/* <div className="flex items-center gap-2 text-white pr-2 font-semibold">
-              <span className="text-topHeader">Start</span>Time
-              <input
-                type="text"
-                className="bg-textCardDark text-textCard font-light rounded-lg px-2 w-10 h-7"
-                maxLength={2}
-                placeholder="HH"
-                name="start-hour"
-                value={startTime.hour}
-                onChange={(prev)=>({...prev, hour:e.target.value})}
-              />
-              :
-              <input
-                type="text"
-                className="bg-textCardDark text-textCard  font-light  rounded-lg w-10 h-7 px-2"
-                maxLength={2}
-                placeholder="MM"
-                name="start-minute"
-                value={startTime.minute}
-                onChange={(prev)=>({...prev, minute:e.target.value})}
-              />
-              Hrs
-            </div> */}
           </div>
           <div className="overflow-y-auto custom-scrollbar h-[520px] ">
             <DragDropContext onDragEnd={onDragEnd}>
