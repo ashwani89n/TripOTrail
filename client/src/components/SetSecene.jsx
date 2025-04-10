@@ -76,7 +76,8 @@ const SetSecene = ({ onClickNext }) => {
     setEndDt,
     startCoordinates, setStartCoordinates,
     destinationCoordinates, setDestinationCoordinates,
-    title, setTitle
+    title, setTitle,
+    transportBudget, setTransportBudget
   } = useContext(tripContext);
   const today = new Date();
 
@@ -206,6 +207,7 @@ const SetSecene = ({ onClickNext }) => {
         setStartDt(startDate);
         setEndDt(endDate);
         setTitle(data.title);
+        setTransportBudget(data.fuel_budget + data.outbound_flight.budgetOB + data.return_flight.budgetRT)
         onClickNext(1);
       })
       .catch(function (error) {

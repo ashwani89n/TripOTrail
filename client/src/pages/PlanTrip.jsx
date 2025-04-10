@@ -85,7 +85,7 @@ const PlanTrip = () => {
                 "image": "https://maps.googleapis.com/maps/api/place/js/PhotoService.GetPhoto?1sAeeoHcKPBRL_G0dnMw_L3MqwWp_GIESBzRmhxyzPmQKLOuEtPK2lk9O1FLgJTlJYjJtKwzSsKl-SqLWe7fmewjQ0Zf9bP_EpUAjWqrBR-bOMkhr2UryJ1-UH06zGySkz1WqX0zSqObHYtp2VgFFtsWJ3b7SwlFHh6wLo3QPHTtweLhVma0gG7RpEbwRVqroQaLae0weo5HNoqkgnOFXXmWnYDqI4acadM4gXPEwfMrSnq-zZdGNYec5i4BD93fhB2B8u2lUuBAoC0-yqYzocDadVwBk8tYag9BtSBHqyjUyoDx7DHeswg0gOzfCilhiTnCkbCKfxku2WSyJXjcPNE8kdoKSZRtgVL93ugMay_uFQA8oU321x0hvUOYkWazcuVkwZ8dDuLn4osmsfhmsXHPOOcdXo7yL50Mh-uj61rLJ4ZXa5daQjRgMoEfUfkECWu4PG6Qb_MmC797Mr4SlsP_yH9TSr7I0uZhhWi78gi2b3raxauazPuXUAuG4KFbDGbiy_ZAD_fhRlBoCZAXfABevj8AuKRENqEUDT1Wg7GueaAu9nSCLggoYP91Up0Bcuym-ycB_M8xcoPUcUg52K5DUm-iykDSg3ySp1gMIlIXdP1t3zU4dF6y3oBc9vIsO3oJL-L_8Zu1ji&3u400&5m1&2e1&callback=none&r_url=http%3A%2F%2Flocalhost%3A5173%2Fplan&key=AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw&token=3114",
                 "category": "spot",
                 "duration": "0:0",
-                "cost": 0
+                "cost": 121
             },
             {
                 "name": "The Kinsley at Perimeter Center, Mount Vernon Highway, Atlanta, GA, USA",
@@ -132,6 +132,7 @@ const PlanTrip = () => {
 ]
 );
   const [title, setTitle] = useState("");
+  const [transportBudget, setTransportBudget] = useState(0);
  
   return (
     <tripContext.Provider
@@ -146,7 +147,8 @@ const PlanTrip = () => {
         endDt, setEndDt,
         startCoordinates, setStartCoordinates,
         destinationCoordinates, setDestinationCoordinates,
-        title, setTitle
+        title, setTitle,
+        transportBudget, setTransportBudget
       }}
     >
       <div className="bg-darkBG min-h-screen flex flex-col">

@@ -88,6 +88,7 @@ const MapJourney = ({
     startCoordinates,
     destinationCoordinates,
     title,
+    transportBudget
   } = useContext(tripContext);
 
   //   const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";

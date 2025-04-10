@@ -16,7 +16,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);
   const apiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
   const { tripId, destinationPoint, startPoint, startDt, endDt , startCoordinates,
-    destinationCoordinates} =
+    destinationCoordinates, title, transportBudget} =
     useContext(tripContext);
   const [error, setError] = useState("");
   const [query, setQuery] = useState('');
