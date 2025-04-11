@@ -52,12 +52,7 @@ const Register = () => {
       const { confirmPassword, ...registerData } = data;
 
       try {
-        const response = await axios.post(`/api/auth/register`, registerData, {
-          headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzk5MjE3LCJleHAiOjE3NDM4MDI4MTd9.-ny5ZMnaPeeM2iU3Ltgv9TmQjydXP1tlEm1xVCvrbRo",
-          },
-        });
+        const response = await axios.post(`/api/auth/register`, registerData);
         navigate("/login");
       } catch (error) {
         if (error.response && error.response.data.message === 'Email already exists') {

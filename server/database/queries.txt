@@ -50,6 +50,10 @@ CREATE TABLE destinations (
     duration INTERVAL, 
     start_time TIME, 
     cost DECIMAL(10,2), 
+    latitude DECIMAL(9,6),  
+    longitude DECIMAL(9,6), 
+    position VARCHAR(10), 
+    order_index INTEGER,
 
     FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
 );

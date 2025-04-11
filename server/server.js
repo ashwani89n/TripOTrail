@@ -7,7 +7,7 @@ const YAML = require("yamljs");
 const authRoutes = require("./routes/authRoutes");
 const tripRoutes = require("./routes/tripRoutes");
 const destinationRoutes = require("./routes/destinationRoutes");
-// const budgetRoutes = require("./routes/budgetRoutes");
+const budgetRoutes = require("./routes/budgetRoutes");
 const expenseRoutes = require("./routes/expenseRoutes")
 const mediaRoutes = require("./routes/mediaRoutes")
 // const tripmateRoutes = require("./routes/tripmateRoutes")
@@ -32,7 +32,7 @@ app.use('/trips', authenticateJWT, destinationRoutes);
 app.use('/trips', authenticateJWT, mediaRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use('/trips', authenticateJWT, expenseRoutes);
-// app.use('/trips/:tripId/budget', authenticateJWT, budgetRoutes);
+app.use('/trips', authenticateJWT, budgetRoutes);
 // app.use('/trips/:tripId/tripmates', authenticateJWT, tripmateRoutes);
 
 app.listen(5000, () => console.log("Server running on port 5000"));

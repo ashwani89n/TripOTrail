@@ -1,5 +1,58 @@
 const pool = require("../database/db");
+// const haversine = require('haversine-distance');
 
+// function getDistance(from, to) {
+//     return haversine(
+//         { lat: from.latitude, lon: from.longitude },
+//         { lat: to.latitude, lon: to.longitude }
+//     );
+// }
+// function aStarOptimizedRoute(spots) {
+//     const start = spots.find(spot => spot.position === "start");
+//     const end = spots.find(spot => spot.position === "end");
+//     const betweens = spots.filter(spot => spot.position === "between");
+
+//     const openList = [{
+//         path: [start],
+//         cost: 0,
+//         heuristic: getDistance(start, end)
+//     }];
+
+//     let bestPath = null;
+
+//     while (openList.length > 0) {
+//         openList.sort((a, b) => (a.cost + a.heuristic) - (b.cost + b.heuristic));
+//         const current = openList.shift();
+
+//         if (current.path.length === betweens.length + 1) {
+//             const totalCost = current.cost + getDistance(current.path[current.path.length - 1], end);
+//             const completePath = [...current.path, end];
+//             if (!bestPath || totalCost < bestPath.cost) {
+//                 bestPath = {
+//                     path: completePath,
+//                     cost: totalCost
+//                 };
+//             }
+//             continue;
+//         }
+
+//         for (let spot of betweens) {
+//             if (current.path.includes(spot)) continue;
+
+//             const last = current.path[current.path.length - 1];
+//             const newCost = current.cost + getDistance(last, spot);
+//             const newHeuristic = getDistance(spot, end);
+
+//             openList.push({
+//                 path: [...current.path, spot],
+//                 cost: newCost,
+//                 heuristic: newHeuristic
+//             });
+//         }
+//     }
+
+//     return bestPath?.path || spots;
+// }
 
 exports.getDestinations = async (req, res) => {
     try {
@@ -54,11 +107,18 @@ exports.addDestination = async (req, res) => {
         const { tripId } = req.params;
         console.log("trip id ", tripId)
         const { start_time, selected_spots, budget, team_members, status } = req.body;
+        // const optimized_spots = aStarOptimizedRoute(selected_spots);
+        // optimized_spots.forEach((spot, index) => {
+        //     spot.order_index = index + 1; // starting from 1
+        // });
+
+
         let insertedDestinations = [];
+        // console.log(optimized_spots)
         for (let spot of selected_spots) {
             const destinationResult = await pool.query(
-                `INSERT INTO destinations (trip_id, name, address, image, is_added, duration, start_time, cost) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+                `INSERT INTO destinations (trip_id, name, address, image, is_added, duration, start_time, cost, latitude, longitude, position, order_index) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
                 [
                     tripId,
                     spot.name,
@@ -67,7 +127,11 @@ exports.addDestination = async (req, res) => {
                     spot.is_added,
                     spot.duration,
                     start_time,
-                    spot.cost
+                    spot.cost,
+                    spot.latitude,
+                    spot.longitude,
+                    spot.position,
+                    spot.order_index
                 ]
             );
             insertedDestinations.push(destinationResult.rows[0]);

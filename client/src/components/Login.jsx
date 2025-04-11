@@ -26,12 +26,7 @@ const Login = () => {
         } else {
           setError("");
           try {
-            const response = await axios.post(`/api/auth/login`, data, {
-              headers: {
-                Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQzNzk5MjE3LCJleHAiOjE3NDM4MDI4MTd9.-ny5ZMnaPeeM2iU3Ltgv9TmQjydXP1tlEm1xVCvrbRo",
-              },
-            });
+            const response = await axios.post(`/api/auth/login`, data);
             navigate("/");
           } catch (error) {
               setError(error.response?.data?.message || 'Login failed');

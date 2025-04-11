@@ -10,6 +10,8 @@ import { IoCalendar, IoCalendarSharp } from "react-icons/io5";
 import "./planTrip.css";
 import SetSecene from "../components/SetSecene";
 import PickSpots from "../components/PickSpots";
+import MapJourney from "../components/MapJourney";
+import LockJourney from "../components/LockJourney";
 import { tripContext } from "../context/useTripDataContext";
 
 const PlanTrip = () => {
@@ -18,16 +20,15 @@ const PlanTrip = () => {
   const [destinationPoint, setDestinationPoint] = useState();
   const [startDt, setStartDt] = useState(new Date());
   const [endDt, setEndDt] = useState(new Date());
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
+  const [startCoordinates, setStartCoordinates] = useState(null);
+  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
+  const [selectedSpotsData, setSelectedSpotsData] = useState([]);
+  const [finalData, setFinalData] = useState([]);
+  const [title, setTitle] = useState("");
 
-  // const handleNext = () => {
-  //   setPage((prev) => prev + 1);
-  //   // console.log(page);
-  // };
-  // const handlePrevious = () => {
-  //   setPage((prev) => prev - 1);
-  //   // console.log(page);
-  // };
+  console.log("Final JSON: ", finalData);
+ 
   return (
     <tripContext.Provider
       value={{
@@ -39,6 +40,9 @@ const PlanTrip = () => {
         setStartPoint,
         startDt, setStartDt,
         endDt, setEndDt,
+        startCoordinates, setStartCoordinates,
+        destinationCoordinates, setDestinationCoordinates,
+        title, setTitle
       }}
     >
       <div className="bg-darkBG min-h-screen flex flex-col">
@@ -100,23 +104,9 @@ const PlanTrip = () => {
           </div>
         </div>
         {page === 0 && <SetSecene onClickNext={setPage} />}
-        {page === 1 && <PickSpots onClickNextPrev={setPage}/>}
-        {/* {page > 0 && (
-          <div className="flex justify-end pb-20 pr-10 mt-10 gap-5">
-            <button
-              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
-              onClick={handlePrevious}
-            >
-              Previous
-            </button>
-            <button
-              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold  rounded-lg items-center"
-              onClick={handleNext}
-            >
-              Next
-            </button>
-          </div>
-        )} */}
+        {page === 1 && <PickSpots onClickNextPrev={setPage} sendDataToParent ={setSelectedSpotsData}/>}
+        {page === 2 && <MapJourney onClickNextPrev={setPage} selectedAttraction={selectedSpotsData} sendDataToParent = {setFinalData}/>} 
+        {page === 3 && <LockJourney onClickNextPrev={setPage} />} 
       </div>
     </tripContext.Provider>
   );

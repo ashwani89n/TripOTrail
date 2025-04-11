@@ -11,13 +11,15 @@ export default {
         topHeader:"#DF8114",
         darkBG: "rgba(5, 5, 5, 0.92)",
         subHeaderBG:"rgba(255, 255, 255, 0.27)",
+        myTripSearchBG:"rgba(255, 255, 255, 0.5)",
         subTitle:"rgba(148, 148, 148, 1)",
         flightIterinary: "rgba(255, 253, 253, 0.5)",
         textInputBG:"rgba(255, 253, 253, 0.13)",
         card:"rgba(68, 68, 68, 0.2)",
         list:"rgba(28, 28, 28, 1)",
         textCard:"rgba(141,141,141,1)",
-        topHeaderLite:"rgba(223, 128, 20, 0.31)"
+        topHeaderLite:"rgba(223, 128, 20, 0.31)",
+        textCardDark:"rgb(40, 40, 40)"
          // Add your custom color
       },
       fontSize: {
