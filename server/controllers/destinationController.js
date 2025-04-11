@@ -106,7 +106,7 @@ exports.addDestination = async (req, res) => {
     try {
         const { tripId } = req.params;
         console.log("trip id ", tripId)
-        const { start_time, selected_spots, budget, team_members, status } = req.body;
+        const { timeline, budget, team_members, status } = req.body;
         // const optimized_spots = aStarOptimizedRoute(selected_spots);
         // optimized_spots.forEach((spot, index) => {
         //     spot.order_index = index + 1; // starting from 1
@@ -115,26 +115,25 @@ exports.addDestination = async (req, res) => {
 
         let insertedDestinations = [];
         // console.log(optimized_spots)
-        for (let spot of selected_spots) {
-            const destinationResult = await pool.query(
-                `INSERT INTO destinations (trip_id, name, address, image, is_added, duration, start_time, cost, latitude, longitude, position, order_index) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
-                [
-                    tripId,
-                    spot.name,
-                    spot.address,
-                    spot.image,
-                    spot.is_added,
-                    spot.duration,
-                    start_time,
-                    spot.cost,
-                    spot.latitude,
-                    spot.longitude,
-                    spot.position,
-                    spot.order_index
-                ]
-            );
-            insertedDestinations.push(destinationResult.rows[0]);
+        for (let day of timeline) {
+            for (let spot of day.selected_spots) {
+                const destinationResult = await pool.query(
+                    `INSERT INTO destinations (trip_id, name, category, cost, duration, travel_time, day_date, week_day, order_index) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+                    [
+                        tripId,
+                        spot.name,
+                        spot.category,
+                        spot.cost,
+                        spot.duration,
+                        spot.travelTime,
+                        day.dayDate, // Adding dayDate for each spot
+                        day.weekDay,
+                        spot.order_index ,// Ensure you set an order_index or calculate it here
+                    ]
+                );
+                insertedDestinations.push(destinationResult.rows[0]);
+            }
         }
         let insertedBudgets = [];
         if (budget && typeof budget === "object") {

@@ -59,7 +59,6 @@ const SetSecene = ({ onClickNext }) => {
   const [departureMinuteRT, setDepartureMinuteRT] = useState("");
   const [arrivalHourRT, setArrivalHourRT] = useState("");
   const [arrivalMinuteRT, setArrivalMinuteRT] = useState("");
- 
 
   const [error, setError] = useState("");
 
@@ -74,9 +73,14 @@ const SetSecene = ({ onClickNext }) => {
     setStartDt,
     endDt,
     setEndDt,
-    startCoordinates, setStartCoordinates,
-    destinationCoordinates, setDestinationCoordinates,
-    title, setTitle
+    startCoordinates,
+    setStartCoordinates,
+    destinationCoordinates,
+    setDestinationCoordinates,
+    title,
+    setTitle,
+    transportBudget,
+    setTransportBudget,
   } = useContext(tripContext);
   const today = new Date();
 
@@ -95,11 +99,10 @@ const SetSecene = ({ onClickNext }) => {
     } else if (!data.destination) {
       setError("Please enter Destination");
       return;
-    } else if( data.start_point.trim() == data.destination.trim()){
+    } else if (data.start_point.trim() == data.destination.trim()) {
       setError("Start Point and End Point cannot be the same");
       return;
-    } 
-    else if (!startDate) {
+    } else if (!startDate) {
       setError("Please enter Start Date");
       return;
     } else if (!endDate) {
@@ -195,7 +198,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MjM2MTEyLCJleHAiOjE3NDQyMzk3MTJ9.BsP8EaBucnOEIkoKO3-kUjhRnrWgcxQdrQujKHa6EAs",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MzMyMzE4LCJleHAiOjE3NDQzMzU5MTh9.DYbgnjJWWQ1R4GaYZbPoVlSSpo0pC67ofOtL0Y3JvM4",
           },
         }
       )
@@ -206,6 +209,12 @@ const SetSecene = ({ onClickNext }) => {
         setStartDt(startDate);
         setEndDt(endDate);
         setTitle(data.title);
+        setTransportBudget(
+          Number(data.fuel_budget) ||
+            0 + Number(data.outbound_flight?.budgetOB) ||
+            0 + Number(data.return_flight?.budgetRT) ||
+            0
+        );
         onClickNext(1);
       })
       .catch(function (error) {
@@ -493,7 +502,11 @@ const SetSecene = ({ onClickNext }) => {
     } else {
       setArrivalMinuteRT(value);
       if (arrivalHourRT && value) {
-        handleFlightChange("arrival_timeRT", `${arrivalHourRT}:${value}`, false);
+        handleFlightChange(
+          "arrival_timeRT",
+          `${arrivalHourRT}:${value}`,
+          false
+        );
       }
     }
   };
@@ -516,7 +529,7 @@ const SetSecene = ({ onClickNext }) => {
 
   return (
     <div>
-      <div className="text-center mt-10 mb-16">
+      <div className="text-center m-5 mb-16">
         <h3 className="text-topHeader text-2xl font-kaushan">
           {" "}
           <span className="text-white font-aboreto font-semibold">
@@ -649,13 +662,12 @@ const SetSecene = ({ onClickNext }) => {
                     arrival_timeOB: null,
                   },
                 });
-                setStartValueOBFrom(""); 
-                setDestinationValueOBFrom(""); 
+                setStartValueOBFrom("");
+                setDestinationValueOBFrom("");
                 setDepartureHourOB("");
                 setArrivalHourOB("");
                 setDepartureMinuteOB("");
                 setArrivalMinuteOB("");
-                
               }}
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
             />
@@ -692,14 +704,13 @@ const SetSecene = ({ onClickNext }) => {
                     arrival_timeRT: null,
                   },
                 });
-                setStartValueOBTo(""); 
-                setDestinationValueOBTo(""); 
+                setStartValueOBTo("");
+                setDestinationValueOBTo("");
                 setDepartureHourRT("");
                 setDepartureMinuteRT("");
                 setArrivalHourRT("");
                 setArrivalMinuteRT("");
               }}
-              
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
             />
             <label>Road</label>
