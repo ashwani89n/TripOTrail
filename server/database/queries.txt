@@ -44,16 +44,13 @@ CREATE TABLE destinations (
     destination_id SERIAL PRIMARY KEY,
     trip_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
-    address TEXT NOT NULL,
-    image TEXT, 
-    is_added BOOLEAN DEFAULT TRUE,
-    duration INTERVAL, 
-    start_time TIME, 
-    cost DECIMAL(10,2), 
-    latitude DECIMAL(9,6),  
-    longitude DECIMAL(9,6), 
-    position VARCHAR(10), 
-    order_index INTEGER,
+    category VARCHAR(50) NOT NULL,    -- spot, start, accomodation, end
+    cost DECIMAL(10,2),
+    duration INTERVAL,
+    travel_time VARCHAR(50),  -- Duration of travel to the spot
+    day_date DATE,            -- Date of the day for the spot (useful for timeline)
+    week_day VARCHAR(10),
+    order_index INTEGER,      -- Order of the spot in the day
 
     FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
 );
@@ -104,6 +101,14 @@ CREATE TABLE media (
 
     FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
 );
+
+
+drop table destinations;
+drop table budget;
+drop table media;
+drop table expenses;
+drop table tripmates;
+drop table trips;
 
 
 

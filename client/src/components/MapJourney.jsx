@@ -683,7 +683,7 @@ const MapJourney = ({
         coordinates: { lat, lng },
       };
       setAccommodationDetails(updated);
-      setActiveAccommodationDay(null); // hide suggestions
+      setActiveAccommodationDay(null); 
     } catch (error) {
       console.log("Error: ", error);
     }
@@ -692,7 +692,7 @@ const MapJourney = ({
   return (
     <div>
       <div>
-        <div className="text-center mt-10 mb-16">
+        <div className="text-center mt-5 mb-16">
           <h3 className="text-topHeader text-2xl font-kaushan">
             {" "}
             <span className="text-white font-aboreto font-semibold">
