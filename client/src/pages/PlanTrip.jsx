@@ -11,6 +11,7 @@ import "./planTrip.css";
 import SetSecene from "../components/SetSecene";
 import PickSpots from "../components/PickSpots";
 import MapJourney from "../components/MapJourney";
+import LockJourney from "../components/LockJourney";
 import { tripContext } from "../context/useTripDataContext";
 
 const PlanTrip = () => {
@@ -19,12 +20,6 @@ const PlanTrip = () => {
   const [destinationPoint, setDestinationPoint] = useState();
   const [startDt, setStartDt] = useState(new Date());
   const [endDt, setEndDt] = useState(new Date());
-<<<<<<< Updated upstream
-  const [page, setPage] = useState(2);
-  const [startCoordinates, setStartCoordinates] = useState(null);
-  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
-  const [selectedSpotsData, setSelectedSpotsData] = useState([]);
-=======
   const [page, setPage] = useState(0);
   const [startCoordinates, setStartCoordinates] = useState(null);
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
@@ -139,7 +134,6 @@ const PlanTrip = () => {
 //     }
 // ]
 // );
->>>>>>> Stashed changes
   const [title, setTitle] = useState("");
   const [transportBudget, setTransportBudget] = useState(0);
  
@@ -220,13 +214,9 @@ const PlanTrip = () => {
         </div>
         {page === 0 && <SetSecene onClickNext={setPage} />}
         {page === 1 && <PickSpots onClickNextPrev={setPage} sendDataToParent ={setSelectedSpotsData}/>}
-<<<<<<< Updated upstream
-        {page === 2 && <MapJourney onClickNextPrev={setPage} selectedAttraction={selectedSpotsData}/>} 
-=======
         {console.log("a:", selectedSpotsData)}
         {page === 2 && <MapJourney onClickNextPrev={setPage} selectedAttraction={selectedSpotsData} sendDataToParent = {setFinalData}/>}          
         {page === 3 && <LockJourney onClickNextPrev={setPage} data = {finalData}/>} 
->>>>>>> Stashed changes
       </div>
     </tripContext.Provider>
   );

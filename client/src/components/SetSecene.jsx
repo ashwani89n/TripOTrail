@@ -198,11 +198,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-<<<<<<< Updated upstream
               "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MTU3NzEyLCJleHAiOjE3NDQxNjEzMTJ9.tmPStiDSCJ9iyzFEEFvBTD8Wi16B7EqYZLKxZlIYbEY",
-=======
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MzMyMzE4LCJleHAiOjE3NDQzMzU5MTh9.DYbgnjJWWQ1R4GaYZbPoVlSSpo0pC67ofOtL0Y3JvM4",
->>>>>>> Stashed changes
           },
         }
       )
