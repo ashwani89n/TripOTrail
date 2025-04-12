@@ -1,9 +1,7 @@
 // TripCard.js
 import React from "react";
 import BudgetCharts from "./BudgetCharts";
-import noUpcomingImg from "../images/noUpcomingTrips.png";
-import noActiveImg from "../images/noActiveTrips.png";
-import noPastImg from "../images/noPastTrips.png";
+
 
 const TripCard = ({ type, trip, onNextClick, showCountdown }) => {
   return (
