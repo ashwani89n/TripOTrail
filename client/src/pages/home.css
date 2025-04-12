@@ -1,0 +1,9 @@
+.heroImage{
+    background-image: url("../images/HomeHero.jpeg");
+    background-size: cover;
+
+}
+
+.heroContent{
+   background: #FFFFFF40; 
+}

@@ -1,0 +1,50 @@
+/* Header.css */
+
+/* For screen size between 1000px and 1600px */
+/* @media (min-width: 1024px) and (max-width: 1600px) {
+    .header .container {
+      display: flex;
+      flex-direction: column; 
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .header .logo {
+      margin-bottom: 20px; 
+    }
+  
+    .header nav {
+        padding-left: 20px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+  
+    .header nav ul {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem; 
+    }
+  } */
+  
+  .nav_menu_link {
+    /* border-bottom: 2px solid #0000; */
+    padding: .5rem 1rem;
+    font-weight: 500;
+    transition: border .4s;
+}
+.w-nav-link {
+    vertical-align: top;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+}
+
+  .backgroundHeader{
+    background-color: #0000;
+  }
