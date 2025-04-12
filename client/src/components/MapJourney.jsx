@@ -110,6 +110,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
     startCoordinates,
     destinationCoordinates,
     title,
+    transportBudget
   } = useContext(tripContext);
 
 //   const startDt = "Tue Apr 08 2025 12:56:10 GMT-0400 (Eastern Daylight Time)";
@@ -420,6 +421,97 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
         setError(`Please enter Budget for "${label}"`);
         return;
       }
+<<<<<<< Updated upstream
+=======
+      return attraction;
+    });
+
+    // Filter and sort valid attractions
+    const visible = updatedAttractions.filter((p) => p.is_added);
+
+    // Get start/end from visible list
+    const start = visible.find((p) => p.position === "start");
+    const end = visible.find((p) => p.position === "end");
+
+    // Recompute order_index and ensure position is valid
+    const reindexed = updatedAttractions.map((p) => {
+      if (p.name === start?.name) {
+        return { ...p, order_index: 1, position: "start" };
+      }
+      if (p.name === end?.name) {
+        return {
+          ...p,
+          order_index: visible.length,
+          position: "end",
+        };
+      }
+
+      const idx = visible.findIndex((b) => b.name === p.name);
+      return {
+        ...p,
+        order_index: p.is_added ? idx + 1 : "",
+        position: "between",
+      };
+    });
+
+    setAttractions(reindexed);
+
+    // Update dayMap as well
+    const newDayMap = { ...dayMap };
+    Object.keys(newDayMap).forEach((key) => {
+      newDayMap[key] = newDayMap[key].map((spot) =>
+        spot.name === item.name ? { ...spot, is_added: !spot.is_added } : spot
+      );
+    });
+    setDayMap(newDayMap);
+  };
+
+  const toggleAccommodation = (day) => {
+    if (day === daysCount) return;
+    const updatedAccommodations = [...accommodations];
+    updatedAccommodations[day - 1] = !updatedAccommodations[day - 1];
+    setAccommodations(updatedAccommodations);
+
+    // Reset values if turned off
+    if (!updatedAccommodations[day - 1]) {
+      setAccommodationValue("");
+
+    }
+  };
+
+  const {
+    ready: accommodationReady,
+    value: accommodationValue,
+    suggestions: { status: accommodationStatus, data: accommodationData },
+    setValue: setAccommodationValue,
+    clearSuggestions: clearAccommodationSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      types: ["establishment"], // You can modify this based on the type of accommodation
+    },
+    debounce: 300,
+  });
+
+  const handleAccommodationSelect = async (address, day) => {
+    setAccommodationValue(address);
+    clearAccommodationSuggestions();
+
+    try {
+      const results = await getGeocode({ address });
+      const { lat, lng } = await getLatLng(results[0]);
+
+      const updated = [...accommodationDetails];
+      updated[day - 1] = {
+        ...updated[day - 1],
+        name: address,
+        location: address,
+        coordinates: { lat, lng },
+      };
+      setAccommodationDetails(updated);
+      setActiveAccommodationDay(null); 
+    } catch (error) {
+      console.log("Error: ", error);
+>>>>>>> Stashed changes
     }
     // onClickNextPrev((prev) => prev + 1);
   };
@@ -427,7 +519,7 @@ const MapJourney = ({ onClickNextPrev, selectedAttraction }) => {
   return (
     <div>
       <div>
-        <div className="text-center mt-10 mb-16">
+        <div className="text-center mt-5 mb-16">
           <h3 className="text-topHeader text-2xl font-kaushan">
             {" "}
             <span className="text-white font-aboreto font-semibold">

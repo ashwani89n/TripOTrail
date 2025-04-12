@@ -6,8 +6,8 @@ exports.getTrips = async (req, res) => {
   try {
     const userId = req.user.id;
     const tripResult = await pool.query(
-        'SELECT * FROM trips WHERE user_id = $1',
-        [userId]
+        'SELECT * FROM trips WHERE user_id = $1 AND status = $2',
+  [userId, 'Confirm']
       );
       const trips = [];
 

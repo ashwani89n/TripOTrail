@@ -19,7 +19,9 @@ export default {
         list:"rgba(28, 28, 28, 1)",
         textCard:"rgba(141,141,141,1)",
         topHeaderLite:"rgba(223, 128, 20, 0.31)",
-        textCardDark:"rgb(40, 40, 40)"
+        textCardDark:"rgb(40, 40, 40)",
+        textCardDarker:"rgb(89, 89, 89)",
+        myTripSearchBGLite:"rgba(255, 255, 255, 0.56)",
          // Add your custom color
       },
       fontSize: {

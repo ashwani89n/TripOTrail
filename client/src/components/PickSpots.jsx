@@ -16,7 +16,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);
   const apiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
   const { tripId, destinationPoint, startPoint, startDt, endDt , startCoordinates,
-    destinationCoordinates} =
+    destinationCoordinates, title, transportBudget} =
     useContext(tripContext);
   const [error, setError] = useState("");
 
@@ -84,7 +84,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
           id: attraction.name,
         })),
         { id: "end", name: destinationPoint, position: destinationCoordinates },
-      ];
+      ]; 
 
       const optimizedRoute = getOptimizedRoute(
         { position: startCoordinates, name: startPoint},
@@ -109,7 +109,6 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
         ];
     
         setSelectedSpotsData(finalizedSpots);
-        console.log(finalizedSpots);
 
 
     if (!finalizedSpots || finalizedSpots.length === 0) {
@@ -123,29 +122,6 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
       onClickNextPrev((prev) => prev + 1);
 
     }
-
-    // const response = await axios
-    //   .post(
-    //     `/api/trips/${tripId}/destinations`,
-    //     {
-    //       ...data,
-    //       selected_spots: finalizedSpots,
-    //     },
-    //     {
-    //       headers: {
-    //         Authorization:
-    //           "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MDYzNjczLCJleHAiOjE3NDQwNjcyNzN9.eqqtcPpFn4BpYsbHIPWW2Fx_1me9VwBY_9GpTc4OwlQ",
-    //       },
-    //     }
-    //   )
-    //   .then(function (response) {
-    //     onClickNextPrev((prev) => prev + 1);
-    //     console.log(response.data);
-    //   })
-    //   .catch(function (error) {
-    //     console.log(error);
-    //   });
-
     }else {
       setError("No optimal route found.");
     }
@@ -319,7 +295,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
   return (
     <>
       <div>
-        <div className="text-center mt-10 mb-16">
+        <div className="text-center mt-5 mb-16">
           <h3 className="text-topHeader text-2xl font-kaushan">
             {" "}
             <span className="text-white font-aboreto font-semibold">
