@@ -8,6 +8,10 @@ import tripJeep from "../images/TripJeep.png";
 import UpcomingMytrip from "../components/UpcomingMytrip";
 import ActiveMyTrip from "../components/ActiveMyTrip";
 import PastMyTrip from "../components/PastMyTrip";
+import attch from "../images/Attach.png";
+import endTrip from "../images/Remove.png";
+import addStop from "../images/Address.png";
+
 const TripDetails = () => {
   const [myTripsByIdData, setMyTripsByIdData] = useState({});
   const [error, setError] = useState("");
@@ -18,10 +22,11 @@ const TripDetails = () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ0NTYxOTM5LCJleHAiOjE3NDQ1NjU1Mzl9.VIaZoLEJAi2USut7DCEFTI0_zB1rTY2_TQ55T8S29H8`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTgzMDQ4LCJleHAiOjE3NDQ1ODY2NDh9.PlaOwIwVVbMqI5ENE18stb6LcEGA02mq1n6t5SK_hfU`,
         },
       });
       setMyTripsByIdData(response.data);
+      console.log(response.data);
     } catch (error) {
       setError(error.response?.data?.message || "Trips Loading Unsuccessful");
       console.log({ error });
@@ -31,7 +36,6 @@ const TripDetails = () => {
   useEffect(() => {
     console.log("USE EFFECT");
     if (!tripId) return;
-
     getTripById();
   }, []);
 
@@ -40,26 +44,80 @@ const TripDetails = () => {
       <Header />
       <div className="mt-10 text-white">
         <div className=" p-1 text-topHeader rounded-lg cursor-pointer text-center font-aldrich text-2xl">
-          {myTripsByIdData.title && (
-            <>
-              <span className="text-white">
-                {`${myTripsByIdData.title.split(" ")[0]}`}&nbsp;
-              </span>
-              <span>{myTripsByIdData.title.split(" ").slice(1).join(" ")}</span>
-            </>
-          )}
+          <div className="flex flex-row justify-between items-center w-full px-10">
+            {/* Center Title + Team Members */}
+            <div className="flex flex-row items-center justify-center mx-auto text-center">
+              {myTripsByIdData.title && (
+                <div className="flex items-center justify-center text-2xl font-aldrich text-topHeader">
+                  <span className="text-white mr-1">
+                    {myTripsByIdData.title.split(" ")[0]}
+                  </span>
+                  <span>
+                    {myTripsByIdData.title.split(" ").slice(1).join(" ")}
+                  </span>
+                </div>
+              )}&nbsp;
+              <div className="flex items-center justify-center">
+                {myTripsByIdData.team_members
+                  ?.slice(0, 3)
+                  .map((mate, index) => (
+                    <div
+                      key={index}
+                      className={`relative w-8 h-8 rounded-full bg-textCardDark border border-textCard flex items-center justify-center text-sm text-white ${
+                        index !== 0 ? "-ml-3" : ""
+                      }`}
+                      style={{ zIndex: 10 + index }}
+                    >
+                      {mate.profile_picture ? (
+                        <img
+                          src={`http://localhost:5000${mate.profile_picture}`}
+                          alt={`Tripmate ${index + 1}`}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center rounded-full bg-textInputBG">
+                          <CiUser className="text-white w-full h-full p-2" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Right Action Icons */}
+            <div className="flex flex-row gap-2">
+              <div className="bg-topHeader rounded-sm w-7 h-7">
+                <img src={attch} className="w-full h-full p-1" />
+              </div>
+              <div className="bg-topHeader rounded-sm w-7 h-7">
+                <img src={addStop} className="w-full h-full p-1" />
+              </div>
+              <div className="bg-topHeader rounded-sm w-7 h-7">
+                <img src={endTrip} className="w-full h-full p-1" />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="text-white font-inria flex flex-row mt-3 items-center justify-center gap-4">
-          <div className="flex flex-col items-center justify-center">
-            <img src={tripJeep} alt="" />
-            <p className="text-[10px] font-inria">
+        <div className="flex flex-col items-center justify-center w-full mt-8">
+          {/* Icons and dashed line */}
+          <div className="flex flex-row items-center justify-center gap-4 w-[50%]">
+            <div className="flex flex-col items-center justify-center pl-20">
+              <img src={tripJeep} alt="" className="w-6 h-6" />
+            </div>
+
+            <div className="flex-1 border-t border-dashed border-topHeader h-0" />
+
+            <div className="flex flex-col items-center justify-center">
+              <img src={destinationPin} alt="" className="w-5 h-5 mr-20" />
+            </div>
+          </div>
+
+          {/* Text under icons */}
+          <div className="flex flex-row justify-between w-[50%] mt-2 text-white font-inria">
+            <p className="text-left w-1/2 text-md ">
               {myTripsByIdData.start_point}
             </p>
-          </div>
-          <div className="border-t-2 border-topHeader border-dashed w-[30%]" />
-          <div className="flex flex-col items-center justify-center">
-            <img src={destinationPin} alt="" />
-            <p className="text-[10px] font-inria">
+            <p className="text-right w-1/2 text-md ">
               {myTripsByIdData.destination}
             </p>
           </div>

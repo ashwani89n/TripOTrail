@@ -47,7 +47,8 @@ const MyTrip = () => {
       const response = await axios.get(`/api/trips`, {
         headers: {
           Authorization:
-            `Bearer ${token}`,
+            // `Bearer ${token}`,
+            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTc5MzQ3LCJleHAiOjE3NDQ1ODI5NDd9.6IVbWKwvIyjroSdYB44HAxuYaq6I6iNJws3nRkQCnJU`,
         },
       });
       console.log(response.data);

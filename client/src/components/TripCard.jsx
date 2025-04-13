@@ -63,6 +63,7 @@ const TripCard = ({
 
       {trip ? (
         <div >
+          
           {(() => {
             const [date, weekday] = formatDate(new Date(trip.start_date));
             return (
@@ -106,15 +107,19 @@ const TripCard = ({
               alt="trip"
               className="w-[40%] bg-contain rounded-l-lg"
             />
+
             <div className="text-topHeader flex flex-col w-full">
+            <Link to={`/myTrip/${trip.trip_id}`} className="cursor-pointer">
               <div className="flex flex-row justify-between">
                 <div className="flex flex-col mt-3">
-                  <Link to={`/myTrip/${trip.trip_id}`} className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria cursor-pointer">
+                <div className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria ">
+                  
                     <span className="text-white">
                       {`${trip.title.split(" ")[0]}`}&nbsp;
                     </span>
                     {trip.title.split(" ").slice(1).join(" ")}
-                  </Link>
+                  
+                  </div>
                   <div className="text-[10px] pl-1 mb-2 text-textCard">
                     {calculateTripDays(trip.start_date, trip.end_date)} days
                     venture
@@ -144,6 +149,7 @@ const TripCard = ({
                   ))}
                 </div>
               </div>
+              </Link>
 
               <div className="flex flex-row justify-evenly gap-2 items-center mt-5 p-1">
                 <div className="text-center flex flex-col justify-center">

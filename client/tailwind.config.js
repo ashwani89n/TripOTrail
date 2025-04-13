@@ -22,6 +22,7 @@ export default {
         textCardDark:"rgb(40, 40, 40)",
         textCardDarker:"rgb(89, 89, 89)",
         myTripSearchBGLite:"rgba(255, 255, 255, 0.56)",
+        calendarView:"rgba(58, 58, 58, 1)",
          // Add your custom color
       },
       fontSize: {

@@ -15,6 +15,7 @@ exports.getTrips = async (req, res) => {
       [userId, "Confirm"]
     );
     const trips = [];
+    console.log("Get:", tripResult.rows, userId);
 
     for (const trip of tripResult.rows) {
       const { trip_id: tripId } = trip;

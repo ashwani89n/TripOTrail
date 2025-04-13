@@ -25,6 +25,7 @@ const PlanTrip = () => {
   const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);
   const [finalData, setFinalData] = useState([]);
+  
 
   console.log(selectedSpotsData);
 //   const [finalData, setFinalData] = useState([

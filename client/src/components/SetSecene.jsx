@@ -16,6 +16,7 @@ import usePlacesAutocomplete, {
 import axios from "axios";
 import { tripContext } from "../context/useTripDataContext";
 
+
 const SetSecene = ({ onClickNext }) => {
   const {token} = useContext(tripContext);
   const [data, setData] = useState({
@@ -30,6 +31,7 @@ const SetSecene = ({ onClickNext }) => {
     outbound_flight: {},
     return_flight: {},
   });
+
 
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
@@ -196,7 +198,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ0NTM3Njg3LCJleHAiOjE3NDQ1NDEyODd9.t4eVRxBG0W3CYIJ8yfKykuA2DEdnGNKzwFBFIx7SCXE`,
+              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc0NDU3NTMyMiwiZXhwIjoxNzQ0NTc4OTIyfQ.xTQp5NdOtPhNIRG_4-m0hZC7Hz9_48Cp_Q3m2_1bqLA`,
           },
         }
       )
