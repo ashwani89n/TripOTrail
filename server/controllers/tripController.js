@@ -52,7 +52,7 @@ exports.getTrips = async (req, res) => {
 
       // Get team members
       const teamResult = await pool.query(
-        'SELECT name, email FROM tripmates WHERE trip_id = $1',
+        'SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1',
         [tripId]
       );
       const team_members = teamResult.rows;

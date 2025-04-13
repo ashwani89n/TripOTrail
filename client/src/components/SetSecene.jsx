@@ -99,9 +99,6 @@ const SetSecene = ({ onClickNext }) => {
     } else if (!data.destination) {
       setError("Please enter Destination");
       return;
-    } else if (data.start_point.trim() == data.destination.trim()) {
-      setError("Start Point and End Point cannot be the same");
-      return;
     } else if (!startDate) {
       setError("Please enter Start Date");
       return;
@@ -198,7 +195,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MTU3NzEyLCJleHAiOjE3NDQxNjEzMTJ9.tmPStiDSCJ9iyzFEEFvBTD8Wi16B7EqYZLKxZlIYbEY",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTA0NDE1LCJleHAiOjE3NDQ1MDgwMTV9.l7ddjftj0Q_5_n9t1DMbdtxkGaxGLlpcY2_YMMs-TAw",
           },
         }
       )

@@ -37,7 +37,7 @@ const MyTrip = () => {
       const response = await axios.get(`/api/trips`, {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NDM4OTg3LCJleHAiOjE3NDQ0NDI1ODd9.PcYFX91tPDfeX767jR9VrDcPUSEUqiFBltT8B_hFjhg",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTA3NDgyLCJleHAiOjE3NDQ1MTEwODJ9.4uapdTV8qC0RP-ywdCOMgR9M-xpm9QJePNFglzurAZc",
         },
       });
       console.log(response.data);
@@ -79,9 +79,10 @@ const MyTrip = () => {
         <input type="text" value="Search" className="text-textCardDarker bg-transparent" />
       </div>
   
-      <div className="flex flex-row justify-evenly">
+      <div className="flex flex-col md:flex-row justify-between items-center p-6">
         <TripCard
           type="Upcoming"
+          totalTrips={upcomingTrips.length}
           trip={upcomingTrips[upcomingIndex]}
           onNextClick={() => setUpcomingIndex(prev => prev + 1)}
           showCountdown={true}
@@ -89,6 +90,7 @@ const MyTrip = () => {
   
         <TripCard
           type="Active"
+          totalTrips={activeTrips.length}
           trip={activeTrips[activeIndex]}
           onNextClick={() => setActiveIndex(prev => prev + 1)}
           showCountdown={false}
@@ -96,6 +98,7 @@ const MyTrip = () => {
   
         <TripCard
           type="Past"
+          totalTrips={pastTrips.length}
           trip={pastTrips[pastIndex]}
           onNextClick={() => setPastIndex(prev => prev + 1)}
           showCountdown={false}
