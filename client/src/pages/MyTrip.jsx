@@ -31,6 +31,7 @@ const MyTrip = () => {
   dayjs.extend(weekday);
   dayjs.extend(localizedFormat);
   dayjs.extend(advancedFormat);
+  console.log("token:", token);
 
   const formatDate = (isoDate) => {
     return dayjs(isoDate).format("DD MMMM, YYYY | dddd");

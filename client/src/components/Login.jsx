@@ -30,7 +30,7 @@ const Login = () => {
           try {
             const response = await axios.post(`/api/auth/login`, data).then(function (response) {
               setToken(response.data.token);
-              console.log(response.data.token)
+              console.log("token:", response.data.token);
               }
             );
             navigate("/");
