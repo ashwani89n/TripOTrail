@@ -31,6 +31,7 @@ function LockJourney({ onClickNextPrev, data }) {
   const [activitiesBudget, setActivitiesBudget] = useState(0);
   const [foodBudget, setfoodBudget] = useState(0);
   const navigate = useNavigate();
+  const {token} = useContext(tripContext);
 
   const {
     tripId,
@@ -302,7 +303,7 @@ function LockJourney({ onClickNextPrev, data }) {
         requestPayload,
         {
           headers: {
-            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTI5MjQ3LCJleHAiOjE3NDQ1MzI4NDd9.6IjMhalf6w9XOrdUMIl9K4I_y4HBVg-T3myaHRYZJQo",
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ0NTM3Njg3LCJleHAiOjE3NDQ1NDEyODd9.t4eVRxBG0W3CYIJ8yfKykuA2DEdnGNKzwFBFIx7SCXE`,
           },
         }
       );

@@ -1,12 +1,16 @@
 // TripCard.js
 import React from "react";
-import BudgetCharts from "./BudgetCharts";
 import destinationPin from "../images/destinationPin.png";
 import tripJeep from "../images/TripJeep.png";
+import BudgetCharts from "./BudgetCharts";
 import homeHero from "../images/HomeHero.jpeg";
 import tripsNext from "../images/MyTripsNext.png";
 import tripsPrev from "../images/MyTripsPrevious.png";
 import { CiUser } from "react-icons/ci";
+import { Link } from "react-router-dom";
+// import noUpcomingImg from "../images/noUpcomingTrips.png";
+// import noActiveImg from "../images/noActiveTrips.png";
+// import noPastImg from "../images/noPastTrips.png";
 
 const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
   const formatDate = (date) => {
@@ -50,7 +54,7 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
       </div>
 
       {trip ? (
-        <>
+        <div >
           {(() => {
             const [date, weekday] = formatDate(new Date(trip.start_date));
             return (
@@ -88,12 +92,12 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
             <div className="text-topHeader flex flex-col mt-3 w-full">
               <div className="flex flex-row justify-between">
                 <div className="flex flex-col mt-3">
-                  <div className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria ">
+                  <Link to={`/myTrip/${trip.trip_id}`} className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria cursor-pointer">
                     <span className="text-white">
                       {`${trip.title.split(" ")[0]}`}&nbsp;
                     </span>
                     {trip.title.split(" ").slice(1).join(" ")}
-                  </div>
+                  </Link>
                   <div className="text-[10px] pl-1 mb-2 text-textCard">
                     {calculateTripDays(trip.start_date, trip.end_date)} days
                     venture
@@ -109,16 +113,16 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
                       style={{ zIndex: 10 + index }} // ensures proper stacking
                     >
                       {mate.profile_picture ? (
-        <img
-        src={`http://localhost:5000${mate.profile_picture}`}
-          alt={`Tripmate ${index + 1}`}
-          className="w-full h-full object-cover rounded-full"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center rounded-full bg-textInputBG">
-          <CiUser className="text-white w-full h-full p-2" />
-        </div>
-      )}
+                        <img
+                          src={`http://localhost:5000${mate.profile_picture}`}
+                          alt={`Tripmate ${index + 1}`}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center rounded-full bg-textInputBG">
+                          <CiUser className="text-white w-full h-full p-2" />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -153,7 +157,7 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
           <button className="text-white mt-4" onClick={onNextClick}>
             Next
           </button>
-        </>
+        </div>
       ) : (
         <>
           {type === "Upcoming" && (
