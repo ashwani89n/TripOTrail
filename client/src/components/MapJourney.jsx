@@ -234,15 +234,37 @@ const MapJourney = ({
         indexLabel.style.fontWeight = "bold";
         markerContent.appendChild(indexLabel);
 
-        const marker = new window.google.maps.marker.AdvancedMarkerElement({
-          position: { lat: place.latitude, lng: place.longitude },
-          map: mapInstance,
-          content: markerContent,
-          title: `Attraction ${place.order_index}`,
-        });
+        // const marker = new window.google.maps.marker.AdvancedMarkerElement({
+        //   position: { lat: place.latitude, lng: place.longitude },
+        //   map: mapInstance,
+        //   content: markerContent,
+        //   title: `Attraction ${place.order_index}`,
+        // });
 
-        // Store the marker reference for later removal or updates
-        markerRefs.current.push(marker);
+        try {
+          // Make sure everything is loaded and correct
+          if (
+            window.google?.maps?.marker?.AdvancedMarkerElement &&
+            mapInstance instanceof window.google.maps.Map
+          ) {
+            const marker = new window.google.maps.marker.AdvancedMarkerElement({
+              position: { lat: place.latitude, lng: place.longitude },
+              map: mapInstance,
+              content: markerContent,
+              title: `Attraction ${place.order_index}`,
+            });
+        
+            // ✅ Only push if the marker was created
+            if (marker) {
+              markerRefs.current.push(marker);
+            }
+          } else {
+            console.warn("Advanced markers not available or map is invalid");
+          }
+        } catch (error) {
+          console.error("Failed to create advanced marker:", error);
+        }
+        
       });
   };
 
@@ -316,14 +338,37 @@ const MapJourney = ({
           indexLabel.style.fontWeight = "bold";
           markerContent.appendChild(indexLabel);
 
-          const marker = new window.google.maps.marker.AdvancedMarkerElement({
-            position: { lat: place.latitude, lng: place.longitude },
-            map,
-            content: markerContent,
-            title: `Attraction ${place.order_index}`,
-          });
+          // const marker = new window.google.maps.marker.AdvancedMarkerElement({
+          //   position: { lat: place.latitude, lng: place.longitude },
+          //   map,
+          //   content: markerContent,
+          //   title: `Attraction ${place.order_index}`,
+          // });
 
-          markerRefs.current.push(marker);
+          try {
+            // Make sure everything is loaded and correct
+            if (
+              window.google?.maps?.marker?.AdvancedMarkerElement &&
+              mapInstance instanceof window.google.maps.Map
+            ) {
+              const marker = new window.google.maps.marker.AdvancedMarkerElement({
+                position: { lat: place.latitude, lng: place.longitude },
+                map: mapInstance,
+                content: markerContent,
+                title: `Attraction ${place.order_index}`,
+              });
+          
+              // ✅ Only push if the marker was created
+              if (marker) {
+                markerRefs.current.push(marker);
+              }
+            } else {
+              console.warn("Advanced markers not available or map is invalid");
+            }
+          } catch (error) {
+            console.error("Failed to create advanced marker:", error);
+          }
+          
         });
     };
 

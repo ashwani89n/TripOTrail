@@ -16,12 +16,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const googleMapsApiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw"; // Replace with your key
+const mapLibraries = ["places", "marker"];
 
-function LockJourney({ onClickPrevNext, data }) {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey,
-    libraries: ["places"],
-  });
+function LockJourney({ onClickNextPrev, data }) {
+  // const { isLoaded, loadError } = useLoadScript({
+  //   googleMapsApiKey,
+  //   libraries: mapLibraries,
+  // });
 
   const [itinerary, setItinerary] = useState([]);
   const [error, setError] = useState("");
@@ -54,7 +55,12 @@ function LockJourney({ onClickPrevNext, data }) {
 
   const [req, setReq] = useState([]);
   useEffect(() => {
-    if (!isLoaded) return;
+    // if (!isLoaded) return;
+
+    if (!window.google || !window.google.maps) {
+      console.warn("Google Maps not loaded");
+      return;
+    }
 
     const fetchTravelTimes = async () => {
       try {
@@ -75,8 +81,14 @@ function LockJourney({ onClickPrevNext, data }) {
             spots[0].timeLine = currentTime.format("HH:mm");
 
             for (let i = 0; i < spots.length - 1; i++) {
+              const spot = spots[i];
               const origin = spots[i].name;
               const destination = spots[i + 1].name;
+
+              if (!origin || !destination) {
+                console.warn("Skipping invalid route", { origin, destination });
+                continue;
+              }
 
               const response = await new Promise((resolve, reject) => {
                 service.getDistanceMatrix(
@@ -95,22 +107,21 @@ function LockJourney({ onClickPrevNext, data }) {
                 );
               });
 
-              const travelTimeSec = response.rows[0].elements[0].duration.value;
+              const element = response?.rows?.[0]?.elements?.[0];
+              if (!element || element.status !== "OK" || !element.duration) {
+                console.warn("Distance Matrix failed for", {
+                  origin,
+                  destination,
+                  element,
+                });
+                continue;
+              }
+
+              const travelTimeSec = element.duration.value;
               const travelTimeMin = Math.floor(travelTimeSec / 60);
-              spots[i + 1].travelTime =
-                response.rows[0].elements[0].duration.text;
+              spots[i + 1].travelTime = element.duration.text;
 
-              // Convert duration "H:mm" or "M:ss" → total minutes
-              const [h, m] = (spots[i].duration || "0:00")
-                .split(":")
-                .map(Number);
-              const durationMins = h * 60 + m;
-
-              // Advance current time
-              currentTime = currentTime
-                .add(durationMins, "minute")
-                .add(10, "minute")
-                .add(travelTimeMin, "minute");
+              currentTime = currentTime.add(10, "minute").add(travelTimeMin, "minute");
 
               spots[i + 1].timeLine = currentTime.format("HH:mm");
             }
@@ -156,7 +167,8 @@ function LockJourney({ onClickPrevNext, data }) {
     };
 
     fetchTravelTimes();
-  }, [isLoaded, data]);
+    // }, [isLoaded, data]);
+  }, [data]);
 
   const handleTimeChange = (e, dayIdx, spotIdx, part) => {
     const value = e.target.value;
@@ -175,30 +187,88 @@ function LockJourney({ onClickPrevNext, data }) {
   };
 
   const handlePrevious = () => {
-    onClickPrevNext((prev) => prev - 1);
+    onClickNextPrev((prev) => prev - 1);
   };
 
+  // const handleNext = async () => {
+  //   const teamMembersWithBase64 = await Promise.all(
+  //     members.map(async (m) => {
+  //       let profilePictureBase64 = "";
+
+  //       if (m.photo && m.photo instanceof File) {
+  //         try {
+  //           profilePictureBase64 = await convertToBase64(m.photo);
+  //         } catch (error) {
+  //           console.error("Error converting photo to base64:", error);
+  //         }
+  //       } else if (typeof m.photo === "string") {
+  //         profilePictureBase64 = m.photo; // already base64
+  //       }
+
+  //       return {
+  //         name: m.name,
+  //         email: m.email,
+  //         profile_picture: profilePictureBase64,
+  //       };
+  //     })
+  //   );
+
+  //   const formattedTimeline = itinerary.map((day) => ({
+  //     day: day.day,
+  //     dayDate: day.dayDate,
+  //     weekDay: day.weekDay,
+  //     selected_spots: day.selected_spots.map((spot, i) => ({
+  //       name: spot.name,
+  //       category: spot.category,
+  //       cost: spot.cost || 0,
+  //       duration: spot.duration || "0:00",
+  //       travelTime: spot.timeLine || "00:00",
+  //       order_index: i + 1,
+  //     })),
+  //   }));
+
+  //   const requestPayload = {
+  //     timeline: formattedTimeline,
+  //     budget: {
+  //       transport: transportBudget,
+  //       food: foodBudget,
+  //       accommodation: accommodationBudget,
+  //       activities: activitiesBudget,
+  //     },
+  //     team_members: members.map((m) => ({
+  //       name: m.name,
+  //       email: m.email,
+  //       profile_picture: m.photo || "", // ✅ already base64
+  //     })),
+
+  //     status: "Confirm",
+  //   };
+
+  //   // Only set state if needed
+  //   setReq(requestPayload);
+  //   console.log(requestPayload);
+
+  //   try {
+  //     const response = await axios.post(
+  //       `/api/trips/${tripId}/destinations`,
+  //       requestPayload,
+  //       {
+  //         headers: {
+  //           Authorization:
+  //             "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTE5ODEwLCJleHAiOjE3NDQ1MjM0MTB9.VV3BDEufD08st-9e1-06FGnJzFSZ3EVuIjOKY34aeLk",
+  //         },
+  //       }
+  //     );
+  //     navigate("/");
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
   const handleNext = async () => {
-    const teamMembersWithBase64 = await Promise.all(
-      members.map(async (m) => {
-        let profilePictureBase64 = "";
-
-        if (m.photo) {
-          try {
-            profilePictureBase64 = await convertToBase64(m.photo);
-          } catch (error) {
-            console.error("Error converting photo to base64:", error);
-          }
-        }
-
-        return {
-          name: m.name,
-          email: m.email,
-          profile_picture: profilePictureBase64,
-        };
-      })
-    );
-
+    // Upload profile pictures for each member
+    const teamMembersWithPhotos = await uploadMemberPhotos(members);
+  
     const formattedTimeline = itinerary.map((day) => ({
       day: day.day,
       dayDate: day.dayDate,
@@ -212,7 +282,7 @@ function LockJourney({ onClickPrevNext, data }) {
         order_index: i + 1,
       })),
     }));
-
+  
     const requestPayload = {
       timeline: formattedTimeline,
       budget: {
@@ -221,27 +291,18 @@ function LockJourney({ onClickPrevNext, data }) {
         accommodation: accommodationBudget,
         activities: activitiesBudget,
       },
-      team_members: members.map((m) => ({
-        name: m.name,
-        email: m.email,
-        profile_picture: m.photo || "", // ✅ already base64
-      })),
-
+      team_members: teamMembersWithPhotos,  // Include profile picture URLs here
       status: "Confirm",
     };
-
-    // Only set state if needed
-    setReq(requestPayload);
-    console.log(requestPayload);
-
+  
     try {
       const response = await axios.post(
         `/api/trips/${tripId}/destinations`,
+        // `/api/trips/1/destinations`,
         requestPayload,
         {
           headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTA3NDgyLCJleHAiOjE3NDQ1MTEwODJ9.4uapdTV8qC0RP-ywdCOMgR9M-xpm9QJePNFglzurAZc",
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTI5MjQ3LCJleHAiOjE3NDQ1MzI4NDd9.6IjMhalf6w9XOrdUMIl9K4I_y4HBVg-T3myaHRYZJQo",
           },
         }
       );
@@ -251,11 +312,40 @@ function LockJourney({ onClickPrevNext, data }) {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    console.log("Updated req:", req); // Logs the updated state
-  }, [req]);
-
+  
+  const uploadMemberPhotos = async (members) => {
+    const updatedMembers = await Promise.all(
+      members.map(async (member) => {
+        if (member.photo) {
+          // Prepare form data for uploading the file
+          const formData = new FormData();
+          formData.append('file', member.photo);  // Append the selected file to form data
+  
+          try {
+            // Send the file to the backend (where it's stored on the server or cloud storage)
+            const response = await axios.post("/api/uploads", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",  // Set correct header for file upload
+              },
+            });
+  
+            // Assuming the backend returns the URL of the uploaded image
+            const fileUrl = response.data.url;
+            
+            // Return the updated member with the photo URL
+            return { ...member, photo: fileUrl };
+          } catch (error) {
+            console.error("Error uploading image:", error);
+            return { ...member, photo: null }; // Fallback if upload fails
+          }
+        }
+        return member; // If no photo selected, return member as is
+      })
+    );
+  
+    return updatedMembers;
+  };
+  
   const handleAddMember = () => {
     if (!newMember.name.trim()) {
       setErrorPopUp("Please enter Name");
@@ -274,21 +364,14 @@ function LockJourney({ onClickPrevNext, data }) {
     setMembers(members.filter((_, i) => i !== index));
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const base64 = await convertToBase64(file);
-      setNewMember({ ...newMember, photo: base64 }); // ✅ store base64 string
+      setNewMember((prev) => ({ ...prev, photo: file }));
     }
   };
+  
 
-  const convertToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file); // this gives you: data:image/jpeg;base64,...
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
 
   return (
     <div className="p-6 text-white">
@@ -543,10 +626,14 @@ function LockJourney({ onClickPrevNext, data }) {
                     <li key={index} className="flex items-center gap-4 mb-3">
                       {member.photo ? (
                         <img
-                          src={member.photo} // ✅ works if photo is already base64
-                          alt="Member"
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
+                        src={
+                          typeof member.photo === "string"
+                            ? member.photo // It's a URL
+                            : URL.createObjectURL(member.photo) // It's a File object
+                        }
+                        alt="Member"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
                       ) : (
                         <div className="w-10 h-10 items-center justify-center rounded-full bg-textInputBG text-sm">
                           <CiUser className="text-white w-full h-full p-2" />
@@ -595,7 +682,7 @@ function LockJourney({ onClickPrevNext, data }) {
                           >
                             {newMember.photo ? (
                               <img
-                              src={newMember.photo}
+                                src={URL.createObjectURL(newMember.photo)} // Preview the selected file
                                 alt="Profile"
                                 className="w-20 h-20 object-cover rounded-full border-2 border-white"
                               />
@@ -608,7 +695,7 @@ function LockJourney({ onClickPrevNext, data }) {
                               id="photo-upload"
                               type="file"
                               accept="image/*"
-                              onChange={handleFileChange}
+                              onChange={(e) => handleFileChange(e)} // Handle file selection
                               className="hidden"
                             />
                           </label>

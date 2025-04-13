@@ -44,7 +44,7 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
   };
 
   return (
-    <div className="w-[90%] md:w-[32%] min-h-[400px] bg-darkBG p-4 rounded-lg shadow-lg mt-2 items-center my-5">
+    <div className="w-[90%] md:w-[32%] h-[400px] bg-darkBG p-4 rounded-lg shadow-lg mt-2 items-center my-5">
       <div className="bg-topHeader h-[38px] text-xl w-[80%] mx-auto relative -top-9 text-center text-white font-inria font-semibold flex items-center justify-center rounded-md">
         {type}
       </div>
@@ -79,11 +79,11 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
               </>
             );
           })()}
-          <div className="flex gap-5 mt-2 bg-list rounded-lg pr-2">
+          <div className="flex gap-5 mt-2 bg-list rounded-lg pr-2 h-[300px]">
             <img
               src={homeHero}
               alt="trip"
-              className="w-[50%] bg-contain rounded-l-lg"
+              className="w-[40%] bg-contain rounded-l-lg"
             />
             <div className="text-topHeader flex flex-col mt-3 w-full">
               <div className="flex flex-row justify-between">
@@ -103,14 +103,14 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
                   {trip.team_members?.slice(0, 3).map((mate, index) => (
                     <div
                       key={index}
-                      className={`relative w-10 h-10 rounded-full bg-textCardDark border-2 border-textCard flex items-center justify-center text-sm text-white ${
+                      className={`relative w-8 h-8 rounded-full bg-textCardDark border-2 border-textCard flex items-center justify-center text-sm text-white ${
                         index !== 0 ? "-ml-3" : ""
                       }`}
                       style={{ zIndex: 10 + index }} // ensures proper stacking
                     >
                       {mate.profile_picture ? (
         <img
-          src={mate.profile_picture}
+        src={`http://localhost:5000${mate.profile_picture}`}
           alt={`Tripmate ${index + 1}`}
           className="w-full h-full object-cover rounded-full"
         />
@@ -126,7 +126,7 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
 
               <div className="flex flex-row justify-evenly gap-2 items-center mt-5">
                 <div className="text-center flex flex-col justify-center">
-                  <img src={tripJeep} alt="start" className="w-5 ml-6" />
+                  <img src={tripJeep} alt="start" className="w-5 ml-4" />
                   <h3 className="text-white text-[6px]">{trip.start_point}</h3>
                 </div>
                 <div className="border-t-2 border-topHeader border-dashed w-[90%]" />
@@ -143,8 +143,9 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
                 {showCountdown ? (
                   <p className="text-center text-white mt-2">{trip.timeLeft}</p>
                 ) : (
-                  <BudgetCharts budget={trip.budget} expense={trip.expense} />
+                  <></>
                 )}
+                <BudgetCharts budget={trip.budget} expense={trip.expense} />
               </div>
             </div>
           </div>

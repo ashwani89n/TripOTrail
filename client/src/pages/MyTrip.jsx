@@ -37,7 +37,7 @@ const MyTrip = () => {
       const response = await axios.get(`/api/trips`, {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTA3NDgyLCJleHAiOjE3NDQ1MTEwODJ9.4uapdTV8qC0RP-ywdCOMgR9M-xpm9QJePNFglzurAZc",
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTI5MjQ3LCJleHAiOjE3NDQ1MzI4NDd9.6IjMhalf6w9XOrdUMIl9K4I_y4HBVg-T3myaHRYZJQo",
         },
       });
       console.log(response.data);

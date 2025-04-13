@@ -93,10 +93,13 @@ exports.addDestination = async (req, res) => {
         }
 
         let insertedTeamMembers = [];
+
+
         for (let member of team_members) {
+            console.log(member.photo);
             const teamMemberResult = await pool.query(
                 `INSERT INTO tripmates (trip_id, name, email, profile_picture) VALUES ($1, $2, $3, $4) RETURNING *`,
-                [tripId, member.name, member.email, member.profile_picture]
+                [tripId, member.name, member.email, member.photo ]
             );
             insertedTeamMembers.push(teamMemberResult.rows[0]);
         }
