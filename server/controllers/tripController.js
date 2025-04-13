@@ -4,7 +4,12 @@ const dayjs = require("dayjs");
 exports.getTrips = async (req, res) => {
   console.log("✅ getTrips called");
   try {
+    console.log("✅ getTrips ty called");
     const userId = req.user.id;
+  //   const tripResult = await pool.query(
+  //       'SELECT * FROM trips WHERE user_id = $1 AND status = $2',
+  // [userId, 'Confirm']
+  //     );
     const tripResult = await pool.query(
       "SELECT * FROM trips WHERE user_id = $1 AND status = $2",
       [userId, "Confirm"]
@@ -70,13 +75,13 @@ exports.getTrips = async (req, res) => {
       const startDate = dayjs(trip.start_date);
       const endDate = dayjs(trip.end_date);
 
-      let status = "";
+      let runningStatus = "";
       if (today.isBefore(startDate, "day")) {
-        status = "upcoming";
+        runningStatus = "upcoming";
       } else if (today.isAfter(endDate, "day")) {
-        status = "past";
+        runningStatus = "past";
       } else {
-        status = "active";
+        runningStatus = "active";
       }
 
       trips.push({
@@ -85,7 +90,7 @@ exports.getTrips = async (req, res) => {
         expense,
         team_members,
         media,
-        status,
+        runningStatus,
         totalBudget,
         totalExpense,
       });
@@ -99,6 +104,7 @@ exports.getTrips = async (req, res) => {
 
 exports.getTripById = async (req, res) => {
   try {
+    let trips ={};
     const { tripId } = req.params;
     const userId = req.user.id;
     const result = await pool.query(
@@ -106,11 +112,86 @@ exports.getTripById = async (req, res) => {
       [tripId, userId]
     );
 
+    const tripResult = result.rows[0]
+
+    const budgetResult = await pool.query(
+      `SELECT category, SUM(amount) AS total
+        FROM budget
+        WHERE trip_id = $1
+        GROUP BY category`,
+       [tripId]
+     );
+     const budget = {};
+     let totalBudget = 0;
+     for (const row of budgetResult.rows) {
+       console.log(row)
+       const amount = parseFloat(row.total);
+       budget[row.category] = amount;
+       totalBudget += amount;
+     }
+     // Get total expense
+     const expenseResult = await pool.query(
+      `SELECT category, SUM(amount) AS total
+       FROM expenses
+       WHERE trip_id = $1
+       GROUP BY category`,
+      [tripId]
+    );
+    console.log(tripId)
+    console.log("🧪 expenseResult.rows:", expenseResult.rows);
+    const expense = {};
+    let totalExpense = 0;
+    for (const row of expenseResult.rows) {
+      console.log(row)
+      const amount = parseFloat(row.total);
+      expense[row.category] = amount;
+      totalExpense += amount;
+    }
+
+
+    // Get team members
+    const teamResult = await pool.query(
+      'SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1',
+      [tripId]
+    );
+    const team_members = teamResult.rows;
+    const today = dayjs();
+
+    const startDate = dayjs(tripResult.start_date);
+    const endDate = dayjs(tripResult.end_date);
+    let runningStatus = "";
+      if (today.isBefore(startDate, "day")) {
+        runningStatus = "upcoming";
+      } else if (today.isAfter(endDate, "day")) {
+        runningStatus = "past";
+      } else {
+        runningStatus = "active";
+      }
+
+    console.log({
+      ...tripResult,
+      budget,
+      expense,
+      team_members,
+      totalBudget,
+      totalExpense
+    })
+    trips = {
+      ...tripResult,
+      runningStatus,
+      budget,
+      expense,
+      team_members,
+      totalBudget,
+      totalExpense
+    };
+
+
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(trips);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

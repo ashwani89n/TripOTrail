@@ -17,6 +17,7 @@ import axios from "axios";
 import { tripContext } from "../context/useTripDataContext";
 
 const SetSecene = ({ onClickNext }) => {
+  const {token} = useContext(tripContext);
   const [data, setData] = useState({
     title: "",
     start_point: "",
@@ -195,7 +196,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTY2Nzc0LCJleHAiOjE3NDQ1NzAzNzR9.xvV7BqJlJ-IVPijRG2ROtsV5Wt-cR63GUjFD3z1sRQU",
+              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ0NTM3Njg3LCJleHAiOjE3NDQ1NDEyODd9.t4eVRxBG0W3CYIJ8yfKykuA2DEdnGNKzwFBFIx7SCXE`,
           },
         }
       )

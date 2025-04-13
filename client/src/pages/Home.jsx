@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import "./home.css";
 import Plan1 from "../images/plan1.png";
 import Plan2 from "../images/plan2.png";
 import Plan3 from "../images/plan3.png";
-
+import { tripContext } from "../context/useTripDataContext";
 function Home() {
+  const [token, setToken] = useState("");
   return (
-    <div>
+    <tripContext.Provider value={{token, setToken}}>
       <Header />
       <div className="heroImage h-[790px] flex items-center ">
         <div className="heroContent ml-10 p-10 flex flex-col items-end rounded-xl">
@@ -104,7 +105,7 @@ function Home() {
           </div>
         </div>
       </div>
-    </div>
+    </tripContext.Provider>
   );
 }
 

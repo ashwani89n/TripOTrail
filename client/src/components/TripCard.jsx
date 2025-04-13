@@ -1,13 +1,17 @@
 // TripCard.js
 import React from "react";
-import BudgetCharts from "./BudgetCharts";
 import destinationPin from "../images/destinationPin.png";
 import tripJeep from "../images/TripJeep.png";
+import BudgetCharts from "./BudgetCharts";
 import homeHero from "../images/HomeHero.jpeg";
 import tripsNext from "../images/MyTripsNext.png";
 import tripsPrev from "../images/MyTripsPrevious.png";
 import { CiUser } from "react-icons/ci";
 import Slider from "react-slick"; // at top
+import { Link } from "react-router-dom";
+// import noUpcomingImg from "../images/noUpcomingTrips.png";
+// import noActiveImg from "../images/noActiveTrips.png";
+// import noPastImg from "../images/noPastTrips.png";
 
 const TripCard = ({
   type,
@@ -58,7 +62,7 @@ const TripCard = ({
       </div>
 
       {trip ? (
-        <>
+        <div >
           {(() => {
             const [date, weekday] = formatDate(new Date(trip.start_date));
             return (
@@ -104,13 +108,13 @@ const TripCard = ({
             />
             <div className="text-topHeader flex flex-col w-full">
               <div className="flex flex-row justify-between">
-                <div className="flex flex-col ">
-                  <div className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria ">
+                <div className="flex flex-col mt-3">
+                  <Link to={`/myTrip/${trip.trip_id}`} className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria cursor-pointer">
                     <span className="text-white">
                       {`${trip.title.split(" ")[0]}`}&nbsp;
                     </span>
                     {trip.title.split(" ").slice(1).join(" ")}
-                  </div>
+                  </Link>
                   <div className="text-[10px] pl-1 mb-2 text-textCard">
                     {calculateTripDays(trip.start_date, trip.end_date)} days
                     venture
@@ -208,7 +212,7 @@ const TripCard = ({
               </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <>
           {/* Conditional rendering for empty states */}

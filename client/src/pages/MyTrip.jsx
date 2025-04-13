@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import MytripsHero from "../images/MytripsHero.png";
-import { FaSearch } from "react-icons/fa";
+import { FaHandLizard, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
@@ -15,9 +15,13 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import BudgetCharts from "../components/BudgetCharts";
 import searchIcon from "../images/Search.png";
 import TripCard from "../components/TripCard";
+import { tripContext } from "../context/useTripDataContext";
+import { useNavigate } from "react-router";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 const MyTrip = () => {
+  const navigate = useNavigate();
+  const {token} = useContext(tripContext)
   const [myTrips, setMyTrips] = useState([]);
   const [error, setError] = useState({});
   const [activeIndex, setActiveIndex] = useState(0);
@@ -27,17 +31,23 @@ const MyTrip = () => {
   dayjs.extend(weekday);
   dayjs.extend(localizedFormat);
   dayjs.extend(advancedFormat);
+  console.log("token:", token);
 
   const formatDate = (isoDate) => {
     return dayjs(isoDate).format("DD MMMM, YYYY | dddd");
   };
+
+  const handleCardClick =(tripId) =>{
+    console.log(tripId);
+    navigate(`/myTrip/${tripId}`)
+  }
 
   const getTripsData = async () => {
     try {
       const response = await axios.get(`/api/trips`, {
         headers: {
           Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTY2Nzc0LCJleHAiOjE3NDQ1NzAzNzR9.xvV7BqJlJ-IVPijRG2ROtsV5Wt-cR63GUjFD3z1sRQU",
+            `Bearer ${token}`,
         },
       });
       console.log(response.data);
@@ -50,9 +60,9 @@ const MyTrip = () => {
   useEffect(() => {
     getTripsData();
   }, []);
-  const activeTrips = myTrips.filter((trips) => trips.status === "active");
-  const upcomingTrips = myTrips.filter((trips) => trips.status === "upcoming");
-  const pastTrips = myTrips.filter((trips) => trips.status === "past");
+  const activeTrips = myTrips.filter((trips) => trips.runningStatus === "active");
+  const upcomingTrips = myTrips.filter((trips) => trips.runningStatus === "upcoming");
+  const pastTrips = myTrips.filter((trips) => trips.runningStatus === "past");
 
   console.log({ activeTrips, upcomingTrips, pastTrips });
 
@@ -87,6 +97,7 @@ const MyTrip = () => {
           onNextClick={() => setUpcomingIndex((prev) =>  Math.min(prev + 1, upcomingTrips.length - 1))}
           onPrevClick={() => setUpcomingIndex((prev) => Math.max(prev - 1, 0))}
           showBudgetVsExpense={true}
+          onClick={() =>handleCardClick(upcomingTrips[upcomingIndex].trip_id)}
         />
   
         <TripCard
@@ -96,6 +107,7 @@ const MyTrip = () => {
           onNextClick={() => setActiveIndex((prev) =>  Math.min(prev + 1, activeTrips.length - 1))}
           onPrevClick={() => setActiveIndex((prev) => Math.max(prev - 1, 0))}
           showBudgetVsExpense={false}
+          onClick={() =>handleCardClick(activeTrips[activeIndex].trip_id)}
         />
   
         <TripCard
@@ -105,6 +117,8 @@ const MyTrip = () => {
           onNextClick={() => setPastIndex((prev) =>  Math.min(prev + 1, pastTrips.length - 1))}
           onPrevClick={() => setPastIndex((prev) => Math.max(prev - 1, 0))}
           showBudgetVsExpense={false}
+          onClick={() =>handleCardClick(pastTrips[pastIndex].trip_id)}
+
         />
       </div>
     </div>
