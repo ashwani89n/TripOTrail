@@ -7,8 +7,16 @@ import homeHero from "../images/HomeHero.jpeg";
 import tripsNext from "../images/MyTripsNext.png";
 import tripsPrev from "../images/MyTripsPrevious.png";
 import { CiUser } from "react-icons/ci";
+import Slider from "react-slick"; // at top
 
-const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
+const TripCard = ({
+  type,
+  totalTrips,
+  trip,
+  onNextClick,
+  onPrevClick,
+  showBudgetVsExpense,
+}) => {
   const formatDate = (date) => {
     const day = date.getDate();
     const month = date.toLocaleString("en-US", { month: "long" });
@@ -44,7 +52,7 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
   };
 
   return (
-    <div className="w-[90%] md:w-[32%] h-[400px] bg-darkBG p-4 rounded-lg shadow-lg mt-2 items-center my-5">
+    <div className="w-[90%] md:w-[32%] h-[450px] bg-darkBG p-4 rounded-lg shadow-lg mt-2 items-center my-5 z-10">
       <div className="bg-topHeader h-[38px] text-xl w-[80%] mx-auto relative -top-9 text-center text-white font-inria font-semibold flex items-center justify-center rounded-md">
         {type}
       </div>
@@ -64,30 +72,39 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
                     </span>
                     <span className="text-topHeader font-inria">{weekday}</span>
                   </p>
-                  {console.log(totalTrips)}
-                  {totalTrips > 0 && (
+                  {totalTrips > 1 && (
                     <div className="flex justify-center">
-                      <img
-                        src={tripsPrev}
-                        alt="Previous"
-                        className="w-5 h-5 "
-                      />
-                      <img src={tripsNext} alt="Next" className="w-5 h-5 " />
+                      <button
+                        onClick={onPrevClick}
+                        className="cursor-pointer bg-transparent border-none p-0"
+                      >
+                        <img
+                          src={tripsPrev}
+                          alt="Previous"
+                          className="w-5 h-5"
+                        />
+                      </button>
+                      <button
+                        onClick={onNextClick}
+                        className="cursor-pointer bg-transparent border-none p-0"
+                      >
+                        <img src={tripsNext} alt="Next" className="w-5 h-5" />
+                      </button>
                     </div>
                   )}
                 </div>
               </>
             );
           })()}
-          <div className="flex gap-5 mt-2 bg-list rounded-lg pr-2 h-[300px]">
+          <div className="flex gap-3 mt-2 bg-headerBG rounded-lg pr-1h-[330px] relative overflow-hidden">
             <img
               src={homeHero}
               alt="trip"
               className="w-[40%] bg-contain rounded-l-lg"
             />
-            <div className="text-topHeader flex flex-col mt-3 w-full">
+            <div className="text-topHeader flex flex-col w-full">
               <div className="flex flex-row justify-between">
-                <div className="flex flex-col mt-3">
+                <div className="flex flex-col ">
                   <div className="flex flex-row justify-start text-md p-1 text-topHeader rounded-lg font-inria ">
                     <span className="text-white">
                       {`${trip.title.split(" ")[0]}`}&nbsp;
@@ -103,63 +120,101 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
                   {trip.team_members?.slice(0, 3).map((mate, index) => (
                     <div
                       key={index}
-                      className={`relative w-8 h-8 rounded-full bg-textCardDark border-2 border-textCard flex items-center justify-center text-sm text-white ${
+                      className={`relative w-8 h-8 rounded-full bg-textCardDark border border-textCard flex items-center justify-center text-sm text-white ${
                         index !== 0 ? "-ml-3" : ""
                       }`}
                       style={{ zIndex: 10 + index }} // ensures proper stacking
                     >
                       {mate.profile_picture ? (
-        <img
-        src={`http://localhost:5000${mate.profile_picture}`}
-          alt={`Tripmate ${index + 1}`}
-          className="w-full h-full object-cover rounded-full"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center rounded-full bg-textInputBG">
-          <CiUser className="text-white w-full h-full p-2" />
-        </div>
-      )}
+                        <img
+                          src={`http://localhost:5000${mate.profile_picture}`}
+                          alt={`Tripmate ${index + 1}`}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center rounded-full bg-textInputBG">
+                          <CiUser className="text-white w-full h-full p-2" />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-row justify-evenly gap-2 items-center mt-5">
+              <div className="flex flex-row justify-evenly gap-2 items-center mt-5 p-1">
                 <div className="text-center flex flex-col justify-center">
                   <img src={tripJeep} alt="start" className="w-5 ml-4" />
-                  <h3 className="text-white text-[6px]">{trip.start_point}</h3>
+                  <h3 className="text-white text-[7px]">{trip.start_point}</h3>
                 </div>
                 <div className="border-t-2 border-topHeader border-dashed w-[90%]" />
                 <div className="text-center">
                   <img src={destinationPin} alt="end" className="w-4 ml-6" />
-                  <h3 className="text-white text-[6px]">{trip.destination}</h3>
+                  <h3 className="text-white text-[7px]">{trip.destination}</h3>
                 </div>
               </div>
 
-              <div className="mt-3">
-                <h3 className="font-aldrich text-center text-white">
-                  {showCountdown ? "Time Left" : "Budget"}
-                </h3>
-                {showCountdown ? (
-                  <p className="text-center text-white mt-2">{trip.timeLeft}</p>
-                ) : (
-                  <></>
-                )}
-                <BudgetCharts budget={trip.budget} expense={trip.expense} />
+              <div className="flex flex-row gap-2 mt-6 h-full">
+                {/* Budget */}
+                <div className="w-1/2 bg-zinc-900 p-2 rounded-lg flex flex-col">
+                  <div className="font-aldrich text-center mb-1 text-[12px]">
+                    Budget
+                  </div>
+                  <div className="flex-1 flex justify-center items-center">
+                    {trip.budget || trip.expense ? (
+                      <BudgetCharts
+                        budget={trip.budget}
+                        expense={trip.expense}
+                        showBudgetVsExpense
+                      />
+                    ) : (
+                      <p className="italic text-textCard text-[7px] text-center">
+                        No budget data available..
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Highlights */}
+                <div className="w-1/2 bg-zinc-900 p-2 rounded-lg flex flex-col">
+                  <div className="font-aldrich text-center mb-1 text-[12px]">
+                    Highlights
+                  </div>
+                  <div className="flex-1 flex justify-center items-center">
+                    {trip.media?.length > 0 ? (
+                      <Slider
+                        dots={true}
+                        infinite={true}
+                        speed={500}
+                        slidesToShow={1}
+                        slidesToScroll={1}
+                      >
+                        {trip.media.map((url, index) => (
+                          <div key={index} className="px-2">
+                            <img
+                              src={`http://localhost:5000${url}`}
+                              alt={`Trip Media ${index + 1}`}
+                              className="rounded-md w-full h-[120px] object-cover"
+                            />
+                          </div>
+                        ))}
+                      </Slider>
+                    ) : (
+                      <p className="italic text-textCard text-[7px] text-center">
+                        No memories to cherish..
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-          <button className="text-white mt-4" onClick={onNextClick}>
-            Next
-          </button>
         </>
       ) : (
         <>
+          {/* Conditional rendering for empty states */}
           {type === "Upcoming" && (
             <div className="flex flex-col justify-center items-center text-center text-gray-400 h-full min-h-[300px]">
-              {/* <img src={noUpcomingImg} alt="No Upcoming Trips" className="w-[28%] mb-4" /> */}
-              <h3 className="text-lg font-normal text-white ">
+              <h3 className="text-lg font-normal text-white">
                 Plan the Road Ahead..
               </h3>
               <p className="mt-1 text-sm italic text-textCard mb-20">
@@ -170,7 +225,6 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
 
           {type === "Active" && (
             <div className="h-full flex flex-col justify-center items-center text-center text-gray-400 h-full min-h-[300px]">
-              {/* <img src={noActiveImg} alt="No Active Trips" className="w-[25%] mb-4" /> */}
               <h3 className="text-lg font-normal text-white">
                 Adventure Awaits..
               </h3>
@@ -182,7 +236,6 @@ const TripCard = ({ type, totalTrips, trip, onNextClick, showCountdown }) => {
 
           {type === "Past" && (
             <div className="h-full flex flex-col justify-center items-center text-center text-gray-400 h-full min-h-[300px]">
-              {/* <img src={noPastImg} alt="No Past Trips" className="w-[25%] mt-3 mb-3" /> */}
               <h3 className="text-lg font-normal text-white">
                 Memories in the Making..
               </h3>

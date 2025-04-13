@@ -302,7 +302,7 @@ function LockJourney({ onClickNextPrev, data }) {
         requestPayload,
         {
           headers: {
-            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTI5MjQ3LCJleHAiOjE3NDQ1MzI4NDd9.6IjMhalf6w9XOrdUMIl9K4I_y4HBVg-T3myaHRYZJQo",
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTY2Nzc0LCJleHAiOjE3NDQ1NzAzNzR9.xvV7BqJlJ-IVPijRG2ROtsV5Wt-cR63GUjFD3z1sRQU",
           },
         }
       );

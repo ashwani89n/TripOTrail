@@ -2,20 +2,19 @@ const pool = require("../database/db");
 const dayjs = require("dayjs");
 
 exports.getTrips = async (req, res) => {
-    console.log("✅ getTrips called");
+  console.log("✅ getTrips called");
   try {
     const userId = req.user.id;
     const tripResult = await pool.query(
-        'SELECT * FROM trips WHERE user_id = $1 AND status = $2',
-  [userId, 'Confirm']
-      );
-      const trips = [];
+      "SELECT * FROM trips WHERE user_id = $1 AND status = $2",
+      [userId, "Confirm"]
+    );
+    const trips = [];
 
     for (const trip of tripResult.rows) {
-
       const { trip_id: tripId } = trip;
       const budgetResult = await pool.query(
-       `SELECT category, SUM(amount) AS total
+        `SELECT category, SUM(amount) AS total
          FROM budget
          WHERE trip_id = $1
          GROUP BY category`,
@@ -24,7 +23,7 @@ exports.getTrips = async (req, res) => {
       const budget = {};
       let totalBudget = 0;
       for (const row of budgetResult.rows) {
-        console.log(row)
+        console.log(row);
         const amount = parseFloat(row.total);
         budget[row.category] = amount;
         totalBudget += amount;
@@ -38,21 +37,31 @@ exports.getTrips = async (req, res) => {
          GROUP BY category`,
         [tripId]
       );
-      console.log(tripId)
+      console.log(tripId);
       console.log("🧪 expenseResult.rows:", expenseResult.rows);
       const expense = {};
       let totalExpense = 0;
       for (const row of expenseResult.rows) {
-        console.log(row)
+        console.log(row);
         const amount = parseFloat(row.total);
         expense[row.category] = amount;
         totalExpense += amount;
       }
 
+      // Get media
+      const fileType = "image";
+      const mediaResult = await pool.query(
+        `SELECT file_url FROM media WHERE trip_id = $1 AND file_type = $2`,
+        [tripId, fileType]
+      );
+      const media = mediaResult.rows.map((row) => row.file_url);
+
+      console.log(tripId);
+      console.log("🧪 mediaResult.rows:", mediaResult.rows);
 
       // Get team members
       const teamResult = await pool.query(
-        'SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1',
+        "SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1",
         [tripId]
       );
       const team_members = teamResult.rows;
@@ -75,9 +84,10 @@ exports.getTrips = async (req, res) => {
         budget,
         expense,
         team_members,
+        media,
         status,
         totalBudget,
-        totalExpense
+        totalExpense,
       });
     }
 

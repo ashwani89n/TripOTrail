@@ -10,6 +10,9 @@ import PlanTrip from './pages/PlanTrip';
 import MyTrip from './pages/MyTrip';
 import Register from './components/Register';
 import Login from './components/Login';
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+
 
 function App() {
   return (
