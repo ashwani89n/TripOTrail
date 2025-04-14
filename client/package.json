@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@headlessui/react": "^2.2.1",
     "@hello-pangea/dnd": "^18.0.1",
     "@heroicons/react": "^2.2.0",
+    "@mui/material": "^7.0.2",
     "@react-google-maps/api": "^2.20.6",
     "@vis.gl/react-google-maps": "^1.5.2",
     "aos": "^2.3.4",
@@ -36,6 +40,7 @@
     "react-slick": "^0.30.3",
     "react-vertical-timeline-component": "^3.5.3",
     "react-world-flags": "^1.6.0",
+    "recharts": "^2.15.2",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.2.3",
     "use-places-autocomplete": "^4.0.1"

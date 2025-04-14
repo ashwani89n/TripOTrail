@@ -22,7 +22,7 @@ const TripDetails = () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTk3NDc3LCJleHAiOjE3NDQ2MDEwNzd9.hJwLiSbeq5mjjhrboFpxbWLiqRpyioqPPeTBMZctlUQ`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjUzMjIzLCJleHAiOjE3NDQ2NTY4MjN9.O8PBmfOeBw5otLKU3mHAoYkohX6wHlvGF7COpd9H548`,
         },
       });
       setMyTripsByIdData(response.data);
@@ -123,7 +123,7 @@ const TripDetails = () => {
           </div>
         </div>
       </div>
-      <div className="mt-10">
+      <div className="mt-10 p-4">
         {myTripsByIdData.runningStatus === "upcoming" ? (
           <UpcomingMytrip tripDetails={myTripsByIdData} />
         ) : myTripsByIdData.runningStatus === "active" ? (

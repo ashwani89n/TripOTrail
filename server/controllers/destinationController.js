@@ -20,12 +20,42 @@ exports.getDestinations = async (req, res) => {
     );
 
     const expensesResult = await pool.query(
-      `SELECT e.added_by_name, u.profile_picture, e.category, e.comments
-             FROM expenses e
-             LEFT JOIN tripmates u ON e.added_by_name = u.name AND u.trip_id = $1
-             WHERE e.trip_id = $1`,
+      `SELECT added_by_name, added_by_profile_picture, category, comments, amount
+             FROM expenses 
+             WHERE trip_id = $1`,
       [tripId]
     );
+
+    const expenses = expensesResult.rows.map((expense) => ({
+      added_by_name: expense.added_by_name,
+      added_by_profile_picture: expense.profile_picture || null,
+      category: expense.category,
+      comments: expense.comments,
+      amount: expense.amount || 0
+    }));
+
+    const budgetResult = await pool.query(
+        `SELECT category, SUM(amount) AS total
+         FROM budget
+         WHERE trip_id = $1
+         GROUP BY category`,
+        [tripId]
+      );
+      const budget = {};
+      let totalBudget = 0;
+      for (const row of budgetResult.rows) {
+        console.log(row);
+        const amount = parseFloat(row.total);
+        budget[row.category] = amount;
+        totalBudget += amount;
+      }
+
+      // Get team members
+      const teamResult = await pool.query(
+        "SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1",
+        [tripId]
+      );
+      const team_members = teamResult.rows;
 
      // Group destinations by day
      const timelineMap = new Map();
@@ -37,8 +67,7 @@ exports.getDestinations = async (req, res) => {
              timelineMap.set(dayKey, {
                  dayDate: dest.day_date,
                  weekDay: dest.week_day,
-                 selected_spots: [],
-                 added_expense: []
+                 selected_spots: []
              });
          }
 
@@ -51,32 +80,7 @@ exports.getDestinations = async (req, res) => {
              order_index: dest.order_index
          });
      }
-     
-    // Add expenses to each day
-    for (let expense of expensesResult.rows) {
-      const dayKey = expense.day_date?.toISOString();
-
-      const expenseData = {
-        added_by_name: expense.added_by_name,
-        added_by_profile_picture: expense.profile_picture || null,
-        category: expense.category,
-        comments: expense.comments,
-      };
-
-      if (dayKey) {
-        if (!timelineMap.has(dayKey)) {
-          timelineMap.set(dayKey, {
-            dayDate: expense.day_date,
-            weekDay: new Date(expense.day_date).toLocaleDateString("en-US", {
-              weekday: "long",
-            }),
-            selected_spots: [],
-            added_expense: [],
-          });
-        }
-        timelineMap.get(dayKey).added_expense.push(expenseData);
-      }
-    }
+    
 
     // Convert Map to sorted array
     const timeline = Array.from(timelineMap.values()).sort(
@@ -86,6 +90,9 @@ exports.getDestinations = async (req, res) => {
     res.status(200).json({
       status: "success",
       timeline,
+      budget,
+      expenses,
+      team_members
     });
   } catch (error) {
     console.error("Error fetching destinations:", error);
