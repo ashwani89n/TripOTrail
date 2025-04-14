@@ -15,15 +15,10 @@ import { tripContext } from "../context/useTripDataContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const googleMapsApiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw"; // Replace with your key
+const googleMapsApiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw"; 
 const mapLibraries = ["places", "marker"];
 
 function LockJourney({ onClickNextPrev, data }) {
-  // const { isLoaded, loadError } = useLoadScript({
-  //   googleMapsApiKey,
-  //   libraries: mapLibraries,
-  // });
-
   const [itinerary, setItinerary] = useState([]);
   const [error, setError] = useState("");
   const [errorPopUp, setErrorPopUp] = useState("");
@@ -121,9 +116,7 @@ function LockJourney({ onClickNextPrev, data }) {
               const travelTimeSec = element.duration.value;
               const travelTimeMin = Math.floor(travelTimeSec / 60);
               spots[i + 1].travelTime = element.duration.text;
-
               currentTime = currentTime.add(10, "minute").add(travelTimeMin, "minute");
-
               spots[i + 1].timeLine = currentTime.format("HH:mm");
             }
 
@@ -168,7 +161,6 @@ function LockJourney({ onClickNextPrev, data }) {
     };
 
     fetchTravelTimes();
-    // }, [isLoaded, data]);
   }, [data]);
 
   const handleTimeChange = (e, dayIdx, spotIdx, part) => {
@@ -191,81 +183,6 @@ function LockJourney({ onClickNextPrev, data }) {
     onClickNextPrev((prev) => prev - 1);
   };
 
-  // const handleNext = async () => {
-  //   const teamMembersWithBase64 = await Promise.all(
-  //     members.map(async (m) => {
-  //       let profilePictureBase64 = "";
-
-  //       if (m.photo && m.photo instanceof File) {
-  //         try {
-  //           profilePictureBase64 = await convertToBase64(m.photo);
-  //         } catch (error) {
-  //           console.error("Error converting photo to base64:", error);
-  //         }
-  //       } else if (typeof m.photo === "string") {
-  //         profilePictureBase64 = m.photo; // already base64
-  //       }
-
-  //       return {
-  //         name: m.name,
-  //         email: m.email,
-  //         profile_picture: profilePictureBase64,
-  //       };
-  //     })
-  //   );
-
-  //   const formattedTimeline = itinerary.map((day) => ({
-  //     day: day.day,
-  //     dayDate: day.dayDate,
-  //     weekDay: day.weekDay,
-  //     selected_spots: day.selected_spots.map((spot, i) => ({
-  //       name: spot.name,
-  //       category: spot.category,
-  //       cost: spot.cost || 0,
-  //       duration: spot.duration || "0:00",
-  //       travelTime: spot.timeLine || "00:00",
-  //       order_index: i + 1,
-  //     })),
-  //   }));
-
-  //   const requestPayload = {
-  //     timeline: formattedTimeline,
-  //     budget: {
-  //       transport: transportBudget,
-  //       food: foodBudget,
-  //       accommodation: accommodationBudget,
-  //       activities: activitiesBudget,
-  //     },
-  //     team_members: members.map((m) => ({
-  //       name: m.name,
-  //       email: m.email,
-  //       profile_picture: m.photo || "", // ✅ already base64
-  //     })),
-
-  //     status: "Confirm",
-  //   };
-
-  //   // Only set state if needed
-  //   setReq(requestPayload);
-  //   console.log(requestPayload);
-
-  //   try {
-  //     const response = await axios.post(
-  //       `/api/trips/${tripId}/destinations`,
-  //       requestPayload,
-  //       {
-  //         headers: {
-  //           Authorization:
-  //             "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTE5ODEwLCJleHAiOjE3NDQ1MjM0MTB9.VV3BDEufD08st-9e1-06FGnJzFSZ3EVuIjOKY34aeLk",
-  //         },
-  //       }
-  //     );
-  //     navigate("/");
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
   const handleNext = async () => {
     // Upload profile pictures for each member
     const teamMembersWithPhotos = await uploadMemberPhotos(members);
@@ -292,7 +209,7 @@ function LockJourney({ onClickNextPrev, data }) {
         accommodation: accommodationBudget,
         activities: activitiesBudget,
       },
-      team_members: teamMembersWithPhotos,  // Include profile picture URLs here
+      team_members: teamMembersWithPhotos,  
       status: "Confirm",
     };
   

@@ -8,7 +8,6 @@ import {
 import { tripContext } from "../context/useTripDataContext";
 import "../components/styles/PickSpots.css";
 import noSpotsChosen from "../assets/noSpots.png";
-// import axios from "axios";
 
 const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
   const [attractions, setAttractions] = useState([]);

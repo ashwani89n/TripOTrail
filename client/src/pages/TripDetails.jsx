@@ -22,7 +22,7 @@ const TripDetails = () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTgzMDQ4LCJleHAiOjE3NDQ1ODY2NDh9.PlaOwIwVVbMqI5ENE18stb6LcEGA02mq1n6t5SK_hfU`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NTk3NDc3LCJleHAiOjE3NDQ2MDEwNzd9.hJwLiSbeq5mjjhrboFpxbWLiqRpyioqPPeTBMZctlUQ`,
         },
       });
       setMyTripsByIdData(response.data);
@@ -46,7 +46,7 @@ const TripDetails = () => {
         <div className=" p-1 text-topHeader rounded-lg cursor-pointer text-center font-aldrich text-2xl">
           <div className="flex flex-row justify-between items-center w-full px-10">
             {/* Center Title + Team Members */}
-            <div className="flex flex-row items-center justify-center mx-auto text-center">
+            <div className="flex flex-row items-center justify-center mx-auto pl-20 text-center">
               {myTripsByIdData.title && (
                 <div className="flex items-center justify-center text-2xl font-aldrich text-topHeader">
                   <span className="text-white mr-1">
@@ -100,7 +100,7 @@ const TripDetails = () => {
         </div>
         <div className="flex flex-col items-center justify-center w-full mt-8">
           {/* Icons and dashed line */}
-          <div className="flex flex-row items-center justify-center gap-4 w-[50%]">
+          <div className="flex flex-row items-center justify-center gap-4 w-[40%]">
             <div className="flex flex-col items-center justify-center pl-20">
               <img src={tripJeep} alt="" className="w-6 h-6" />
             </div>
@@ -113,7 +113,7 @@ const TripDetails = () => {
           </div>
 
           {/* Text under icons */}
-          <div className="flex flex-row justify-between w-[50%] mt-2 text-white font-inria">
+          <div className="flex flex-row justify-between w-[40%] mt-2 text-white font-inria">
             <p className="text-left w-1/2 text-md ">
               {myTripsByIdData.start_point}
             </p>
