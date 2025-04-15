@@ -1,15 +1,25 @@
+<<<<<<< HEAD
 import React, { useContext, useState } from "react";
+=======
+import React, { useState } from "react";
+>>>>>>> origin/main
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import welcome from "../assets/Welcome6.jpg";
 import { Link } from "react-router-dom";
 import axios from "axios";
+<<<<<<< HEAD
 import { tripContext } from "../context/useTripDataContext";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const {token, setToken} = useContext(tripContext)
+=======
+
+const Login = () => {
+    const [showPassword, setShowPassword] = useState(false);
+>>>>>>> origin/main
     const [data, setData] = useState({
     email: "",
     password: "",
@@ -28,11 +38,15 @@ const Login = () => {
         } else {
           setError("");
           try {
+<<<<<<< HEAD
             const response = await axios.post(`/api/auth/login`, data).then(function (response) {
               setToken(response.data.token);
               console.log("token:", response.data.token);
               }
             );
+=======
+            const response = await axios.post(`/api/auth/login`, data);
+>>>>>>> origin/main
             navigate("/");
           } catch (error) {
               setError(error.response?.data?.message || 'Login failed');
