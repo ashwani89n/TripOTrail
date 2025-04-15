@@ -29,15 +29,15 @@ const SpendAnalyzerChart = ({ budgetData }) => {
 
   return (
     <div className="mt-5 bg-headerBG p-4 rounded-lg h-[330px] flex flex-col">
-      <h3 className="text-white text-lg font-semibold font-aldrich mb-10 text-center">
+      {/* <h3 className="text-white text-lg font-semibold font-aldrich mb-10 text-center">
         Spend <span className="text-topHeader">Analyzer</span>
-      </h3>
-      <h3 className="text-white text-md font-semibold font-aldrich mb-4 text-center">
+      </h3> */}
+      <h3 className="text-white text-lg font-semibold font-aldrich mb-4 mt-5 text-center">
         Budget <span className="text-topHeader">V/s</span> Expenses
       </h3>
 
       <div className="flex justify-center flex-1">
-        <ResponsiveContainer width="60%" height="100%">
+        <ResponsiveContainer width="60%" height="90%">
           <BarChart data={budgetData} barCategoryGap={1} barGap={1}>
             <CartesianGrid stroke="#444" strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="category" stroke="#ccc"/>

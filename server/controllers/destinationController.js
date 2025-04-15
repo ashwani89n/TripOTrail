@@ -48,7 +48,6 @@ exports.getDestinations = async (req, res) => {
       for (const row of expCatResult.rows) {
         const amount = parseFloat(row.total);
         expense_by_category[row.category] = amount;
-        totalBudget += amount;
       }
     // const expense_by_category = expCatResult.rows;
     

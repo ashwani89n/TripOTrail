@@ -17,6 +17,7 @@ import TimelineView from "../components/TimelineView";
 import AddExpenseModal from "../components/AddExpenseModal";
 
 
+
 const generateDateRange = (start, days) => {
   const dateArray = [];
   for (let i = -days; i <= days; i++) {
@@ -71,7 +72,7 @@ const useAutoScrollOnHover = (ref, speed = 2, edgeThreshold = 40) => {
   }, [ref, speed, edgeThreshold]);
 };
 
-const UpcomingMytrip = ({ tripDetails }) => {
+const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
   const [selectedStartDate, setSelectedStartDate] = useState(
     moment(tripDetails.start_date)
   );
@@ -153,7 +154,7 @@ const UpcomingMytrip = ({ tripDetails }) => {
         newExpensePayload,
         {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njc2MTQxLCJleHAiOjE3NDQ2Nzk3NDF9.bouZxse7JHiNkDKWAC3fZmPcj6t4KSnFO8m-InWkr7U`,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njk0Nzk4LCJleHAiOjE3NDQ2OTgzOTh9.CN0P53iWn9500luCu_i6PtcvgST60EW9r9iqVpWVAzs`,
           },
         }
       );
@@ -205,14 +206,42 @@ const UpcomingMytrip = ({ tripDetails }) => {
   useAutoScrollOnHover(startDateRef);
   useAutoScrollOnHover(endDateRef);
 
+  const buildItineraryHTML = (itinerary, startDate) => {
+    if (!Array.isArray(itinerary)) return "";
+  
+    return itinerary
+      .map((day, index) => {
+        const formattedDate = moment(day.dayDate || startDate).format("MMMM D, YYYY");
+        const spots = day.selected_spots
+          .map(
+            (spot) => `<li>📍 ${spot.name}${spot.cost ? ` – ₹${spot.cost}` : ""}</li>`
+          )
+          .join("");
+  
+        return `
+          <div style="background: #f4faff; padding: 15px 20px; border-radius: 8px; margin-bottom: 15px;">
+            <h3 style="margin: 0 0 10px; color: #1a73e8;">🗓️ Day ${index + 1} – ${formattedDate}</h3>
+            <ul style="padding-left: 20px; margin: 0; line-height: 1.6;">
+              ${spots}
+            </ul>
+          </div>
+        `;
+      })
+      .join("");
+  };
+
   const getTripById = async () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}/destinations`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njc2MTQxLCJleHAiOjE3NDQ2Nzk3NDF9.bouZxse7JHiNkDKWAC3fZmPcj6t4KSnFO8m-InWkr7U`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njk0Nzk4LCJleHAiOjE3NDQ2OTgzOTh9.CN0P53iWn9500luCu_i6PtcvgST60EW9r9iqVpWVAzs`,
         },
       });
       setItinerary(response.data.timeline);
+      if (onClickEmail && typeof onClickEmail === "function") {
+        const formattedHTML = buildItineraryHTML(response.data.timeline, tripDetails.start_date);
+        onClickEmail(formattedHTML);
+      }
       setExpenses(categorizeExpenses(response.data.expenses));
       setBudgetData(
         prepareBudgetData(response.data.budget, response.data.expenses)

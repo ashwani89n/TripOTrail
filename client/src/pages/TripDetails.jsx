@@ -11,18 +11,25 @@ import PastMyTrip from "../components/PastMyTrip";
 import attch from "../images/Attach.png";
 import endTrip from "../images/Remove.png";
 import addStop from "../images/Address.png";
+import sendEmail from "../images/SendEmail.png";
+import emailjs from 'emailjs-com';
+
 
 const TripDetails = () => {
   const [myTripsByIdData, setMyTripsByIdData] = useState({});
   const [error, setError] = useState("");
   const { token } = useContext(tripContext);
   const { tripId } = useParams();
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [emailBody, setEmailBody] = useState([]);
 
   const getTripById = async () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njc2MTQxLCJleHAiOjE3NDQ2Nzk3NDF9.bouZxse7JHiNkDKWAC3fZmPcj6t4KSnFO8m-InWkr7U`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njk0Nzk4LCJleHAiOjE3NDQ2OTgzOTh9.CN0P53iWn9500luCu_i6PtcvgST60EW9r9iqVpWVAzs`,
         },
       });
       setMyTripsByIdData(response.data);
@@ -38,6 +45,44 @@ const TripDetails = () => {
     if (!tripId) return;
     getTripById();
   }, []);
+
+  const handleEmailSend = async () => {
+    if (!emailInput) {
+      setEmailError("Please enter an email address");
+      return;
+    }
+  
+    // Format itinerary HTML
+    const itinerary = myTripsByIdData.destinations || []; // Adjust if structured differently
+    const tripBody = itinerary.map((spot, index) => {
+      return `Day ${index + 1}: ${spot.name || "Unknown spot"} - ₹${spot.cost || 0}`;
+    }).join("\n");
+  
+    const templateParams = {
+      to_email: emailInput,
+      trip_title: myTripsByIdData.title,
+      trip_body: emailBody
+    };
+  
+    try {
+      const result = await emailjs.send(
+        "service_q59sdwp",     // e.g., service_qwerty123
+        "template_j6qd23w",    // e.g., template_abcd1234
+        templateParams,
+        "G1SL5ipv-ruQVsSmI"         // Your EmailJS public key
+      );
+  
+      console.log("EmailJS success:", result.text);
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      alert("Failed to send itinerary email.");
+    } finally {
+      setShowEmailPrompt(false);
+      setEmailInput("");
+    }
+  };
+    
+  
 
   return (
     <div className="bg-darkBG min-h-screen flex flex-col">
@@ -56,7 +101,8 @@ const TripDetails = () => {
                     {myTripsByIdData.title.split(" ").slice(1).join(" ")}
                   </span>
                 </div>
-              )}&nbsp;
+              )}
+              &nbsp;
               <div className="flex items-center justify-center">
                 {myTripsByIdData.team_members
                   ?.slice(0, 3)
@@ -86,15 +132,31 @@ const TripDetails = () => {
 
             {/* Right Action Icons */}
             <div className="flex flex-row gap-2">
-              <div className="bg-topHeader rounded-sm w-7 h-7">
-                <img src={attch} className="w-full h-full p-1" />
-              </div>
-              <div className="bg-topHeader rounded-sm w-7 h-7">
-                <img src={addStop} className="w-full h-full p-1" />
-              </div>
-              <div className="bg-topHeader rounded-sm w-7 h-7">
-                <img src={endTrip} className="w-full h-full p-1" />
-              </div>
+            <button
+                onClick={() => setShowEmailPrompt(true)}
+                className="bg-topHeader rounded-sm w-7 h-7 p-1"
+              >
+                <img src={attch} className="w-full h-full" />
+                </button>
+              <button
+                onClick={() => setShowEmailPrompt(true)}
+                className="bg-topHeader rounded-sm w-7 h-7 p-1"
+              >
+                <img src={addStop} className="w-full h-full" />
+                </button>
+              <button
+                onClick={() => setShowEmailPrompt(true)}
+                className="bg-topHeader rounded-sm w-7 h-7 p-1"
+              >
+                <img src={endTrip} className="w-full h-full" />
+                </button>
+
+              <button
+                onClick={() => setShowEmailPrompt(true)}
+                className="bg-topHeader rounded-sm w-7 h-7 p-1"
+              >
+                <img src={sendEmail} className="w-full h-full" />
+              </button>
             </div>
           </div>
         </div>
@@ -125,13 +187,68 @@ const TripDetails = () => {
       </div>
       <div className="mt-10 p-4">
         {myTripsByIdData.runningStatus === "upcoming" ? (
-          <UpcomingMytrip tripDetails={myTripsByIdData} />
+          <UpcomingMytrip tripDetails={myTripsByIdData} onClickEmail={setEmailBody}/>
         ) : myTripsByIdData.runningStatus === "active" ? (
           <ActiveMyTrip tripDetails={myTripsByIdData} />
         ) : (
           <PastMyTrip tripDetails={myTripsByIdData} />
         )}
       </div>
+      {showEmailPrompt && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="w-[30%] max-w-md bg-textCardDark rounded-lg overflow-hidden">
+      {/* Heading */}
+      <span className="text-white text-xl font-aldrich flex items-center justify-center mt-5">
+        Email Itinerary
+      </span>
+
+      {/* Content */}
+      <div className="flex flex-col gap-4 p-5">
+        {emailError && (
+          <div className="flex bg-headerBG justify-center items-center">
+            <p className="p-2 text-textCard font-light text-lg font-inria">
+              {emailError}
+            </p>
+          </div>
+        )}
+
+        {/* Email Input */}
+        <div className="flex flex-col mb-2">
+          <label className="text-white mb-1">Recipient Email</label>
+          <input
+            type="email"
+            className="p-2 bg-textInputBG border-none rounded-md text-white outline-none"
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
+            placeholder="example@email.com"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            onClick={handleEmailSend}
+            className="px-4 py-2 bg-topHeader text-white rounded-md w-1/3"
+          >
+            Send
+          </button>
+          <button
+            onClick={() => {
+              setEmailInput("");
+              setShowEmailPrompt(false);
+              setEmailError("");
+            }}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md w-1/3"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };
