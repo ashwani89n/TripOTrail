@@ -1,18 +1,15 @@
 import React, { useRef, useState } from "react";
 import Header from "../components/Header";
-
 import { CiCompass1 } from "react-icons/ci";
 import { FaListCheck } from "react-icons/fa6";
 import { TbCarCrash } from "react-icons/tb";
-import { FaCalendar, FaCloudUploadAlt, FaFlagCheckered } from "react-icons/fa";
-import { IoCalendar, IoCalendarSharp } from "react-icons/io5";
-
-import "./planTrip.css";
 import SetSecene from "../components/SetSecene";
 import PickSpots from "../components/PickSpots";
 import MapJourney from "../components/MapJourney";
 import LockJourney from "../components/LockJourney";
 import { tripContext } from "../context/useTripDataContext";
+import { FaFlagCheckered } from "react-icons/fa";
+import "./planTrip.css";
 
 const PlanTrip = () => {
   const [tripId, setTripId] = useState();
@@ -215,7 +212,6 @@ const PlanTrip = () => {
         </div>
         {page === 0 && <SetSecene onClickNext={setPage} />}
         {page === 1 && <PickSpots onClickNextPrev={setPage} sendDataToParent ={setSelectedSpotsData}/>}
-        {console.log("a:", selectedSpotsData)}
         {page === 2 && <MapJourney onClickNextPrev={setPage} selectedAttraction={selectedSpotsData} sendDataToParent = {setFinalData}/>}          
         {page === 3 && <LockJourney onClickNextPrev={setPage} data = {finalData}/>} 
       </div>

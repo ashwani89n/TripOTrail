@@ -1,9 +1,7 @@
 import React, {useLayoutEffect} from "react";
-import moment from "moment";
 
 const CalendarPicker = ({ type, selectedDate, onSelectDate, dateList, scrollRef, dataOffset }) => {
     useLayoutEffect(() => {
-        console.log("type:", type);
         if (scrollRef.current) {
           const selector = `.selected-${type}`;
           const selectedElement = scrollRef.current.querySelector(selector);

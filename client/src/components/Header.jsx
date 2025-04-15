@@ -91,14 +91,14 @@ const Header = () => {
                   My Trips
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/destinations"
                   className={getNavLinkClass("/destinations")}
                 >
                   Destinations
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/about" className={getNavLinkClass("/about")}>
                 About

@@ -13,6 +13,10 @@ import endTrip from "../images/Remove.png";
 import addStop from "../images/Address.png";
 import sendEmail from "../images/SendEmail.png";
 import emailjs from 'emailjs-com';
+import api from "../api/api";
+import { CiUser } from "react-icons/ci";
+
+// https://drive.google.com/file/d/1GhG5PiTc-Nd9_n57T_hTBLF4ayseBpR_/view?usp=sharing
 
 
 const TripDetails = () => {
@@ -25,15 +29,14 @@ const TripDetails = () => {
   const [emailError, setEmailError] = useState("");
   const [emailBody, setEmailBody] = useState([]);
 
+  const service_id = import.meta.env.VITE_EMAIL_SERVICE_ID;
+  const template_id = import.meta.env.VITE_EMAIL_TEMPLATE_ID;
+  const public_api_key = import.meta.env.VITE_EMAIL_PUBLIC_KEY;
+
   const getTripById = async () => {
     try {
-      const response = await axios.get(`/api/trips/${tripId}`, {
-        headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
-        },
-      });
+      const response = await api.get(`/trips/${tripId}`);
       setMyTripsByIdData(response.data);
-      console.log(response.data);
     } catch (error) {
       setError(error.response?.data?.message || "Trips Loading Unsuccessful");
       console.log({ error });
@@ -41,10 +44,10 @@ const TripDetails = () => {
   };
 
   useEffect(() => {
-    console.log("USE EFFECT");
     if (!tripId) return;
     getTripById();
   }, []);
+
 
   const handleEmailSend = async () => {
     if (!emailInput) {
@@ -53,7 +56,7 @@ const TripDetails = () => {
     }
   
     // Format itinerary HTML
-    const itinerary = myTripsByIdData.destinations || []; // Adjust if structured differently
+    const itinerary = myTripsByIdData.destinations || []; 
     const tripBody = itinerary.map((spot, index) => {
       return `Day ${index + 1}: ${spot.name || "Unknown spot"} - ₹${spot.cost || 0}`;
     }).join("\n");
@@ -61,15 +64,17 @@ const TripDetails = () => {
     const templateParams = {
       to_email: emailInput,
       trip_title: myTripsByIdData.title,
+      start_date: myTripsByIdData.start_date,
+      end_date:myTripsByIdData.end_data,
       trip_body: emailBody
     };
   
     try {
       const result = await emailjs.send(
-        "service_q59sdwp",     // e.g., service_qwerty123
-        "template_j6qd23w",    // e.g., template_abcd1234
+        service_id,     
+        template_id,    
         templateParams,
-        "G1SL5ipv-ruQVsSmI"         // Your EmailJS public key
+        public_api_key         
       );
   
       console.log("EmailJS success:", result.text);
@@ -81,9 +86,8 @@ const TripDetails = () => {
       setEmailInput("");
     }
   };
-    
-  
 
+  console.log(emailBody);
   return (
     <div className="bg-darkBG min-h-screen flex flex-col">
       <Header />

@@ -1,24 +1,20 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import DatePicker from "react-datepicker";
 import {
-  FaCalendar,
   FaCloudUploadAlt,
-  FaFlagCheckered,
   FaCalendarAlt,
 } from "react-icons/fa";
-import { IoCalendar, IoCalendarSharp } from "react-icons/io5";
 import "react-datepicker/dist/react-datepicker.css";
 import "./styles/SetSecene.css";
 import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
 } from "use-places-autocomplete";
-import axios from "axios";
 import { tripContext } from "../context/useTripDataContext";
+import api from "../api/api";
 
 
 const SetSecene = ({ onClickNext }) => {
-  const {token} = useContext(tripContext);
   const [data, setData] = useState({
     title: "",
     start_point: "",
@@ -31,6 +27,7 @@ const SetSecene = ({ onClickNext }) => {
     outbound_flight: {},
     return_flight: {},
   });
+
 
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
@@ -85,6 +82,8 @@ const SetSecene = ({ onClickNext }) => {
     setTransportBudget,
   } = useContext(tripContext);
   const today = new Date();
+  const api_key = import.meta.env.VITE_GOOGLE_API_KEY;
+  
 
   const handleNext = async () => {
     const { fromOB, toOB, budgetOB, dateOB, departure_timeOB, arrival_timeOB } =
@@ -162,9 +161,9 @@ const SetSecene = ({ onClickNext }) => {
       console.log("data:", data);
     }
 
-    const response = await axios
+    const response = await api
       .post(
-        "/api/trips",
+        "/trips",
         {
           ...data,
           start_point: startValue,
@@ -193,12 +192,6 @@ const SetSecene = ({ onClickNext }) => {
                   arrival_time: arrival_timeRT,
                 }
               : {},
-        },
-        {
-          headers: {
-            Authorization:
-              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
-          },
         }
       )
       .then(function (response) {
@@ -227,11 +220,10 @@ const SetSecene = ({ onClickNext }) => {
     console.log(startCoordinates, destinationCoordinates);
   }, []);
 
-  const YOUR_GOOGLE_API_KEY = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
   useEffect(() => {
     if (!window.google) {
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${YOUR_GOOGLE_API_KEY}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${api_key}&libraries=places&loading=async`;
       script.async = true;
       document.body.appendChild(script);
 
@@ -243,7 +235,7 @@ const SetSecene = ({ onClickNext }) => {
         console.error("Error loading Google Maps script.");
       };
     }
-  }, [YOUR_GOOGLE_API_KEY]);
+  }, [api_key]);
 
   const {
     ready: startReady,
@@ -554,6 +546,7 @@ const SetSecene = ({ onClickNext }) => {
           <input
             className="bg-textInputBG w-[90%] h-[31px] rounded-lg pl-2"
             onChange={(e) => setData({ ...data, title: e.target.value })}
+            value={data.title}
           ></input>
         </div>
         <div className="flex items-center gap-16 justify-between ">

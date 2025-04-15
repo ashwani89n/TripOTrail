@@ -866,7 +866,7 @@ const MapJourney = ({
                                           src={item.image}
                                           alt=""
                                         />
-                                        <span className="truncate w-full mr-4 text-textCard italic">
+                                        <span className="w-full mr-4 text-textCard italic">
                                           {item.name}
                                         </span>
                                       </div>

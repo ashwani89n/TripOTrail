@@ -28,10 +28,10 @@ const TimelineView = ({ itinerary, tripStartDate, onCostChange }) => {
                 </p>
               </div>
 
-              <ul className="space-y-10 relative border-l-2 border-textCard ml-[23%] mt-6">
+              <ul className="space-y-10 relative border-l-2 border-textCard ml-[26%] mt-6">
                 {day.selected_spots.map((spot, i) => (
                   <li key={i} className="relative pl-6">
-                    <div className="absolute left-[-33%] flex items-center gap-1">
+                    <div className="absolute left-[-38%] flex items-center gap-1">
                       {(() => {
                         const [hours, minute] = spot.travelTime.split(":");
                         return (
@@ -54,7 +54,7 @@ const TimelineView = ({ itinerary, tripStartDate, onCostChange }) => {
                     </span>
 
                     <div className="flex items-center gap-4">
-                      <div className="flex flex-col w-[80%] gap-2 italic text-md">
+                      <div className="flex flex-col w-[75%] gap-2 italic text-md">
                         <span
                           className={`${
                             spot.category === "start" || spot.category === "end"

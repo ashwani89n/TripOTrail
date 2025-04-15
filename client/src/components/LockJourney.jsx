@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useContext } from "react";
-import { GiMoneyStack } from "react-icons/gi";
-import { useLoadScript } from "@react-google-maps/api";
 import CarImg from "../images/Car.png";
 import AccomodationImg from "../images/EqualHousingOpportunity.png";
 import AlarmClock from "../images/AlarmClock.png";
@@ -12,11 +10,8 @@ import solo from "../images/Solotrip.png";
 import { CiUser } from "react-icons/ci";
 import dayjs from "dayjs";
 import { tripContext } from "../context/useTripDataContext";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const googleMapsApiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw"; 
-const mapLibraries = ["places", "marker"];
+import api from "../api/api";
 
 function LockJourney({ onClickNextPrev, data }) {
   const [itinerary, setItinerary] = useState([]);
@@ -26,7 +21,6 @@ function LockJourney({ onClickNextPrev, data }) {
   const [activitiesBudget, setActivitiesBudget] = useState(0);
   const [foodBudget, setfoodBudget] = useState(0);
   const navigate = useNavigate();
-  const {token} = useContext(tripContext);
 
   const {
     tripId,
@@ -49,9 +43,7 @@ function LockJourney({ onClickNextPrev, data }) {
     photo: null,
   });
 
-  const [req, setReq] = useState([]);
   useEffect(() => {
-    // if (!isLoaded) return;
 
     if (!window.google || !window.google.maps) {
       console.warn("Google Maps not loaded");
@@ -73,7 +65,6 @@ function LockJourney({ onClickNextPrev, data }) {
               "MMMM DD, YYYY HH:mm"
             );
 
-            // Assign timeline to the first spot
             spots[0].timeLine = currentTime.format("HH:mm");
 
             for (let i = 0; i < spots.length - 1; i++) {
@@ -214,15 +205,9 @@ function LockJourney({ onClickNextPrev, data }) {
     };
   
     try {
-      const response = await axios.post(
-        `/api/trips/${tripId}/destinations`,
-        // `/api/trips/1/destinations`,
-        requestPayload,
-        {
-          headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
-          },
-        }
+      const response = await api.post(
+        `/trips/${tripId}/destinations`,
+        requestPayload
       );
       navigate("/");
       console.log(response.data);
@@ -237,24 +222,27 @@ function LockJourney({ onClickNextPrev, data }) {
         if (member.photo) {
           // Prepare form data for uploading the file
           const formData = new FormData();
-          formData.append('file', member.photo);  
+          formData.append('file', member.photo);  // Append the selected file to form data
   
           try {
-            const response = await axios.post("/api/uploads", formData, {
+            // Send the file to the backend (where it's stored on the server or cloud storage)
+            const response = await api.post("/uploads", formData, {
               headers: {
-                "Content-Type": "multipart/form-data",  
+                "Content-Type": "multipart/form-data",  // Set correct header for file upload
               },
             });
   
+            // Assuming the backend returns the URL of the uploaded image
             const fileUrl = response.data.url;
             
+            // Return the updated member with the photo URL
             return { ...member, photo: fileUrl };
           } catch (error) {
             console.error("Error uploading image:", error);
-            return { ...member, photo: null }; 
+            return { ...member, photo: null }; // Fallback if upload fails
           }
         }
-        return member; 
+        return member; // If no photo selected, return member as is
       })
     );
   
@@ -410,12 +398,12 @@ function LockJourney({ onClickNextPrev, data }) {
                                   value={spot.cost}
                                   onFocus={(e) => {
                                     if (spot.cost === 0) {
-                                      e.target.value = ""; 
+                                      e.target.value = ""; // Clear the input if cost is 0
                                     }
                                   }}
                                   onBlur={(e) => {
                                     if (e.target.value === "") {
-                                      e.target.value = 0; 
+                                      e.target.value = 0; // Set the value to 0 if the input is empty when blurred
                                     }
                                   }}
                                   onChange={(e) => {

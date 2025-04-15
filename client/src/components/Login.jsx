@@ -4,12 +4,11 @@ import Header from "./Header";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import welcome from "../assets/Welcome6.jpg";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { tripContext } from "../context/useTripDataContext";
+import api from "../api/api";
+
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const {token, setToken} = useContext(tripContext)
     const [data, setData] = useState({
     email: "",
     password: "",
@@ -28,8 +27,9 @@ const Login = () => {
         } else {
           setError("");
           try {
-            const response = await axios.post(`/api/auth/login`, data).then(function (response) {
-              setToken(response.data.token);
+            const response = await api.post(`/auth/login`, data).then(function (response) {
+              localStorage.setItem('token', response.data.token)
+              localStorage.setItem("token_expiry", response.data.token_expiry);
               console.log("token:", response.data.token);
               }
             );

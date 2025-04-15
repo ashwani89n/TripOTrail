@@ -9,16 +9,25 @@ import { tripContext } from "../context/useTripDataContext";
 import "../components/styles/PickSpots.css";
 import noSpotsChosen from "../assets/noSpots.png";
 
-const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
+const PickSpots = ({ onClickNextPrev, sendDataToParent }) => {
   const [attractions, setAttractions] = useState([]);
   const [selectedAttraction, setSelectedAttraction] = useState([]);
   const [selectedSpotsData, setSelectedSpotsData] = useState([]);
-  const apiKey = "AIzaSyA3xEs87Yqi3PpC8YKGhztvrXNDJX5nNDw";
-  const { tripId, destinationPoint, startPoint, startDt, endDt , startCoordinates,
-    destinationCoordinates, title, transportBudget} =
-    useContext(tripContext);
+  const apiKey = import.meta.env.VITE_GOOGLE_API_KEY;
+  const {
+    tripId,
+    destinationPoint,
+    startPoint,
+    startDt,
+    endDt,
+    startCoordinates,
+    destinationCoordinates,
+    title,
+    transportBudget,
+  } = useContext(tripContext);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // const mapRef = useRef(null);
   const handleSelectSpots = (item) => {
@@ -29,13 +38,13 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
       return prev;
     });
   };
-  
+
   function calculateDistance(a, b) {
     const dx = a.position.lat - b.position.lat;
     const dy = a.position.lng - b.position.lng;
     return Math.sqrt(dx * dx + dy * dy); // Replace with Haversine if needed
   }
-  
+
   function getTotalDistance(path) {
     let total = 0;
     for (let i = 0; i < path.length - 1; i++) {
@@ -43,7 +52,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
     }
     return total;
   }
-  
+
   function permute(arr) {
     if (arr.length <= 1) return [arr];
     const result = [];
@@ -57,12 +66,12 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
     }
     return result;
   }
-  
+
   function getOptimizedRoute(start, attractions, end) {
     const allPermutations = permute(attractions);
     let bestRoute = null;
     let shortestDistance = Infinity;
-  
+
     for (const order of allPermutations) {
       const fullRoute = [start, ...order, end];
       const distance = getTotalDistance(fullRoute);
@@ -71,66 +80,68 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
         bestRoute = fullRoute;
       }
     }
-  
+
     return bestRoute;
   }
-  
 
-    const handleNext = async() => {
-      const nodes = [
-        { id: "start", name: startPoint, position: startCoordinates },
-        ...selectedAttraction.filter((item) => item.enabled === true).map((attraction) => ({
+  const handleNext = async () => {
+    const nodes = [
+      { id: "start", name: startPoint, position: startCoordinates },
+      ...selectedAttraction
+        .filter((item) => item.enabled === true)
+        .map((attraction) => ({
           ...attraction,
           id: attraction.name,
         })),
-        { id: "end", name: destinationPoint, position: destinationCoordinates },
-      ]; 
+      { id: "end", name: destinationPoint, position: destinationCoordinates },
+    ];
 
-      const optimizedRoute = getOptimizedRoute(
-        { position: startCoordinates, name: startPoint},
-        selectedAttraction.filter((item) => item.enabled === true), 
-        { position: destinationCoordinates, name: destinationPoint }
-      );
+    const optimizedRoute = getOptimizedRoute(
+      { position: startCoordinates, name: startPoint },
+      selectedAttraction.filter((item) => item.enabled === true),
+      { position: destinationCoordinates, name: destinationPoint }
+    );
 
-      console.log("optimized:", optimizedRoute);
+    console.log("optimized:", optimizedRoute);
 
-      if (optimizedRoute.length > 0) {
-        const finalizedSpots = [
-          ...optimizedRoute.map((spot, index) => ({
-            name: spot.name,
-            address: spot.address || "",
-            image: spot.photoUrl || "",
-            is_added: true,
-            latitude: spot.position.lat,
-            longitude: spot.position.lng,
-            position: index === 0 ? "start" : index === optimizedRoute.length - 1 ? "end" : "between",
-            order_index: index + 1,
-          })),
-        ];
-    
-        setSelectedSpotsData(finalizedSpots);
+    if (optimizedRoute.length > 0) {
+      const finalizedSpots = [
+        ...optimizedRoute.map((spot, index) => ({
+          name: spot.name,
+          address: spot.address || "",
+          image: spot.photoUrl || "",
+          is_added: true,
+          latitude: spot.position.lat,
+          longitude: spot.position.lng,
+          position:
+            index === 0
+              ? "start"
+              : index === optimizedRoute.length - 1
+              ? "end"
+              : "between",
+          order_index: index + 1,
+        })),
+      ];
 
-
-    if (!finalizedSpots || finalizedSpots.length === 0) {
-      setError("Please select destinations to proceed");
-      return;
-    } else {
-      setError("");
-      console.log("selected1:", finalizedSpots);
       setSelectedSpotsData(finalizedSpots);
-      sendDataToParent(finalizedSpots);
-      onClickNextPrev((prev) => prev + 1);
 
-    }
-    }else {
+      if (!finalizedSpots || finalizedSpots.length === 0) {
+        setError("Please select destinations to proceed");
+        return;
+      } else {
+        setError("");
+        console.log("selected1:", finalizedSpots);
+        setSelectedSpotsData(finalizedSpots);
+        sendDataToParent(finalizedSpots);
+        onClickNextPrev((prev) => prev + 1);
+      }
+    } else {
       setError("No optimal route found.");
     }
-
-
-    };
-    const handlePrevious = () => {
-      onClickNextPrev((prev) => prev - 1);
-    };
+  };
+  const handlePrevious = () => {
+    onClickNextPrev((prev) => prev - 1);
+  };
 
   const handleSearch = async () => {
     try {
@@ -185,22 +196,23 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
     }
   };
 
-
   useEffect(() => {
     console.log(startCoordinates, destinationCoordinates);
+    setLoading(true);
     if (!window.google || !window.google.maps) {
       const interval = setInterval(() => {
         if (window.google && window.google.maps) {
           clearInterval(interval);
-          handleSearch();
+          // handleSearch();
+          handleSearch().then(() => setLoading(false));
         }
       }, 2000);
       return () => clearInterval(interval);
     } else {
-      handleSearch();
+      // handleSearch();
+      handleSearch().then(() => setLoading(false));
     }
   }, [tripId]);
-
 
   const formatDate = (date) => {
     const day = date.getDate();
@@ -242,7 +254,10 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
     };
   };
 
-  const { daysCount, dayOneWeekday, formattedDate } = calculateTripDays(startDt, endDt);
+  const { daysCount, dayOneWeekday, formattedDate } = calculateTripDays(
+    startDt,
+    endDt
+  );
 
   return (
     <>
@@ -275,7 +290,7 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
                 className="bg-textInputBG w-[70%] h-[31px] rounded-md pl-3 italic"
                 placeholder="Search by location..."
                 value={query}
-                onChange={(e)=> setQuery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
               ></input>
               <button
                 disabled
@@ -285,52 +300,85 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
               </button>
             </div>
             <div className="h-[580px] overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between gap-3">
-                {attractions
-                  .filter((item) => item.photoUrl && 
-                    (query.trim()?item.name.toLowerCase().includes(query.toLowerCase()):true))
-                  .map((item) => (
-                    <div
-                      className="w-full h-[280px] bg-headerBG rounded-lg overflow-hidden cursor-pointer transition-transform transform hover:scale-10 hover:border-[1px] hover:border-subTitle"
-                      key={item.id}
-                      onClick={() => handleSelectSpots(item)}
-                    >
-                      <img
-                        src={item.photoUrl}
-                        alt={item.name}
-                        className="w-full h-[200px] object-cover"
-                      />
-                      <div className="p-2">
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm text-white truncate font-aldrich">
-                            <span className="text-topHeader">
-                              {item.name.split(" ")[0]}
-                            </span>{" "}
-                            {item.name.split(" ").slice(1).join(" ")}
-                          </p>
-                          <div className="flex flex-row">
-                            <p className="text-textCard text-[10px] pr-1 font-light">
-                              {item.rating}
+              {loading ? (
+                  <div className="flex items-center w-full justify-center h-full min-h-[300px]">
+                    <div className="text-center">
+                      <p className="text-lg font-light font-inria text-textCard">
+                        Hang tight!
+                      </p>
+                      <p className="text-lg font-inria font-medium italic text-topHeader mt-1 animate-pulse">
+                      We’re adding your bucket list spots...
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-between gap-3">
+                    {attractions
+                      .filter(
+                        (item) =>
+                          item.photoUrl &&
+                          (query.trim()
+                            ? item.name
+                                .toLowerCase()
+                                .includes(query.toLowerCase())
+                            : true)
+                      )
+                      .map((item) => (
+                        <div
+                          className="w-full h-[280px] bg-headerBG rounded-lg overflow-hidden cursor-pointer transition-transform transform hover:scale-10 hover:border-[1px] hover:border-subTitle"
+                          key={item.id}
+                          onClick={() => handleSelectSpots(item)}
+                        >
+                          <img
+                            src={item.photoUrl}
+                            alt={item.name}
+                            className="w-full h-[200px] object-cover"
+                          />
+                          <div className="p-2">
+                            <div className="flex justify-between items-center">
+                              <p className="text-sm text-white truncate font-aldrich">
+                                <span className="text-topHeader">
+                                  {item.name.split(" ")[0]}
+                                </span>{" "}
+                                {item.name.split(" ").slice(1).join(" ")}
+                              </p>
+                              <div className="flex flex-row">
+                                <p className="text-textCard text-[10px] pr-1 font-light">
+                                  {item.rating}
+                                </p>
+                                <div className="text-topHeader text-[10px]">
+                                  {" "}
+                                  ★
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-xs text-textCard mt-1 text-left">
+                              {item.address}
                             </p>
-                            <div className="text-topHeader text-[10px]"> ★</div>
                           </div>
                         </div>
-                        <p className="text-xs text-textCard mt-1 text-left">
-                          {item.address}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
+                      ))}</div>
+                )}
+              
             </div>
           </div>
 
           <div className="w-full lg:w-1/2 bg-card text-white p-5 rounded-l h-full">
             <div className="h-[626px] overflow-y-auto custom-scrollbar justify-center">
               <div className="text-white mx-5 my-5">
-              <p className="text-white text-xl font-aldrich">
-              Day 1 - {daysCount}<span className="font-light text-textCard text-[20px]"> | </span><span className="text-topHeader font-semibold">{dayOneWeekday}</span></p>
-                <p className="text-textCard text-md font-light">{formattedDate}</p>
+                <p className="text-white text-xl font-aldrich">
+                  Day 1 - {daysCount}
+                  <span className="font-light text-textCard text-[20px]">
+                    {" "}
+                    |{" "}
+                  </span>
+                  <span className="text-topHeader font-semibold">
+                    {dayOneWeekday}
+                  </span>
+                </p>
+                <p className="text-textCard text-md font-light">
+                  {formattedDate}
+                </p>
               </div>
               <ul className="space-y-2">
                 {selectedAttraction.length > 0 ? (
@@ -340,10 +388,13 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
                       className="bg-list p-3 rounded-lg text-sm flex justify-between items-center"
                     >
                       <div className="flex flex-row gap-2">
-                      <img className="w-[35px] h-[26px]" src={item.photoUrl}></img>
-                      <span className="truncate mr-4 text-textCard italic">
-                        {item.name}
-                      </span>
+                        <img
+                          className="w-[35px] h-[26px]"
+                          src={item.photoUrl}
+                        ></img>
+                        <span className="truncate mr-4 text-textCard italic">
+                          {item.name}
+                        </span>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
@@ -351,10 +402,13 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
                           className="sr-only peer"
                           checked={item.enabled}
                           onChange={() => {
-                            setSelectedAttraction(prev =>
+                            setSelectedAttraction((prev) =>
                               prev.map((attraction, i) =>
                                 i === index
-                                  ? { ...attraction, enabled: !attraction.enabled }
+                                  ? {
+                                      ...attraction,
+                                      enabled: !attraction.enabled,
+                                    }
                                   : attraction
                               )
                             );
@@ -371,7 +425,10 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
                       src={noSpotsChosen}
                       className="w-[300px] h-[300px] object-contain"
                     ></img>
-                    <p className="text-textCard text-md font-light">Still undecided? Start narrowing down your bucket list today!</p>
+                    <p className="text-textCard  font-inria  text-md font-light">
+                      <span className="text-topHeader text-lg"> Still undecided?</span>&nbsp;Start narrowing down your bucket list
+                      today!
+                    </p>
                   </div>
                 )}
               </ul>
@@ -379,19 +436,19 @@ const PickSpots = ({onClickNextPrev, sendDataToParent}) => {
           </div>
         </div>
         <div className="flex justify-end pb-20 pr-10 gap-5">
-            <button
-              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
-              onClick={handlePrevious}
-            >
-              Previous
-            </button>
-            <button
-              className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold  rounded-lg items-center"
-              onClick={handleNext}
-            >
-              Next
-            </button>
-          </div>
+          <button
+            className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
+            onClick={handlePrevious}
+          >
+            Previous
+          </button>
+          <button
+            className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold  rounded-lg items-center"
+            onClick={handleNext}
+          >
+            Next
+          </button>
+        </div>
       </APIProvider>
     </>
   );

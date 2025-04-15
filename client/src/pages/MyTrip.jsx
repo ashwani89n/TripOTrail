@@ -1,15 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
-import axios from "axios";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
 import searchIcon from "../images/Search.png";
 import TripCard from "../components/TripCard";
 import { tripContext } from "../context/useTripDataContext";
 import { useNavigate } from "react-router";
+import api from "../api/api";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 const MyTrip = () => {
@@ -24,7 +25,11 @@ const MyTrip = () => {
   dayjs.extend(weekday);
   dayjs.extend(localizedFormat);
   dayjs.extend(advancedFormat);
+  console.log("token1:", token);
 
+  const formatDate = (isoDate) => {
+    return dayjs(isoDate).format("DD MMMM, YYYY | dddd");
+  };
 
   const handleCardClick =(tripId) =>{
     console.log(tripId);
@@ -33,13 +38,7 @@ const MyTrip = () => {
 
   const getTripsData = async () => {
     try {
-      const response = await axios.get(`/api/trips`, {
-        headers: {
-          Authorization:
-            // `Bearer ${token}`,
-            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
-        },
-      });
+      const response = await api.get(`/trips`);
       console.log(response.data);
       setMyTrips(response.data);
     } catch (error) {
