@@ -197,7 +197,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc0NDU3NTMyMiwiZXhwIjoxNzQ0NTc4OTIyfQ.xTQp5NdOtPhNIRG_4-m0hZC7Hz9_48Cp_Q3m2_1bqLA`,
+              `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
           },
         }
       )

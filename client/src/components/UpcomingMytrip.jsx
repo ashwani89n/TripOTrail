@@ -154,7 +154,7 @@ const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
         newExpensePayload,
         {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njk0Nzk4LCJleHAiOjE3NDQ2OTgzOTh9.CN0P53iWn9500luCu_i6PtcvgST60EW9r9iqVpWVAzs`,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
           },
         }
       );
@@ -234,7 +234,7 @@ const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
     try {
       const response = await axios.get(`/api/trips/${tripId}/destinations`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njk0Nzk4LCJleHAiOjE3NDQ2OTgzOTh9.CN0P53iWn9500luCu_i6PtcvgST60EW9r9iqVpWVAzs`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
         },
       });
       setItinerary(response.data.timeline);

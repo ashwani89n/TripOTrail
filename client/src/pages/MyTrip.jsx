@@ -1,18 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
-import MytripsHero from "../images/MytripsHero.png";
-import { FaHandLizard, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import tempTripImage from "../images/tempTripImage.png";
-import TripJeep from "../images/TripJeep.png";
-import destinationPin from "../images/destinationPin.png";
-import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import BudgetCharts from "../components/BudgetCharts";
 import searchIcon from "../images/Search.png";
 import TripCard from "../components/TripCard";
 import { tripContext } from "../context/useTripDataContext";
@@ -44,7 +37,7 @@ const MyTrip = () => {
         headers: {
           Authorization:
             // `Bearer ${token}`,
-            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjkwODE3LCJleHAiOjE3NDQ2OTQ0MTd9.kwfKh_9FGZaqJUvAG8rRFTRBzYIenae7XA6baWPSpCA`,
+            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
         },
       });
       console.log(response.data);

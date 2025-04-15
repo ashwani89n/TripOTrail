@@ -220,7 +220,7 @@ function LockJourney({ onClickNextPrev, data }) {
         requestPayload,
         {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc0NDU3NTMyMiwiZXhwIjoxNzQ0NTc4OTIyfQ.xTQp5NdOtPhNIRG_4-m0hZC7Hz9_48Cp_Q3m2_1bqLA`,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NzMyMDgyLCJleHAiOjE3NDQ3MzU2ODJ9.6RxubHADG6z9H1X2KVjQkzIU16wn4rhEW93JHHYNxp4`,
           },
         }
       );
@@ -237,27 +237,24 @@ function LockJourney({ onClickNextPrev, data }) {
         if (member.photo) {
           // Prepare form data for uploading the file
           const formData = new FormData();
-          formData.append('file', member.photo);  // Append the selected file to form data
+          formData.append('file', member.photo);  
   
           try {
-            // Send the file to the backend (where it's stored on the server or cloud storage)
             const response = await axios.post("/api/uploads", formData, {
               headers: {
-                "Content-Type": "multipart/form-data",  // Set correct header for file upload
+                "Content-Type": "multipart/form-data",  
               },
             });
   
-            // Assuming the backend returns the URL of the uploaded image
             const fileUrl = response.data.url;
             
-            // Return the updated member with the photo URL
             return { ...member, photo: fileUrl };
           } catch (error) {
             console.error("Error uploading image:", error);
-            return { ...member, photo: null }; // Fallback if upload fails
+            return { ...member, photo: null }; 
           }
         }
-        return member; // If no photo selected, return member as is
+        return member; 
       })
     );
   
@@ -413,12 +410,12 @@ function LockJourney({ onClickNextPrev, data }) {
                                   value={spot.cost}
                                   onFocus={(e) => {
                                     if (spot.cost === 0) {
-                                      e.target.value = ""; // Clear the input if cost is 0
+                                      e.target.value = ""; 
                                     }
                                   }}
                                   onBlur={(e) => {
                                     if (e.target.value === "") {
-                                      e.target.value = 0; // Set the value to 0 if the input is empty when blurred
+                                      e.target.value = 0; 
                                     }
                                   }}
                                   onChange={(e) => {
