@@ -26,13 +26,32 @@ exports.getDestinations = async (req, res) => {
       [tripId]
     );
 
+    console.log("expensesResult:", expensesResult);
+
     const expenses = expensesResult.rows.map((expense) => ({
       added_by_name: expense.added_by_name,
-      added_by_profile_picture: expense.profile_picture || null,
+      added_by_profile_picture: expense.added_by_profile_picture || null,
       category: expense.category,
       comments: expense.comments,
       amount: expense.amount || 0
     }));
+
+    const expCatResult = await pool.query(
+        `SELECT category, SUM(amount) AS total
+         FROM expenses
+         WHERE trip_id = $1
+         GROUP BY category`,
+        [tripId]
+      );
+    
+      const expense_by_category = {};
+      for (const row of expCatResult.rows) {
+        const amount = parseFloat(row.total);
+        expense_by_category[row.category] = amount;
+        totalBudget += amount;
+      }
+    // const expense_by_category = expCatResult.rows;
+    
 
     const budgetResult = await pool.query(
         `SELECT category, SUM(amount) AS total
@@ -81,7 +100,6 @@ exports.getDestinations = async (req, res) => {
          });
      }
     
-
     // Convert Map to sorted array
     const timeline = Array.from(timelineMap.values()).sort(
       (a, b) => new Date(a.dayDate) - new Date(b.dayDate)
@@ -92,6 +110,7 @@ exports.getDestinations = async (req, res) => {
       timeline,
       budget,
       expenses,
+      expense_by_category,
       team_members
     });
   } catch (error) {

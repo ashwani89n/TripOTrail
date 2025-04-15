@@ -22,7 +22,7 @@ const TripDetails = () => {
     try {
       const response = await axios.get(`/api/trips/${tripId}`, {
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjUzMjIzLCJleHAiOjE3NDQ2NTY4MjN9.O8PBmfOeBw5otLKU3mHAoYkohX6wHlvGF7COpd9H548`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njc2MTQxLCJleHAiOjE3NDQ2Nzk3NDF9.bouZxse7JHiNkDKWAC3fZmPcj6t4KSnFO8m-InWkr7U`,
         },
       });
       setMyTripsByIdData(response.data);

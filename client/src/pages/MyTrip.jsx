@@ -48,7 +48,7 @@ const MyTrip = () => {
         headers: {
           Authorization:
             // `Bearer ${token}`,
-            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0NjQ0NTAyLCJleHAiOjE3NDQ2NDgxMDJ9.FqMzL8ewNp1JaTk595AMqMamnYDaxvq2X9vSWYKM5LQ`,
+            ` Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0Njc2MTQxLCJleHAiOjE3NDQ2Nzk3NDF9.bouZxse7JHiNkDKWAC3fZmPcj6t4KSnFO8m-InWkr7U`,
         },
       });
       console.log(response.data);
