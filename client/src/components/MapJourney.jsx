@@ -234,7 +234,6 @@ const MapJourney = ({
         indexLabel.style.fontWeight = "bold";
         markerContent.appendChild(indexLabel);
 
-<<<<<<< HEAD
         // const marker = new window.google.maps.marker.AdvancedMarkerElement({
         //   position: { lat: place.latitude, lng: place.longitude },
         //   map: mapInstance,
@@ -266,17 +265,6 @@ const MapJourney = ({
           console.error("Failed to create advanced marker:", error);
         }
         
-=======
-        const marker = new window.google.maps.marker.AdvancedMarkerElement({
-          position: { lat: place.latitude, lng: place.longitude },
-          map: mapInstance,
-          content: markerContent,
-          title: `Attraction ${place.order_index}`,
-        });
-
-        // Store the marker reference for later removal or updates
-        markerRefs.current.push(marker);
->>>>>>> origin/main
       });
   };
 
@@ -350,7 +338,6 @@ const MapJourney = ({
           indexLabel.style.fontWeight = "bold";
           markerContent.appendChild(indexLabel);
 
-<<<<<<< HEAD
           // const marker = new window.google.maps.marker.AdvancedMarkerElement({
           //   position: { lat: place.latitude, lng: place.longitude },
           //   map,
@@ -382,16 +369,6 @@ const MapJourney = ({
             console.error("Failed to create advanced marker:", error);
           }
           
-=======
-          const marker = new window.google.maps.marker.AdvancedMarkerElement({
-            position: { lat: place.latitude, lng: place.longitude },
-            map,
-            content: markerContent,
-            title: `Attraction ${place.order_index}`,
-          });
-
-          markerRefs.current.push(marker);
->>>>>>> origin/main
         });
     };
 
@@ -1118,8 +1095,4 @@ const MapJourney = ({
   );
 };
 
-<<<<<<< HEAD
 export default MapJourney;
-=======
-export default MapJourney;
->>>>>>> origin/main

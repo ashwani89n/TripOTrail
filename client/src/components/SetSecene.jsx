@@ -16,13 +16,9 @@ import usePlacesAutocomplete, {
 import axios from "axios";
 import { tripContext } from "../context/useTripDataContext";
 
-<<<<<<< HEAD
 
 const SetSecene = ({ onClickNext }) => {
   const {token} = useContext(tripContext);
-=======
-const SetSecene = ({ onClickNext }) => {
->>>>>>> origin/main
   const [data, setData] = useState({
     title: "",
     start_point: "",
@@ -36,10 +32,6 @@ const SetSecene = ({ onClickNext }) => {
     return_flight: {},
   });
 
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [dateToFlight, setDateToFlight] = useState();
@@ -109,12 +101,6 @@ const SetSecene = ({ onClickNext }) => {
     } else if (!data.destination) {
       setError("Please enter Destination");
       return;
-<<<<<<< HEAD
-=======
-    } else if (data.start_point.trim() == data.destination.trim()) {
-      setError("Start Point and End Point cannot be the same");
-      return;
->>>>>>> origin/main
     } else if (!startDate) {
       setError("Please enter Start Date");
       return;
@@ -211,11 +197,7 @@ const SetSecene = ({ onClickNext }) => {
         {
           headers: {
             Authorization:
-<<<<<<< HEAD
               `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc0NDU3NTMyMiwiZXhwIjoxNzQ0NTc4OTIyfQ.xTQp5NdOtPhNIRG_4-m0hZC7Hz9_48Cp_Q3m2_1bqLA`,
-=======
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ0MzMyMzE4LCJleHAiOjE3NDQzMzU5MTh9.DYbgnjJWWQ1R4GaYZbPoVlSSpo0pC67ofOtL0Y3JvM4",
->>>>>>> origin/main
           },
         }
       )

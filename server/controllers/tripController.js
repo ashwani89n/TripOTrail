@@ -2,7 +2,6 @@ const pool = require("../database/db");
 const dayjs = require("dayjs");
 
 exports.getTrips = async (req, res) => {
-<<<<<<< HEAD
   console.log("✅ getTrips called");
   try {
     console.log("✅ getTrips ty called");
@@ -22,22 +21,6 @@ exports.getTrips = async (req, res) => {
       const { trip_id: tripId } = trip;
       const budgetResult = await pool.query(
         `SELECT category, SUM(amount) AS total
-=======
-    console.log("✅ getTrips called");
-  try {
-    const userId = req.user.id;
-    const tripResult = await pool.query(
-        'SELECT * FROM trips WHERE user_id = $1',
-        [userId]
-      );
-      const trips = [];
-
-    for (const trip of tripResult.rows) {
-
-      const { trip_id: tripId } = trip;
-      const budgetResult = await pool.query(
-       `SELECT category, SUM(amount) AS total
->>>>>>> origin/main
          FROM budget
          WHERE trip_id = $1
          GROUP BY category`,
@@ -46,11 +29,7 @@ exports.getTrips = async (req, res) => {
       const budget = {};
       let totalBudget = 0;
       for (const row of budgetResult.rows) {
-<<<<<<< HEAD
         console.log(row);
-=======
-        console.log(row)
->>>>>>> origin/main
         const amount = parseFloat(row.total);
         budget[row.category] = amount;
         totalBudget += amount;
@@ -64,26 +43,17 @@ exports.getTrips = async (req, res) => {
          GROUP BY category`,
         [tripId]
       );
-<<<<<<< HEAD
       console.log(tripId);
-=======
-      console.log(tripId)
->>>>>>> origin/main
       console.log("🧪 expenseResult.rows:", expenseResult.rows);
       const expense = {};
       let totalExpense = 0;
       for (const row of expenseResult.rows) {
-<<<<<<< HEAD
         console.log(row);
-=======
-        console.log(row)
->>>>>>> origin/main
         const amount = parseFloat(row.total);
         expense[row.category] = amount;
         totalExpense += amount;
       }
 
-<<<<<<< HEAD
       // Get media
       const fileType = "image";
       const mediaResult = await pool.query(
@@ -98,12 +68,6 @@ exports.getTrips = async (req, res) => {
       // Get team members
       const teamResult = await pool.query(
         "SELECT name, email, profile_picture FROM tripmates WHERE trip_id = $1",
-=======
-
-      // Get team members
-      const teamResult = await pool.query(
-        'SELECT name, email FROM tripmates WHERE trip_id = $1',
->>>>>>> origin/main
         [tripId]
       );
       const team_members = teamResult.rows;
@@ -112,7 +76,6 @@ exports.getTrips = async (req, res) => {
       const startDate = dayjs(trip.start_date);
       const endDate = dayjs(trip.end_date);
 
-<<<<<<< HEAD
       let runningStatus = "";
       if (today.isBefore(startDate, "day")) {
         runningStatus = "upcoming";
@@ -120,15 +83,6 @@ exports.getTrips = async (req, res) => {
         runningStatus = "past";
       } else {
         runningStatus = "active";
-=======
-      let status = "";
-      if (today.isBefore(startDate, "day")) {
-        status = "upcoming";
-      } else if (today.isAfter(endDate, "day")) {
-        status = "past";
-      } else {
-        status = "active";
->>>>>>> origin/main
       }
 
       trips.push({
@@ -136,16 +90,10 @@ exports.getTrips = async (req, res) => {
         budget,
         expense,
         team_members,
-<<<<<<< HEAD
         media,
         runningStatus,
         totalBudget,
         totalExpense,
-=======
-        status,
-        totalBudget,
-        totalExpense
->>>>>>> origin/main
       });
     }
 
@@ -157,10 +105,7 @@ exports.getTrips = async (req, res) => {
 
 exports.getTripById = async (req, res) => {
   try {
-<<<<<<< HEAD
     let trips ={};
-=======
->>>>>>> origin/main
     const { tripId } = req.params;
     const userId = req.user.id;
     const result = await pool.query(
@@ -168,7 +113,6 @@ exports.getTripById = async (req, res) => {
       [tripId, userId]
     );
 
-<<<<<<< HEAD
     const tripResult = result.rows[0]
 
     const budgetResult = await pool.query(
@@ -244,17 +188,11 @@ exports.getTripById = async (req, res) => {
     };
 
 
-=======
->>>>>>> origin/main
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Trip not found" });
     }
 
-<<<<<<< HEAD
     res.status(200).json(trips);
-=======
-    res.status(200).json(result.rows[0]);
->>>>>>> origin/main
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
