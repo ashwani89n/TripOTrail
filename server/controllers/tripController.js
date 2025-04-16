@@ -169,14 +169,6 @@ exports.getTripById = async (req, res) => {
         runningStatus = "active";
       }
 
-    console.log({
-      ...tripResult,
-      budget,
-      expense,
-      team_members,
-      totalBudget,
-      totalExpense
-    })
     trips = {
       ...tripResult,
       runningStatus,
@@ -267,11 +259,14 @@ exports.createTrip = async (req, res) => {
 };
 
 exports.deleteTrip = async (req, res) => {
+  console.log("Delete");
   try {
     const { tripId } = req.params;
+    const { status } = req.body;
+
     const result = await pool.query(
-      "DELETE FROM trips WHERE trip_id = $1 RETURNING *",
-      [tripId]
+      "UPDATE trips SET status = $1 WHERE trip_id = $2 RETURNING *",
+      [status,tripId]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Trip not found" });

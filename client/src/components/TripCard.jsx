@@ -7,11 +7,9 @@ import homeHero from "../images/HomeHero.jpeg";
 import tripsNext from "../images/MyTripsNext.png";
 import tripsPrev from "../images/MyTripsPrevious.png";
 import { CiUser } from "react-icons/ci";
-import Slider from "react-slick"; // at top
+import Slider from "react-slick"; 
 import { Link } from "react-router-dom";
-// import noUpcomingImg from "../images/noUpcomingTrips.png";
-// import noActiveImg from "../images/noActiveTrips.png";
-// import noPastImg from "../images/noPastTrips.png";
+
 
 const TripCard = ({
   type,

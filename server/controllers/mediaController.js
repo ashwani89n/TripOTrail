@@ -15,7 +15,8 @@ exports.uploadMedia = async (req, res) => {
         }
 
         const fileUrl = `/uploads/${req.file.filename}`;
-        const fileType = req.file.mimetype.split("/")[0]; 
+        // const fileType = req.file.mimetype.split("/")[0]; 
+        const fileType = req.body.file_type;
 
         const result = await pool.query(
             `INSERT INTO media (trip_id, file_type, file_url) VALUES ($1, $2, $3) RETURNING *`,

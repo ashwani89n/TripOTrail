@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useLayoutEffect,
   useRef,
   useEffect,
   useContext,
@@ -16,8 +15,7 @@ import CalendarPicker from "../components/CalendarPicker";
 import TimelineView from "../components/TimelineView";
 import AddExpenseModal from "../components/AddExpenseModal";
 import api from "../api/api";
-
-
+import Attachments from "./Attachments";
 
 const generateDateRange = (start, days) => {
   const dateArray = [];
@@ -73,7 +71,7 @@ const useAutoScrollOnHover = (ref, speed = 2, edgeThreshold = 40) => {
   }, [ref, speed, edgeThreshold]);
 };
 
-const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
+const UpcomingMytrip = ({ tripDetails, onClickEmail , showSplitPrompt, showAttachPrompt}) => {
   const [selectedStartDate, setSelectedStartDate] = useState(
     moment(tripDetails.start_date)
   );
@@ -101,6 +99,9 @@ const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
     });
     return catMap;
   };
+
+  console.log("split inside1:", showSplitPrompt);
+  console.log("split inside2:", showAttachPrompt);
 
   const [openModal, setOpenModal] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
@@ -283,9 +284,6 @@ const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
   
     return itinerary.map(getDayHTML).join("");
   };
-  
-  
-
 
   const getTripById = async () => {
     try {
@@ -356,12 +354,16 @@ const UpcomingMytrip = ({ tripDetails, onClickEmail }) => {
           scrollRef={endDateRef}
           dataOffset={(800 / 1920) * window.innerWidth}
         />
+        {showAttachPrompt ? <Attachments id={tripDetails.trip_id}/> : showSplitPrompt ?
+        <>
         <SpendAnalyzerChart budgetData={budgetData} />
         <ExpenseCards
           categories={categories}
           expenses={expenses}
           openExpenseModal={openExpenseModal}
-        />
+        /> 
+        </>: (<></>)
+}
 
         {openModal && (<AddExpenseModal
           open={openModal}
