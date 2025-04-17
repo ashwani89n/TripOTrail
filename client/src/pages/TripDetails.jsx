@@ -4,11 +4,9 @@ import Header from "../components/Header";
 import destinationPin from "../images/destinationPin.png";
 import tripJeep from "../images/TripJeep.png";
 import UpcomingMytrip from "../components/UpcomingMytrip";
-import ActiveMyTrip from "../components/ActiveMyTrip";
-import PastMyTrip from "../components/PastMyTrip";
 import attch from "../images/Attach.png";
 import endTrip from "../images/Remove.png";
-import addStop from "../images/Address.png";
+import addStop from "../images/Edit.png";
 import sendEmail from "../images/SendEmail.png";
 import splitMoney from "../images/SplitMoney.png";
 import api from "../api/api";
@@ -23,6 +21,7 @@ const TripDetails = () => {
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [showAttachPrompt, setShowAttachPrompt] = useState(false);
+  const [showEditPrompt, setShowEditPrompt] = useState(false);
   const [emailBody, setEmailBody] = useState([]);
 
   const getTripById = async () => {
@@ -87,37 +86,88 @@ const TripDetails = () => {
 
             {/* Right Action Icons */}
             <div className="flex flex-row gap-2">
-              <button
-                onClick={() => {setShowSplitPrompt(true);setShowAttachPrompt(false)}}
-                className= "bg-topHeader rounded-sm w-7 h-7 p-1"
-              >
-                <img src={splitMoney} className="w-full h-full" />
-              </button>
-              <button
-                onClick={() => {setShowAttachPrompt(true);setShowSplitPrompt(true)}}
-                className="bg-topHeader rounded-sm w-7 h-7 p-1"
-              >
-                <img src={attch} className="w-full h-full" />
-              </button>
-              <button
-                onClick={() => setShowEmailPrompt(true)}
-                className="bg-topHeader rounded-sm w-7 h-7 p-1"
-              >
-                <img src={addStop} className="w-full h-full" />
-              </button>
-              <button
-                onClick={() => setShowDeletePrompt(true)}
-                className="bg-topHeader rounded-sm w-7 h-7 p-1"
-              >
-                <img src={endTrip} className="w-full h-full" />
-              </button>
+              {/* Spend Analyzer */}
+              <div className="relative group w-full">
+                <button
+                  onClick={() => {
+                    setShowSplitPrompt(true);
+                    setShowEditPrompt(false);
+                    setShowAttachPrompt(false);
+                  }}
+                  className={`rounded-sm w-7 h-7 p-1 ${
+                    showSplitPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
+                  }`}
+                >
+                  <img src={splitMoney} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Spend Analyzer
+                </div>
+              </div>
 
-              <button
-                onClick={() => setShowEmailPrompt(true)}
-                className="bg-topHeader rounded-sm w-7 h-7 p-1"
-              >
-                <img src={sendEmail} className="w-full h-full" />
-              </button>
+              {/* Attach File */}
+              <div className="relative group w-full">
+                <button
+                  onClick={() => {
+                    setShowAttachPrompt(true);
+                    setShowEditPrompt(false);
+                    setShowSplitPrompt(false);
+                  }}
+                  className={`rounded-sm w-7 h-7 p-1 ${
+                    showAttachPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
+                  }`}
+                >
+                  <img src={attch} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Attach File
+                </div>
+              </div>
+
+              {/* Add Stop */}
+              <div className="relative group w-full">
+                <button
+                  onClick={() => {
+                    setShowEditPrompt(true);
+                    setShowSplitPrompt(false);
+                    setShowAttachPrompt(false);
+                  }}
+                  className={`rounded-sm w-7 h-7 p-1 ${
+                    showEditPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
+                  }`}
+                >
+                  <img src={addStop} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Add Stop
+                </div>
+              </div>
+
+              {/* End Trip */}
+              <div className="relative group w-full">
+                <button
+                  onClick={() => {setShowDeletePrompt(true)}}
+                   className="bg-topHeader rounded-sm w-7 h-7 p-1"
+                >
+                  <img src={endTrip} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  End Trip
+                </div>
+              </div>
+
+              {/* Send Email */}
+              <div className="relative group w-full">
+                <button
+                  onClick={() => setShowEmailPrompt(true)}
+                  className="bg-topHeader rounded-sm w-7 h-7 p-1"
+                >
+                  <img src={sendEmail} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Send Email
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -147,21 +197,25 @@ const TripDetails = () => {
         </div>
       </div>
       <div className="mt-10 p-4">
-        {myTripsByIdData.runningStatus === "upcoming" ? (
-          <UpcomingMytrip
-            tripDetails={myTripsByIdData}
-            onClickEmail={setEmailBody}
-            showSplitPrompt={showSplitPrompt}
-            showAttachPrompt={showAttachPrompt}
-          />
-        ) : myTripsByIdData.runningStatus === "active" ? (
-          <ActiveMyTrip tripDetails={myTripsByIdData} />
-        ) : (
-          <PastMyTrip tripDetails={myTripsByIdData} />
-        )}
+        <UpcomingMytrip
+          tripDetails={myTripsByIdData}
+          onClickEmail={setEmailBody}
+          showSplitPrompt={showSplitPrompt}
+          showAttachPrompt={showAttachPrompt}
+          showEditPrompt={showEditPrompt}
+          runningStatus={myTripsByIdData.runningStatus}
+        />
       </div>
-      {showEmailPrompt && <EmailPrompt showPrompt={setShowEmailPrompt} data={myTripsByIdData} body={emailBody}/>}
-      {showDeletePrompt && <DeleteTrip showPrompt={setShowDeletePrompt} data={myTripsByIdData}/>}
+      {showEmailPrompt && (
+        <EmailPrompt
+          showPrompt={setShowEmailPrompt}
+          data={myTripsByIdData}
+          body={emailBody}
+        />
+      )}
+      {showDeletePrompt && (
+        <DeleteTrip showPrompt={setShowDeletePrompt} data={myTripsByIdData} />
+      )}
     </div>
   );
 };

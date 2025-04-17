@@ -5,7 +5,8 @@ import Moneybox from "../images/MoneyBox.png";
 import CarImg from "../images/Car.png";
 import AccomodationImg from "../images/EqualHousingOpportunity.png";
 
-const TimelineView = ({ itinerary, tripStartDate, onCostChange }) => {
+const TimelineView = ({ itinerary, tripStartDate, editable}) => {
+  console.log(itinerary);
   return (
     <div className="flex flex-col md:flex-row justify-center items-start gap-4 overflow-y-auto custom-scrollbar mt-5">
       <div className="w-full rounded-lg">
@@ -76,9 +77,10 @@ const TimelineView = ({ itinerary, tripStartDate, onCostChange }) => {
                                 type="text"
                                 className="bg-textCardDark text-myTripSearchBGLite rounded-lg w-16 h-7 px-2"
                                 value={spot.cost}
-                                onFocus={(e) => e.target.value === "0" && (e.target.value = "")}
-                                onBlur={(e) => e.target.value === "" && (e.target.value = 0)}
-                                onChange={(e) => onCostChange(idx, i, e.target.value)}
+                                readOnly
+                                // onFocus={(e) => e.target.value === "0" && (e.target.value = "")}
+                                // onBlur={(e) => e.target.value === "" && (e.target.value = 0)}
+                                // onChange={(e) => onCostChange(idx, i, e.target.value)}
                               />
                             </div>
                           </>
