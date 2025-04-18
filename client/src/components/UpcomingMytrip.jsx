@@ -251,7 +251,7 @@ const UpcomingMytrip = ({
         </div>
       </div>
   
-      {/* ✅ ROW 2: Timeline + Right Panel (Charts, EditPrompt, Attachments) */}
+      {/*   ROW 2: Timeline + Right Panel (Charts, EditPrompt, Attachments) */}
       <div className="w-full flex flex-row gap-4 flex-1 overflow-hidden">
         {/* TimelineView — hidden when editing */}
         {!showEditPrompt && (
@@ -259,7 +259,6 @@ const UpcomingMytrip = ({
             <TimelineView
               itinerary={itinerary}
               tripStartDate={tripDetails.start_date}
-              editable={showEditPrompt}
             />
           </div>
         )}

@@ -5,8 +5,9 @@ import Moneybox from "../images/MoneyBox.png";
 import CarImg from "../images/Car.png";
 import AccomodationImg from "../images/EqualHousingOpportunity.png";
 
-const TimelineView = ({ itinerary, tripStartDate, editable}) => {
-  console.log(itinerary);
+const TimelineView = ({ itinerary, tripStartDate}) => {
+  console.log("itinerary1", itinerary);
+  console.log("itinerary2", tripStartDate);
   return (
     <div className="flex flex-col md:flex-row justify-center items-start gap-4 overflow-y-auto custom-scrollbar mt-5">
       <div className="w-full rounded-lg">
