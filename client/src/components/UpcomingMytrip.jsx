@@ -31,6 +31,15 @@ const UpcomingMytrip = ({
     tripDetails?.end_date || new Date().toISOString()
   );
 
+  const resetToOriginalDates = () => {
+    console.log("resetting calendar to original dates", tripDetails.start_date, tripDetails.end_date);
+    setStartDate(tripDetails.start_date);
+    setEndDate(tripDetails.end_date);
+    setValidStartDate(tripDetails.start_date);
+    setValidEndDate(tripDetails.end_date);
+  };
+
+
   // Storing the last valid dates separately to retain them when needed
   const [validStartDate, setValidStartDate] = useState(startDate);
   const [validEndDate, setValidEndDate] = useState(endDate);
@@ -281,6 +290,7 @@ const UpcomingMytrip = ({
               itinerary={itinerary}
               startDt={validStartDate}
               endDt={validEndDate}
+              resetDates={resetToOriginalDates}
             />
           ) : null}
   

@@ -11,7 +11,7 @@ import { MapPin, Flag, Target } from "lucide-react";
 import TimelineView from "./TimelineView";
 import dayjs from "dayjs";
 
-const EditPrompt = ({ itinerary, startDt, endDt }) => {
+const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
   const [startEndValues, setStartEndValues] = useState({});
   const [showMessage, setShowMessage] = useState(false);
   const [activeStartEnd, setActiveStartEnd] = useState(null);
@@ -25,12 +25,25 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
   const [activePopupField, setActivePopupField] = useState(null);
   const [debouncedPopupValue, setDebouncedPopupValue] = useState("");
   const [showTimeline, setShowTimeline] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dayMap, setDayMap] = useState([]);
+  const [startDate, setStartDate] = useState(startDt);
+  const [endDate, setEndDate] = useState(endDt);
 
-  const originalItineraryRef = useRef(null);
+  const originalDayMap = useRef({});
+  const originalInputValues = useRef({});
+  const originalStartTimes = useRef([]);
+  const originalStartDateRef = useRef(startDt);
+  const originalEndDateRef = useRef(endDt);
+  const originalItinerary = useRef([]);
 
   useEffect(() => {
-    if (!originalItineraryRef.current) {
-      originalItineraryRef.current = JSON.parse(JSON.stringify(itinerary)); 
+    if (!originalItinerary.current) {
+      originalItinerary.current = itinerary;
+      originalStartDateRef.current = startDt;
+      originalEndDateRef.current = endDt;
+      originalItinerary.current = JSON.parse(JSON.stringify(itinerary));
+      originalStartTimes.current = JSON.parse(JSON.stringify(initStartTimes));
     }
   }, [itinerary]);
 
@@ -88,15 +101,116 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     after: null,
   });
 
-  const [dayMap, setDayMap] = useState(() =>
-    itinerary.reduce((acc, curr, idx) => {
+  // const [dayMap, setDayMap] = useState(() =>
+  //   itinerary.reduce((acc, curr, idx) => {
+  //     acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
+  //       ...spot,
+  //       is_added: spot.is_added ?? true,
+  //     }));
+  //     return acc;
+  //   }, {})
+  // );
+
+  // useEffect(() => {
+  //   const init = itinerary.reduce((acc, curr, idx) => {
+  //     acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
+  //       ...spot,
+  //       is_added: spot.is_added ?? true,
+  //     }));
+  //     return acc;
+  //   }, {});
+
+  //   setDayMap(init);
+  //   setInitialDayMap(init);
+
+  //   originalDayMap.current = init;
+  //   originalInputValues.current = inputValues;
+  //   originalStartTimes.current = startTimes;
+  // }, [itinerary]);
+
+  const didInitOnce = useRef(false);
+
+  useEffect(() => {
+    if (didInitOnce.current) return;
+
+    const init = itinerary.reduce((acc, curr, idx) => {
       acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
         ...spot,
         is_added: spot.is_added ?? true,
       }));
       return acc;
-    }, {})
-  );
+    }, {});
+
+    const initInputValues = {};
+    const initStartTimes = [];
+    const initAccommodations = [];
+    const initAccommodationDetails = [];
+
+    itinerary.forEach((day, index) => {
+      (day.selected_spots || []).forEach((spot) => {
+        initInputValues[spot.name] = {
+          durationHour: spot.duration?.hours ?? "",
+          durationMinute: spot.duration?.minutes ?? "",
+          cost: spot.cost ?? "0.00",
+        };
+      });
+      if (day.startHour && day.startMinute) {
+        initStartTimes[index] = {
+          hour: day.startHour,
+          minute: day.startMinute,
+        };
+      } else if (day.selected_spots?.[0]?.travelTime) {
+        const [hour, minute] = day.selected_spots[0].travelTime.split(":");
+        initStartTimes[index] = { hour, minute };
+      } else {
+        initStartTimes[index] = { hour: "09", minute: "00" };
+      }
+      
+      initAccommodations[index] = false;
+      initAccommodationDetails[index] = {
+        name: "",
+        cost: "",
+        coordinates: null,
+      };
+    });
+
+    // Set state
+    setDayMap(init);
+    setInputValues(initInputValues);
+    setStartTimes(initStartTimes);
+    setAccommodations(initAccommodations);
+    setAccommodationDetails(initAccommodationDetails);
+    setStartDate(startDt);
+    setEndDate(endDt);
+
+    // Store original for undo
+    originalDayMap.current = JSON.parse(JSON.stringify(init));
+    originalInputValues.current = JSON.parse(JSON.stringify(initInputValues));
+    originalStartTimes.current = JSON.parse(JSON.stringify(initStartTimes));
+    originalAccommodations.current = [...initAccommodations];
+    originalAccommodationDetails.current = JSON.parse(
+      JSON.stringify(initAccommodationDetails)
+    );
+    originalStartDateRef.current = startDt;
+    originalEndDateRef.current = endDt;
+
+    didInitOnce.current = true; // prevent re-run
+  }, [itinerary, startDt, endDt]);
+
+  const {
+    ready: accommodationReady,
+    value: accommodationValue,
+    suggestions: { status: accommodationStatus, data: accommodationData },
+    setValue: setAccommodationValue,
+    clearSuggestions: clearAccommodationSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: { types: ["establishment"] },
+    debounce: 300,
+  });
+
+  const originalAccommodationDetails = useRef(accommodationDetails);
+  const originalAccommodations = useRef(accommodations);
+  const originalAccommodationValue = useRef(accommodationValue);
 
   const latestDayMapRef = useRef(dayMap);
   useEffect(() => {
@@ -207,6 +321,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
   // }, [daysCount]);
 
   const fetchPopupAttractions = async (start, end) => {
+    console.log("fetch attractions");
     try {
       setPopupLoading(true);
       setPopupAttractions([]);
@@ -286,17 +401,6 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     }
   };
 
-  const {
-    ready: accommodationReady,
-    value: accommodationValue,
-    suggestions: { status: accommodationStatus, data: accommodationData },
-    setValue: setAccommodationValue,
-    clearSuggestions: clearAccommodationSuggestions,
-  } = usePlacesAutocomplete({
-    requestOptions: { types: ["establishment"] },
-    debounce: 300,
-  });
-
   const handleAccommodationSelect = async (address, day) => {
     setAccommodationValue(address);
     clearAccommodationSuggestions();
@@ -330,38 +434,38 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     debounce: 300,
   });
 
-  useEffect(() => {
-    const initialStartTimes = [];
-    const initialInputValues = {};
+  // useEffect(() => {
+  //   const initialStartTimes = [];
+  //   const initialInputValues = {};
 
-    itinerary.forEach((dayData, dayIndex) => {
-      const spots = dayData.selected_spots || [];
+  //   itinerary.forEach((dayData, dayIndex) => {
+  //     const spots = dayData.selected_spots || [];
 
-      // Set the start time for the day using the travelTime of the first spot
-      if (spots.length > 0) {
-        const [hour, minute] = (spots[0].travelTime || "00:00").split(":");
-        initialStartTimes[dayIndex] = { hour, minute };
-      } else {
-        initialStartTimes[dayIndex] = { hour: "", minute: "" };
-      }
+  //     // Set the start time for the day using the travelTime of the first spot
+  //     if (spots.length > 0) {
+  //       const [hour, minute] = (spots[0].travelTime || "00:00").split(":");
+  //       initialStartTimes[dayIndex] = { hour, minute };
+  //     } else {
+  //       initialStartTimes[dayIndex] = { hour: "", minute: "" };
+  //     }
 
-      // Populate input values for each spot
-      spots.forEach((spot) => {
-        const durationHour = spot.duration?.hours?.toString() || "00";
-        const durationMinute = spot.duration?.minutes?.toString() || "00";
-        const cost = spot.cost?.toString() || "";
+  //     // Populate input values for each spot
+  //     spots.forEach((spot) => {
+  //       const durationHour = spot.duration?.hours?.toString() || "00";
+  //       const durationMinute = spot.duration?.minutes?.toString() || "00";
+  //       const cost = spot.cost?.toString() || "";
 
-        initialInputValues[spot.name] = {
-          durationHour,
-          durationMinute,
-          cost,
-        };
-      });
-    });
+  //       initialInputValues[spot.name] = {
+  //         durationHour,
+  //         durationMinute,
+  //         cost,
+  //       };
+  //     });
+  //   });
 
-    setStartTimes(initialStartTimes);
-    setInputValues(initialInputValues);
-  }, [itinerary]);
+  //   setStartTimes(initialStartTimes);
+  //   setInputValues(initialInputValues);
+  // }, [itinerary]);
 
   // useEffect(() => {
   //   const enrichAndUpdate = async () => {
@@ -438,6 +542,8 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
 
       return newMap;
     });
+    setAccommodations((prev) => prev.slice(0, totalDays - 1));
+    setAccommodationDetails((prev) => prev.slice(0, totalDays - 1));
   }, [startDt, endDt]);
 
   useEffect(() => {
@@ -473,6 +579,15 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
 
     const day = parseInt(targetDay);
 
+    const acc = accommodationDetails[day - 1];
+    if (
+      accommodations[day - 1] &&
+      acc?.name?.toLowerCase().trim() === place.name.toLowerCase().trim()
+    ) {
+      console.warn("This is already set as accommodation, not adding.");
+      return;
+    }
+
     const beforeIndex = updated[day].findIndex(
       (s) => s.name === popupStartValue
     );
@@ -504,13 +619,10 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     val === undefined || val === null || val.trim() === "";
 
   const allDetailsEntered = () => {
-    console.log(startTimes);
     for (let day = 1; day <= daysCount; day++) {
       const start = startTimes[day - 1];
 
-      console.log("1000:", start?.hour);
-
-      if (!start || isEmpty(start.hour) || isNaN(Number(start.hour))) {
+      if (!start?.hour || isNaN(start.hour)) {
         alert(`Please enter start hour for Day ${day}`);
         return false;
       }
@@ -518,19 +630,37 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
       for (const spot of dayMap[day]) {
         if (spot.is_added) {
           const duration = inputValues[spot.name];
-
           const hour = duration?.durationHour ?? "";
           const minute = duration?.durationMinute ?? "";
+          console.log(spot.name, duration);
 
-          const hasHour = !isEmpty(hour);
-          const hasMin = !isEmpty(minute);
+          const hasHour = hour !== "";
+          const hasMin = minute !== "";
 
-          if (!hasHour && !hasMin) {
+          if (
+            !hasHour &&
+            !hasMin &&
+            spot.category != "start" &&
+            spot.category != "end"
+          ) {
             alert(`Please enter duration for "${spot.name}" on Day ${day}`);
             return false;
           }
         }
       }
+    }
+
+    // Final check: Last day must have more than just an "end" spot
+    const lastDaySpots = (dayMap[daysCount] || []).filter((s) => s.is_added);
+    const onlyEnd =
+      lastDaySpots.length === 1 && lastDaySpots[0]?.category === "end";
+
+    const prevAcc =
+      accommodations[daysCount - 2] && accommodationDetails[daysCount - 2];
+
+    if (onlyEnd && !prevAcc?.name) {
+      alert("Last day must have at least one stop (not just an end location).");
+      return false;
     }
 
     return true;
@@ -548,24 +678,28 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
       selected_spots: item.selected_spots || [],
     }))
   );
-
   const handlePreview = async () => {
     if (!allDetailsEntered()) return;
-
+  
     const rawItinerary = await Promise.all(
       Object.entries(latestDayMapRef.current).map(async ([day, spots]) => {
         const dayNumber = parseInt(day);
-        const meta = dayDetails[dayNumber - 1]; // contains { dayDate, weekday }
-
+        const meta = dayDetails[dayNumber - 1];
+  
         const enrichedSpots = await Promise.all(
           spots
-            .filter((s) => s.is_added)
+            .filter((s) => {
+              const name = s.name?.toLowerCase().trim();
+              const accName = accommodationDetails[dayNumber - 1]?.name?.toLowerCase().trim();
+              const isDuplicateAccommodation =
+                accommodations[dayNumber - 1] && name === accName;
+              return s.is_added && !isDuplicateAccommodation;
+            })
             .map(async (s) => {
               const enriched = await ensureCoordinates(s);
-
               const nameKey = s.name ?? "unknown";
               const saved = inputValues[nameKey] ?? {};
-
+  
               return {
                 ...enriched,
                 duration: {
@@ -576,7 +710,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
               };
             })
         );
-
+  
         return {
           day_number: dayNumber,
           selected_spots: enrichedSpots,
@@ -585,14 +719,56 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
         };
       })
     );
+  
+    // Step 1: Copy the raw itinerary
+    const enrichedItinerary = rawItinerary.map((day) => ({
+      ...day,
+      selected_spots: [...day.selected_spots],
+    }));
+  
+    // Step 2: Get only the valid active day indexes
+    const validDayIndexes = Object.keys(latestDayMapRef.current).map((key) => parseInt(key) - 1);
+  
+    // Step 3: Inject accommodations only for valid days
+    for (let idx = 0; idx < daysCount - 1; idx++) {
+  const currentDay = enrichedItinerary[idx];
 
-    const enrichedItinerary = rawItinerary.map((day, idx, arr) => {
-      const spots = [...day.selected_spots];
+  // SKIP if this day is now outside the current trip range
+  if (currentDay.day_number > daysCount) continue;
 
-      const acc = accommodationDetails[idx];
-      if (accommodations[idx] && acc && acc.name && acc.coordinates) {
-        // Add to current day
-        spots.push({
+  const acc = accommodationDetails[idx];
+
+  if (accommodations[idx] && acc && acc.name && acc.coordinates) {
+    const spots = currentDay.selected_spots;
+
+    const alreadyInDay = spots.some(
+      (s) =>
+        s.name?.toLowerCase().trim() === acc.name?.toLowerCase().trim() &&
+        s.category === "accomodation"
+    );
+
+    if (!alreadyInDay) {
+      spots.push({
+        name: acc.name,
+        coordinates: acc.coordinates,
+        category: "accomodation",
+        cost: acc.cost || "0.00",
+        duration: { hours: "0", minutes: "0" },
+        travelTime: "",
+        is_added: true,
+      });
+    }
+
+    const nextDay = enrichedItinerary[idx + 1];
+    if (nextDay && nextDay.day_number <= daysCount) {
+      const alreadyInNextDay = nextDay.selected_spots.some(
+        (s) =>
+          s.name?.toLowerCase().trim() === acc.name?.toLowerCase().trim() &&
+          s.category === "accomodation"
+      );
+
+      if (!alreadyInNextDay) {
+        nextDay.selected_spots.unshift({
           name: acc.name,
           coordinates: acc.coordinates,
           category: "accomodation",
@@ -601,38 +777,25 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
           travelTime: "",
           is_added: true,
         });
-
-        // Also insert as start in next day
-        const nextDay = arr[idx + 1];
-        if (nextDay) {
-          nextDay.selected_spots.unshift({
-            name: acc.name,
-            coordinates: acc.coordinates,
-            category: "accomodation",
-            cost: acc.cost || "0.00",
-            duration: { hours: "0", minutes: "0" },
-            travelTime: "",
-            is_added: true,
-          });
-        }
       }
+    }
+  }
+}
 
-      return {
-        ...day,
-        selected_spots: spots,
-      };
-    });
-
+    
+  
     const finalItinerary = await computeTravelTimes(
       enrichedItinerary,
       startTimes,
       dayDetails,
       accommodationDetails
     );
-
+  
     setUpdatedItinerary(finalItinerary);
     setShowTimeline(true);
   };
+  
+  
 
   const rawItinerary = Object.entries(latestDayMapRef.current)
     .map(([day, spots]) => {
@@ -683,23 +846,65 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     for (const day of Object.keys(updated)) {
       const daySpots = updated[day];
 
-      // Ensure coordinates for all spots
-      const enrichedSpots = await enrichDaySpotsWithCoordinates(daySpots);
+      // Ensure all spots have coordinates
+      const enrichedSpotsRaw = await enrichDaySpotsWithCoordinates(daySpots);
 
-      const start = enrichedSpots.find((s) => s.category === "start");
-      const end = enrichedSpots.find((s) => s.category === "end");
-      const mids = enrichedSpots.filter(
-        (s) => !["start", "end"].includes(s.category)
-      );
+      // ✅ Inject duration & cost from inputValues
+      const enrichedSpots = enrichedSpotsRaw.map((spot) => {
+        const nameKey = spot.name ?? "unknown";
+        return {
+          ...spot,
+          cost: inputValues[nameKey]?.cost ?? spot.cost ?? "0.00",
+          duration: {
+            hours:
+              inputValues[nameKey]?.durationHour ?? spot.duration?.hours ?? "0",
+            minutes:
+              inputValues[nameKey]?.durationMinute ??
+              spot.duration?.minutes ??
+              "0",
+          },
+        };
+      });
+
+      let start = enrichedSpots.find((s) => s.category === "start");
+      let end = enrichedSpots.find((s) => s.category === "end");
+
+      // Use accommodation as end if end not found and toggle is on
+      if (!end && accommodations[day - 1]) {
+        const acc = accommodationDetails[day - 1];
+        if (acc?.coordinates) {
+          end = {
+            ...acc,
+            category: "end",
+            duration: { hours: "0", minutes: "0" },
+            cost: acc.cost || "0.00",
+            is_added: true,
+          };
+          console.log("Using accommodation as end location:", end);
+        }
+      }
+
+      // Filter mids (exclude start/end and only include accommodation if toggled)
+      const mids = enrichedSpots.filter((s) => {
+        if (["start", "end"].includes(s.category)) return false;
+        if (s.category === "accomodation") {
+          return accommodations[day - 1]; // include only if toggled on
+        }
+        return true;
+      });
 
       console.log(`DAY ${day}:`);
       console.log("Start:", start);
       console.log("End:", end);
 
-      if (!start?.coordinates || !end?.coordinates) {
+      if (!start?.coordinates || !end?.coordinates || mids.length === 0) {
         console.warn(
-          `Cannot optimize day ${day} — missing start or end coordinates.`,
-          { start, end }
+          `Cannot optimize day ${day} — missing start/end or no mids`,
+          {
+            start,
+            end,
+            mids,
+          }
         );
         continue;
       }
@@ -919,32 +1124,50 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     }
   };
 
+  // const handleUndo = () => {
+  // const original = originalItineraryRef.current;
+  // if (!original) return;
+
+  // const restoredMap = original.reduce((acc, curr, idx) => {
+  //   acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
+  //     ...spot,
+  //     is_added: true,
+  //   }));
+  //   return acc;
+  // }, {});
+
+  // setDayMap(restoredMap);
+  // setInputValues({});
+  // setAccommodationDetails(
+  //   Array(original.length - 1).fill({
+  //     name: "",
+  //     cost: "",
+  //     location: "",
+  //     coordinates: null,
+  //   })
+  // );
+  // setStartTimes(Array(original.length).fill({ hour: "", minute: "" }));
+  // setShowTimeline(false);
+  // setUpdatedItinerary([]);
+
   const handleUndo = () => {
-    const original = originalItineraryRef.current;
-    if (!original) return;
-
-    const restoredMap = original.reduce((acc, curr, idx) => {
-      acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
-        ...spot,
-        is_added: true,
-      }));
-      return acc;
-    }, {});
-
-    setDayMap(restoredMap);
-    setInputValues({});
+    setDayMap(JSON.parse(JSON.stringify(originalDayMap.current)));
+    setInputValues(JSON.parse(JSON.stringify(originalInputValues.current)));
+    setStartTimes(JSON.parse(JSON.stringify(originalStartTimes.current)));
+    setAccommodations([...originalAccommodations.current]);
     setAccommodationDetails(
-      Array(original.length - 1).fill({
-        name: "",
-        cost: "",
-        location: "",
-        coordinates: null,
-      })
+      JSON.parse(JSON.stringify(originalAccommodationDetails.current))
     );
-    setStartTimes(Array(original.length).fill({ hour: "", minute: "" }));
+    setStartDate(originalStartDateRef.current);
+    setEndDate(originalEndDateRef.current);
     setShowTimeline(false);
-    setUpdatedItinerary([]);
+
+    if (typeof resetDates === "function") {
+      resetDates(); // 🟢 This syncs calendar in UpcomingMytrip
+    }
   };
+
+  // };
 
   return (
     <div className="w-full text-white h-full flex flex-col space-y-4">
@@ -1138,13 +1361,13 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
               </div>
             </div>
           ) : (
-            <>
+            <div className="w-full flex flex-row gap-4 flex-1 overflow-hidden">
               {console.log("before:", startDt)}
               <TimelineView
                 itinerary={updatedItinerary}
                 tripStartDate={startDt}
               />
-            </>
+            </div>
           )}
         </div>
         <div className="w-3/5 p-5 bg-headerBG h-full overflow-y-auto custom-scrollbar rounded-lg ">
@@ -1234,7 +1457,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                             // Not draggable
                             <li
                               key={item.name}
-                              className="w-full flex flex-row gap-2 items-start bg-list p-3 rounded-lg"
+                              className="w-full flex flex-row gap-2 items-start bg-list p-3 rounded-lg outline-none"
                             >
                               <div className="relative w-full">
                                 <input
@@ -1282,7 +1505,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                               setActiveStartEnd(null);
                                               clearPopupSuggestions();
                                             }}
-                                            className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                                            className="px-4 py-2 cursor-pointer hover:bg-gray-200 outline-none"
                                           >
                                             {description}
                                           </li>
@@ -1335,12 +1558,23 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                       setPopupEndValue(startVal);
                                     }
                                   }
+                                  console.log(
+                                    "11111:",
+                                    popupEndValue,
+                                    popupStartValue
+                                  );
+                                  if (popupStartValue && popupEndValue) {
+                                    fetchPopupAttractions(
+                                      popupStartValue,
+                                      popupEndValue
+                                    );
+                                  }
                                 }}
                               >
                                 <img
                                   src={addStop}
                                   alt="add stop"
-                                  className={`w-8 h-6 mt-2 transition-opacity duration-200 ${
+                                  className={`w-8 h-6 mt-2 transition-opacity duration-200 outline-none ${
                                     showTimeline
                                       ? "opacity-50 cursor-not-allowed"
                                       : "cursor-pointer"
@@ -1458,7 +1692,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                       <input
                                         type="text"
                                         className="bg-textCardDark rounded-lg w-16 h-7 px-2"
-                                        maxLength={6}
+                                        maxLength={7}
                                         value={
                                           inputValues[item.name]?.cost !==
                                           undefined
@@ -1474,10 +1708,24 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                             },
                                           }))
                                         }
+                                        onBlur={(e) => {
+                                          const value = parseFloat(
+                                            e.target.value
+                                          );
+                                          if (!isNaN(value)) {
+                                            setInputValues((prev) => ({
+                                              ...prev,
+                                              [item.name]: {
+                                                ...prev[item.name],
+                                                cost: value.toFixed(2),
+                                              },
+                                            }));
+                                          }
+                                        }}
                                       />
                                     </div>
                                   </div>
-                                  <div className="w-[4%]">
+                                  <div className="w-[4%] ">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -1521,15 +1769,26 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                             (s) => s.name === before
                                           );
                                           if (beforeSpot?.category === "end") {
-                                            setPopupEndValue(startVal); // Use same as start
+                                            setPopupEndValue(startVal);
                                           }
+                                        }
+                                        console.log(
+                                          "11111:",
+                                          popupEndValue,
+                                          popupStartValue
+                                        );
+                                        if (popupStartValue && popupEndValue) {
+                                          fetchPopupAttractions(
+                                            popupStartValue,
+                                            popupEndValue
+                                          );
                                         }
                                       }}
                                     >
                                       <img
                                         src={addStop}
                                         alt="add stop"
-                                        className={`w-8 h-6 mt-2 transition-opacity duration-200 ${
+                                        className={`w-8 h-6 mt-2 transition-opacity duration-200 outline-none ${
                                           showTimeline
                                             ? "opacity-50 cursor-not-allowed"
                                             : "cursor-pointer"
@@ -1580,7 +1839,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
 
                                     updated[day - 1] = {
                                       ...existing,
-                                      cost: val,
+                                      name: val,
                                     };
 
                                     return updated;
@@ -1638,7 +1897,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                               <input
                                 type="text"
                                 className="bg-textCardDark rounded-lg w-full h-7 px-2"
-                                maxLength={4}
+                                maxLength={7}
                                 name="cost"
                                 placeholder="Budget"
                                 value={
@@ -1647,6 +1906,15 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                 onChange={(e) => {
                                   const updated = [...accommodationDetails];
                                   updated[day - 1].cost = e.target.value;
+                                  setAccommodationDetails(updated);
+                                }}
+                                onBlur={(e) => {
+                                  const formatted = parseFloat(
+                                    e.target.value || "0"
+                                  ).toFixed(2);
+                                  const updated = [...accommodationDetails];
+                                  if (!updated[day - 1]) updated[day - 1] = {};
+                                  updated[day - 1].cost = formatted;
                                   setAccommodationDetails(updated);
                                 }}
                               />
@@ -1662,7 +1930,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
           </DragDropContext>
         </div>
       </div>
-      <div className="flex justify-end gap-4 mt-6">
+      {/* <div className="flex justify-end gap-4 mt-6">
         <button
           className="bg-topHeader text-white p-2 px-10 font-semibold rounded-lg"
           onClick={handleUndo}
@@ -1695,6 +1963,65 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
         >
           Confirm
         </button>
+      </div> */}
+      <div className="flex items-center justify-end gap-3 mt-4 mr-5">
+        {/* Primary Actions */}
+        <button
+          className="bg-topHeader text-white px-5 py-2 rounded-lg font-semibold hover:cursor-pointer"
+          onClick={() => setShowTimeline(false)}
+        >
+          Add Stop
+        </button>
+
+        <button
+          className="bg-topHeader text-white px-5 py-2 rounded-lg font-semibold hover:cursor-pointer"
+          onClick={handleConfirmUpdates}
+        >
+          Confirm
+        </button>
+
+        {/* Dropdown for extras */}
+        <div className="relative group">
+          <button
+            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+            onClick={() => setShowDropdown((prev) => !prev)}
+          >
+            ⋯
+          </button>
+          {showDropdown && (
+            <div className="absolute right-0 bottom-full  bg-white border rounded-md shadow-lg w-48 mb-2 z-10">
+              <ul className="flex flex-col text-left text-black text-sm">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    handlePreview();
+                  }}
+                >
+                  Preview
+                </li>
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    handleRouteOptimize();
+                  }}
+                >
+                  Optimize
+                </li>
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-topHeader"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    handleUndo();
+                  }}
+                >
+                  Discard Changes
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
