@@ -25,7 +25,14 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
   const [activePopupField, setActivePopupField] = useState(null);
   const [debouncedPopupValue, setDebouncedPopupValue] = useState("");
   const [showTimeline, setShowTimeline] = useState(false);
-  const [historyStack, setHistoryStack] = useState([]);
+
+  const originalItineraryRef = useRef(null);
+
+  useEffect(() => {
+    if (!originalItineraryRef.current) {
+      originalItineraryRef.current = JSON.parse(JSON.stringify(itinerary)); 
+    }
+  }, [itinerary]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -40,23 +47,22 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     const days = [];
     const startDate = dayjs(start);
     const endDate = dayjs(end);
-  
+
     let current = startDate;
     while (current.isBefore(endDate) || current.isSame(endDate)) {
       days.push({
-        dayDate: current.toISOString(),       
-        weekday: current.format("dddd"),      
+        dayDate: current.toISOString(),
+        weekday: current.format("dddd"),
         formatted: current.format("DD MMMM, YYYY"),
       });
       current = current.add(1, "day");
     }
-  
+
     return {
       daysCount: days.length,
       dayDetails: days,
     };
   };
-  
 
   const { daysCount, dayDetails } = calculateTripDays(startDt, endDt);
   const ADD_STOP_ID = "__ADD_STOP__";
@@ -96,10 +102,6 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
   useEffect(() => {
     latestDayMapRef.current = dayMap;
   }, [dayMap]);
-
-  useEffect(() => {
-    setHistoryStack([JSON.parse(JSON.stringify(dayMap))]);
-  }, []);
 
   useEffect(() => {
     const startEnd = {};
@@ -549,21 +551,21 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
 
   const handlePreview = async () => {
     if (!allDetailsEntered()) return;
-  
+
     const rawItinerary = await Promise.all(
       Object.entries(latestDayMapRef.current).map(async ([day, spots]) => {
         const dayNumber = parseInt(day);
         const meta = dayDetails[dayNumber - 1]; // contains { dayDate, weekday }
-  
+
         const enrichedSpots = await Promise.all(
           spots
             .filter((s) => s.is_added)
             .map(async (s) => {
               const enriched = await ensureCoordinates(s);
-  
+
               const nameKey = s.name ?? "unknown";
               const saved = inputValues[nameKey] ?? {};
-  
+
               return {
                 ...enriched,
                 duration: {
@@ -574,7 +576,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
               };
             })
         );
-  
+
         return {
           day_number: dayNumber,
           selected_spots: enrichedSpots,
@@ -583,10 +585,10 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
         };
       })
     );
-  
+
     const enrichedItinerary = rawItinerary.map((day, idx, arr) => {
       const spots = [...day.selected_spots];
-  
+
       const acc = accommodationDetails[idx];
       if (accommodations[idx] && acc && acc.name && acc.coordinates) {
         // Add to current day
@@ -599,7 +601,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
           travelTime: "",
           is_added: true,
         });
-  
+
         // Also insert as start in next day
         const nextDay = arr[idx + 1];
         if (nextDay) {
@@ -614,93 +616,100 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
           });
         }
       }
-  
+
       return {
         ...day,
         selected_spots: spots,
       };
     });
-  
+
     const finalItinerary = await computeTravelTimes(
       enrichedItinerary,
       startTimes,
       dayDetails,
       accommodationDetails
     );
-  
+
     setUpdatedItinerary(finalItinerary);
     setShowTimeline(true);
   };
-  
 
   const rawItinerary = Object.entries(latestDayMapRef.current)
-  .map(([day, spots]) => {
-    const dayNumber = parseInt(day);
-    const meta = dayDetails[dayNumber - 1];
+    .map(([day, spots]) => {
+      const dayNumber = parseInt(day);
+      const meta = dayDetails[dayNumber - 1];
 
-    const activeSpots = spots
-      .filter((s) => s.is_added)
-      .map((s) => ({
-        ...s,
-        duration: {
-          hours: inputValues[s.name]?.durationHour ?? "",
-          minutes: inputValues[s.name]?.durationMinute ?? "",
-        },
-        cost: inputValues[s.name]?.cost ?? s.cost ?? "0.00",
+      const activeSpots = spots
+        .filter((s) => s.is_added)
+        .map((s) => ({
+          ...s,
+          duration: {
+            hours: inputValues[s.name]?.durationHour ?? "",
+            minutes: inputValues[s.name]?.durationMinute ?? "",
+          },
+          cost: inputValues[s.name]?.cost ?? s.cost ?? "0.00",
+        }));
+
+      return {
+        day_number: dayNumber,
+        selected_spots: activeSpots,
+        dayDate: meta?.dayDate ?? "",
+        weekday: meta?.weekday ?? "",
+      };
+    })
+    .sort((a, b) => a.day_number - b.day_number);
+
+  const [initialDayMap, setInitialDayMap] = useState(null);
+
+  useEffect(() => {
+    const init = itinerary.reduce((acc, curr, idx) => {
+      acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
+        ...spot,
+        is_added: spot.is_added ?? true,
       }));
-
-    return {
-      day_number: dayNumber,
-      selected_spots: activeSpots,
-      dayDate: meta?.dayDate ?? "",     
-      weekday: meta?.weekday ?? "",     
-    };
-  })
-  .sort((a, b) => a.day_number - b.day_number);
-
-
-
-  const handleUndo = () => {
-    if (historyStack.length === 0) return;
-    const previous = historyStack[historyStack.length - 1];
-    setDayMap(previous);
-    setUpdatedItinerary(itinerary);
-    setHistoryStack((prev) => prev.slice(0, -1));
-  };
+      return acc;
+    }, {});
+    setDayMap(init);
+    setInitialDayMap(init);
+  }, [itinerary]);
 
   const enrichDaySpotsWithCoordinates = async (spots) => {
     return await Promise.all(spots.map((spot) => ensureCoordinates(spot)));
   };
 
+  const handleRouteOptimize = async () => {
+    const updated = { ...dayMap };
 
- const handleRouteOptimize = async () => {
-  const updated = { ...dayMap };
+    for (const day of Object.keys(updated)) {
+      const daySpots = updated[day];
 
-  for (const day of Object.keys(updated)) {
-    const daySpots = updated[day];
+      // Ensure coordinates for all spots
+      const enrichedSpots = await enrichDaySpotsWithCoordinates(daySpots);
 
-    // Ensure coordinates for all spots
-    const enrichedSpots = await enrichDaySpotsWithCoordinates(daySpots);
+      const start = enrichedSpots.find((s) => s.category === "start");
+      const end = enrichedSpots.find((s) => s.category === "end");
+      const mids = enrichedSpots.filter(
+        (s) => !["start", "end"].includes(s.category)
+      );
 
-    const start = enrichedSpots.find((s) => s.category === "start");
-    const end = enrichedSpots.find((s) => s.category === "end");
-    const mids = enrichedSpots.filter((s) => !["start", "end"].includes(s.category));
+      console.log(`DAY ${day}:`);
+      console.log("Start:", start);
+      console.log("End:", end);
 
-    console.log(`DAY ${day}:`);
-    console.log("Start:", start);
-    console.log("End:", end);
+      if (!start?.coordinates || !end?.coordinates) {
+        console.warn(
+          `Cannot optimize day ${day} — missing start or end coordinates.`,
+          { start, end }
+        );
+        continue;
+      }
 
-    if (!start?.coordinates || !end?.coordinates) {
-      console.warn(`Cannot optimize day ${day} — missing start or end coordinates.`, { start, end });
-      continue;
+      const optimized = getOptimizedRoute(start, mids, end);
+      updated[day] = optimized;
     }
 
-    const optimized = getOptimizedRoute(start, mids, end);
-    updated[day] = optimized;
-  }
-
-  setDayMap(updated);
-};
+    setDayMap(updated);
+  };
 
   function calculateDistance(a, b) {
     if (!a?.coordinates || !b?.coordinates) {
@@ -910,8 +919,35 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
     }
   };
 
+  const handleUndo = () => {
+    const original = originalItineraryRef.current;
+    if (!original) return;
+
+    const restoredMap = original.reduce((acc, curr, idx) => {
+      acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
+        ...spot,
+        is_added: true,
+      }));
+      return acc;
+    }, {});
+
+    setDayMap(restoredMap);
+    setInputValues({});
+    setAccommodationDetails(
+      Array(original.length - 1).fill({
+        name: "",
+        cost: "",
+        location: "",
+        coordinates: null,
+      })
+    );
+    setStartTimes(Array(original.length).fill({ hour: "", minute: "" }));
+    setShowTimeline(false);
+    setUpdatedItinerary([]);
+  };
+
   return (
-    <div className="w-full text-white mt-5 h-full flex flex-col space-y-4">
+    <div className="w-full text-white h-full flex flex-col space-y-4">
       {showMessage && (
         <p className="text-center text-sm text-textCard mt-1">
           To change dates, go to{" "}
@@ -1103,11 +1139,11 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
             </div>
           ) : (
             <>
-            {console.log("before:", startDt)}
-            <TimelineView
-              itinerary={updatedItinerary}
-              tripStartDate={startDt}
-            />
+              {console.log("before:", startDt)}
+              <TimelineView
+                itinerary={updatedItinerary}
+                tripStartDate={startDt}
+              />
             </>
           )}
         </div>
@@ -1532,7 +1568,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                 }}
                                 onChange={(e) => {
                                   const val = e.target.value;
-                                
+
                                   setAccommodationDetails((prev) => {
                                     const updated = [...prev];
                                     const existing = updated[day - 1] || {
@@ -1541,18 +1577,18 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
                                       location: "",
                                       coordinates: null,
                                     };
-                                
+
                                     updated[day - 1] = {
                                       ...existing,
                                       cost: val,
                                     };
-                                
+
                                     return updated;
                                   });
-                                  setAccommodationValue(val); 
+                                  setAccommodationValue(val);
                                 }}
-                                  // THIS IS WHAT TRIGGERS AUTOCOMPLETE
-                               
+                                // THIS IS WHAT TRIGGERS AUTOCOMPLETE
+
                                 className="bg-textCardDark p-2 w-full rounded-lg text-textCard"
                               />
                               {activeAccommodationDay === day &&
@@ -1631,7 +1667,7 @@ const EditPrompt = ({ itinerary, startDt, endDt }) => {
           className="bg-topHeader text-white p-2 px-10 font-semibold rounded-lg"
           onClick={handleUndo}
         >
-          Undo
+          Discard
         </button>
         <button
           className="bg-topHeader text-white p-2 px-10 flex gap-3 font-semibold rounded-lg items-center"
