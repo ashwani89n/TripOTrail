@@ -5,7 +5,8 @@ const {
     getExpenses,
     updateExpense,
     deleteExpense,
-    getExpensesSettle
+    getExpensesSettle,
+    settleExpense
 } = require("../controllers/expenseController");
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.get("/:tripId/expenses", authenticateJWT, getExpenses);
 router.put("/:tripId/expenses/:expenseId", authenticateJWT, updateExpense);
 router.delete("/:tripId/expenses/:expenseId", authenticateJWT, deleteExpense);
 router.get("/:tripId/who-owes-whom", authenticateJWT, getExpensesSettle);
+router.put("/:tripId/who-owes-whom", authenticateJWT, settleExpense);
 
 module.exports = router;

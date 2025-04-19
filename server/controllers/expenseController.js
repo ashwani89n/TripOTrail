@@ -74,12 +74,10 @@ exports.addExpense = async (req, res) => {
     const receivers = tripmates.filter((email) => email !== added_by_email);
 
     if (receivers.length === 0) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "No receivers to split with (payer is the only member).",
-        });
+      return res.status(400).json({
+        status: "error",
+        message: "No receivers to split with (payer is the only member).",
+      });
     }
 
     // 4. Calculate split amount
@@ -212,48 +210,50 @@ exports.deleteExpense = async (req, res) => {
 };
 
 exports.getExpensesSettle = async (req, res) => {
-    const { tripId } = req.params;
+  const { tripId } = req.params;
 
   try {
     const query = `
       SELECT 
-        tm.name AS tripmate_name,
-        tm.email AS tripmate_email,
-        tm.profile_picture AS tripmate_picture,
-        e.expense_id,
-        e.category,
-        e.amount AS total_amount,
-        e.comments,
-        e.added_by_name,
-        e.added_by_email,
-        e.added_by_profile_picture,
-        COALESCE(SUM(CASE WHEN es.payer_email = tm.email THEN es.amount ELSE 0 END), 0) AS lent_amount,
-        COALESCE(SUM(CASE WHEN es.receiver_email = tm.email THEN es.amount ELSE 0 END), 0) AS borrowed_amount
-      FROM tripmates tm
-      CROSS JOIN expenses e
-      LEFT JOIN expense_splits es 
-        ON es.expense_id = e.expense_id AND es.trip_id = $1 
-        AND (es.payer_email = tm.email OR es.receiver_email = tm.email)
-      WHERE tm.trip_id = $1 AND e.trip_id = $1
-      GROUP BY 
-        tm.name, tm.email, tm.profile_picture,
-        e.expense_id, e.category, e.amount, e.comments,
-        e.added_by_name, e.added_by_email, e.added_by_profile_picture
-      ORDER BY e.created_at;
+  tm.name AS tripmate_name,
+  tm.email AS tripmate_email,
+  tm.profile_picture AS tripmate_picture,
+  e.expense_id,
+  e.category,
+  e.amount AS total_amount,
+  e.comments,
+  e.created_at,
+  e.added_by_name,
+  e.added_by_email,
+  e.added_by_profile_picture,
+  COALESCE(SUM(CASE WHEN es.payer_email = tm.email THEN es.amount ELSE 0 END), 0) AS lent_amount,
+  COALESCE(SUM(CASE WHEN es.receiver_email = tm.email THEN es.amount ELSE 0 END), 0) AS borrowed_amount,
+  MAX(CASE WHEN es.receiver_email = tm.email THEN es.is_settled::int ELSE 0 END) > 0 AS is_settled
+FROM tripmates tm
+CROSS JOIN expenses e
+LEFT JOIN expense_splits es 
+  ON es.expense_id = e.expense_id AND es.trip_id = $1 
+  AND (es.payer_email = tm.email OR es.receiver_email = tm.email)
+WHERE tm.trip_id = $1 AND e.trip_id = $1
+GROUP BY 
+  tm.name, tm.email, tm.profile_picture,
+  e.expense_id, e.category, e.amount, e.comments, e.created_at,
+  e.added_by_name, e.added_by_email, e.added_by_profile_picture
+ORDER BY e.created_at;
     `;
 
     const { rows } = await pool.query(query, [tripId]);
 
     // Group by tripmate
     const result = {};
-    rows.forEach(row => {
+    rows.forEach((row) => {
       const email = row.tripmate_email;
       if (!result[email]) {
         result[email] = {
           name: row.tripmate_name,
           email: row.tripmate_email,
           profile_picture: row.tripmate_picture,
-          expenses: []
+          expenses: [],
         };
       }
 
@@ -262,19 +262,47 @@ exports.getExpensesSettle = async (req, res) => {
         category: row.category,
         total_amount: parseFloat(row.total_amount),
         comment: row.comments,
+        dayDate: row.created_at, 
         added_by: {
           name: row.added_by_name,
           email: row.added_by_email,
           profile_picture: row.added_by_profile_picture
         },
         lent: parseFloat(row.lent_amount),
-        borrowed: parseFloat(row.borrowed_amount)
+        borrowed: parseFloat(row.borrowed_amount),
+        is_settled: row.is_settled
       });
+      
     });
 
     res.json(Object.values(result));
   } catch (error) {
-    console.error('Error fetching expense-wise splits:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching expense-wise splits:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+exports.settleExpense = async (req, res) => {
+    const { tripId } = req.params;
+    const { payer_email, receiver_email} = req.body;
+
+  
+    try {
+      const query = `
+        UPDATE expense_splits
+    SET is_settled = TRUE
+    WHERE trip_id = $1 AND (
+      (payer_email = $2 AND receiver_email = $3) OR
+      (payer_email = $3 AND receiver_email = $2)
+    )
+      `;
+  
+      await pool.query(query, [tripId, payer_email, receiver_email]);
+  
+      res.json({ message: "Expense settled successfully." });
+    } catch (error) {
+      console.error("Error settling expense:", error);
+      res.status(500).json({ error: "Failed to settle expense." });
+    }
+  };
+  

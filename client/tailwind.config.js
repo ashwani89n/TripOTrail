@@ -24,6 +24,7 @@ export default {
         myTripSearchBGLite:"rgba(255, 255, 255, 0.56)",
         myTripSearchBGLiter:"rgba(255, 255, 255, 0.8)",
         calendarView:"rgba(58, 58, 58, 1)",
+        splitGreen:"#88B116",
          // Add your custom color
       },
       fontSize: {
