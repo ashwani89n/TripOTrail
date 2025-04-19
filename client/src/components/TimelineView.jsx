@@ -4,6 +4,7 @@ import moment from "moment";
 import Moneybox from "../images/MoneyBox.png";
 import CarImg from "../images/Car.png";
 import AccomodationImg from "../images/EqualHousingOpportunity.png";
+import restaurant from "../images/Restaurant.png";
 
 const TimelineView = ({ itinerary, tripStartDate }) => {
   return (
@@ -62,7 +63,9 @@ const TimelineView = ({ itinerary, tripStartDate }) => {
                         <span className="absolute left-[-12px] top-1 flex h-5 w-5 items-center justify-center bg-topHeader text-black rounded-full text-xs font-bold">
                           {spot.category === "accomodation" ? (
                             <img src={AccomodationImg} />
-                          ) : (
+                          ) : spot.category === "restaurant" ? (
+                            <img src={restaurant} />
+                          ) :(
                             <img src={CarImg} />
                           )}
                         </span>

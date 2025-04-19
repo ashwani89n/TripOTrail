@@ -12,6 +12,8 @@ import dayjs from "dayjs";
 import { tripContext } from "../context/useTripDataContext";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import restaurant from "../images/Restaurant.png";
+
 
 function LockJourney({ onClickNextPrev, data }) {
   const [itinerary, setItinerary] = useState([]);
@@ -354,7 +356,9 @@ function LockJourney({ onClickNextPrev, data }) {
                       <span className="absolute left-[-12px] top-1 flex h-5 w-5 items-center justify-center bg-topHeader text-black rounded-full text-xs font-bold">
                         {["spot", "end", "start"].includes(spot.category) ? (
                           <img src={CarImg} />
-                        ) : spot.category === "accomodation" ? (
+                        ) : spot.category === "restaurant" ? (
+                                                    <img src={restaurant} />
+                                                  ) : spot.category === "accomodation" ? (
                           <img src={AccomodationImg} />
                         ) : (
                           ""

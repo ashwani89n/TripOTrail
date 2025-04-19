@@ -277,92 +277,168 @@ exports.deleteTrip = async (req, res) => {
   }
 };
 
-// Update a trip
-exports.updateTrip = async (req, res) => {
+// // Update a trip
+// exports.updateTrip = async (req, res) => {
+//   try {
+//     const { tripId } = req.params;
+//     const userId = req.user.id;
+//     const {
+//       title,
+//       start_point,
+//       destination,
+//       start_date,
+//       end_date,
+//       outbound_mode_of_transport,
+//       return_mode_of_transport,
+//       fuel_budget,
+//       outbound_flight,
+//       return_flight,
+//       status,
+//     } = req.body;
+
+//     const result = await pool.query(
+//       `UPDATE trips SET 
+//                 title = $1,
+//                 start_point = $2,
+//                 destination = $3,
+//                 start_date = $4,
+//                 end_date = $5,
+//                 outbound_mode_of_transport = $6,
+//                 return_mode_of_transport = $7,
+//                 fuel_budget = $8,
+//                 outbound_flight_from = $9,
+//                 outbound_flight_to = $10,
+//                 outbound_flight_date = $11,
+//                 outbound_flight_dtime = $12,
+//                 outbound_flight_atime = $13,
+//                 outbound_budget = $14,
+//                 outbound_e_ticket = $15,
+//                 return_flight_from = $16,
+//                 return_flight_to = $17,
+//                 return_flight_date = $18,
+//                 return_flight_dtime = $19,
+//                 return_flight_atime = $20,
+//                 return_budget = $21,
+//                 return_e_ticket = $22,
+//                 status = $23
+//             WHERE trip_id = $24 AND user_id = $25 RETURNING *`,
+//       [
+//         title,
+//         start_point,
+//         destination,
+//         start_date,
+//         end_date,
+//         outbound_mode_of_transport,
+//         return_mode_of_transport,
+//         fuel_budget || null,
+//         outbound_flight?.from || null,
+//         outbound_flight?.to || null,
+//         outbound_flight?.date || null,
+//         outbound_flight?.departure_time || null,
+//         outbound_flight?.arrival_time || null,
+//         outbound_flight?.budget || null,
+//         outbound_flight?.e_ticket || null,
+//         return_flight?.from || null,
+//         return_flight?.to || null,
+//         return_flight?.date || null,
+//         return_flight?.departure_time || null,
+//         return_flight?.arrival_time || null,
+//         return_flight?.budget || null,
+//         return_flight?.e_ticket || null,
+//         status,
+//         tripId,
+//         userId,
+//       ]
+//     );
+
+//     if (result.rows.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ status: "error", message: "Trip not found or unauthorized" });
+//     }
+
+//     res.status(200).json({
+//       status: "success",
+//       trip_id: result.rows[0].trip_id,
+//       message: "Trip updated successfully",
+//     });
+//   } catch (error) {
+//     res.status(500).json({ status: "error", error: error.message });
+//   }
+// };
+
+exports.updateTripAndDestinations = async (req, res) => {
   try {
     const { tripId } = req.params;
-    const userId = req.user.id;
     const {
-      title,
-      start_point,
-      destination,
+      timeline,
+      budget,
       start_date,
       end_date,
-      outbound_mode_of_transport,
-      return_mode_of_transport,
-      fuel_budget,
-      outbound_flight,
-      return_flight,
-      status,
+      start_point,
+      destination,
     } = req.body;
 
-    const result = await pool.query(
-      `UPDATE trips SET 
-                title = $1,
-                start_point = $2,
-                destination = $3,
-                start_date = $4,
-                end_date = $5,
-                outbound_mode_of_transport = $6,
-                return_mode_of_transport = $7,
-                fuel_budget = $8,
-                outbound_flight_from = $9,
-                outbound_flight_to = $10,
-                outbound_flight_date = $11,
-                outbound_flight_dtime = $12,
-                outbound_flight_atime = $13,
-                outbound_budget = $14,
-                outbound_e_ticket = $15,
-                return_flight_from = $16,
-                return_flight_to = $17,
-                return_flight_date = $18,
-                return_flight_dtime = $19,
-                return_flight_atime = $20,
-                return_budget = $21,
-                return_e_ticket = $22,
-                status = $23
-            WHERE trip_id = $24 AND user_id = $25 RETURNING *`,
-      [
-        title,
-        start_point,
-        destination,
-        start_date,
-        end_date,
-        outbound_mode_of_transport,
-        return_mode_of_transport,
-        fuel_budget || null,
-        outbound_flight?.from || null,
-        outbound_flight?.to || null,
-        outbound_flight?.date || null,
-        outbound_flight?.departure_time || null,
-        outbound_flight?.arrival_time || null,
-        outbound_flight?.budget || null,
-        outbound_flight?.e_ticket || null,
-        return_flight?.from || null,
-        return_flight?.to || null,
-        return_flight?.date || null,
-        return_flight?.departure_time || null,
-        return_flight?.arrival_time || null,
-        return_flight?.budget || null,
-        return_flight?.e_ticket || null,
-        status,
-        tripId,
-        userId,
-      ]
+    // 1. Update main trip details
+    await pool.query(
+      `UPDATE trips 
+       SET start_date = $1, end_date = $2, start_point = $3, destination = $4 
+       WHERE trip_id = $5`,
+      [start_date, end_date, start_point, destination, tripId]
     );
 
-    if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Trip not found or unauthorized" });
+    // 2. Delete all existing destinations for this trip
+    await pool.query(`DELETE FROM destinations WHERE trip_id = $1`, [tripId]);
+
+    // 3. Insert updated destinations from timeline
+    const insertedDestinations = [];
+    for (let day of timeline) {
+      for (let spot of day.selected_spots) {
+        const result = await pool.query(
+          `INSERT INTO destinations 
+           (trip_id, name, category, cost, duration, travel_time, day_date, week_day, order_index) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+          [
+            tripId,
+            spot.name,
+            spot.category,
+            parseFloat(spot.cost) || 0,
+            spot.duration || "0:00",
+            spot.travelTime || "00:00",
+            day.dayDate,
+            day.weekDay,
+            spot.order_index,
+          ]
+        );
+        insertedDestinations.push(result.rows[0]);
+      }
     }
 
+    // 4. Optional: Clear and re-insert budget
+    await pool.query(
+      `DELETE FROM budget WHERE trip_id = $1 AND category != 'transport'`,
+      [tripId]
+    );
+    const insertedBudgets = [];
+    if (budget && typeof budget === "object") {
+      for (let [category, amount] of Object.entries(budget)) {
+        const result = await pool.query(
+          `INSERT INTO budget (trip_id, category, amount) VALUES ($1, $2, $3) RETURNING *`,
+          [tripId, category, parseFloat(amount) || 0]
+        );
+        insertedBudgets.push(result.rows[0]);
+      }
+    }
+
+    // 6. Return the response
     res.status(200).json({
       status: "success",
-      trip_id: result.rows[0].trip_id,
-      message: "Trip updated successfully",
+      trip_id: tripId,
+      message: "Trip and destinations updated successfully",
     });
   } catch (error) {
+    console.error("Update Trip Error:", error);
     res.status(500).json({ status: "error", error: error.message });
   }
 };
+

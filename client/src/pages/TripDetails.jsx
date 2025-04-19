@@ -173,7 +173,7 @@ const TripDetails = () => {
         </div>
         <div className="flex flex-col items-center justify-center w-full mt-8">
           {/* Icons and dashed line */}
-          <div className="flex flex-row items-center justify-center gap-4 w-[40%]">
+          <div className="flex flex-row items-center justify-center gap-4 w-[50%]">
             <div className="flex flex-col items-center justify-center pl-20">
               <img src={tripJeep} alt="" className="w-6 h-6" />
             </div>
@@ -186,12 +186,16 @@ const TripDetails = () => {
           </div>
 
           {/* Text under icons */}
-          <div className="flex flex-row justify-between w-[40%] mt-2 text-white font-inria">
+          <div className="flex flex-row justify-between w-[70%] mt-2 text-white font-inria">
             <p className="text-left w-1/2 text-md ">
+            <div className="text-center">
               {myTripsByIdData.start_point}
+              </div>
             </p>
             <p className="text-right w-1/2 text-md ">
+            <div className="text-center">
               {myTripsByIdData.destination}
+              </div>
             </p>
           </div>
         </div>

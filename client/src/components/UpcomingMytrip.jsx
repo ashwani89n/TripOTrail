@@ -290,6 +290,7 @@ const UpcomingMytrip = ({
               itinerary={itinerary}
               startDt={validStartDate}
               endDt={validEndDate}
+              tripId = {tripDetails.trip_id}
               resetDates={resetToOriginalDates}
             />
           ) : null}

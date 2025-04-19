@@ -10,8 +10,9 @@ import addStop from "../images/Sum.png";
 import { MapPin, Flag, Target } from "lucide-react";
 import TimelineView from "./TimelineView";
 import dayjs from "dayjs";
+import api from "../api/api";
 
-const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
+              const EditPrompt = ({ itinerary, startDt, endDt, tripId, resetDates }) => {
   const [startEndValues, setStartEndValues] = useState({});
   const [showMessage, setShowMessage] = useState(false);
   const [activeStartEnd, setActiveStartEnd] = useState(null);
@@ -100,33 +101,6 @@ const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
     before: null,
     after: null,
   });
-
-  // const [dayMap, setDayMap] = useState(() =>
-  //   itinerary.reduce((acc, curr, idx) => {
-  //     acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
-  //       ...spot,
-  //       is_added: spot.is_added ?? true,
-  //     }));
-  //     return acc;
-  //   }, {})
-  // );
-
-  // useEffect(() => {
-  //   const init = itinerary.reduce((acc, curr, idx) => {
-  //     acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
-  //       ...spot,
-  //       is_added: spot.is_added ?? true,
-  //     }));
-  //     return acc;
-  //   }, {});
-
-  //   setDayMap(init);
-  //   setInitialDayMap(init);
-
-  //   originalDayMap.current = init;
-  //   originalInputValues.current = inputValues;
-  //   originalStartTimes.current = startTimes;
-  // }, [itinerary]);
 
   const didInitOnce = useRef(false);
 
@@ -556,13 +530,15 @@ const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
     });
   }, [daysCount]);
 
-  const handleInsertStop = (place) => {
+  const handleInsertStop = (place) => { 
+    const finalCategory = popupPlaceType === "tourist_attraction" ? "spot" : popupPlaceType;
+
     const newStop = {
       name: place.name,
       is_added: true,
       duration: { hours: 0, minutes: 0 },
       cost: 0,
-      category: selectedCategory || "custom",
+      category: finalCategory || "custom",
       image: place.photoUrl || "",
       address: place.address || "",
       coordinates: place.position || {},
@@ -666,12 +642,106 @@ const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
     return true;
   };
 
-  const handleConfirmUpdates = () => {
-    if (allDetailsEntered) {
-    } else return;
-
-    // Call back to parent (optional): maybe via a prop like onConfirmUpdate(updatedItinerary)
+  const formatItineraryForConfirm = (itinerary) => {
+    return itinerary.map((day) => ({
+      day: day.day_number,
+      dayDate: day.dayDate,
+      weekDay: day.weekday,
+      selected_spots: day.selected_spots.map((spot, i) => ({
+        name: spot.name,
+        category: spot.category,
+        cost: parseFloat(spot.cost) || 0,
+        duration:
+          spot.duration?.hours || spot.duration?.minutes
+            ? `${spot.duration.hours || 0}:${spot.duration.minutes || 0}`
+            : "0:00",
+        travelTime: spot.timeLine || spot.travelTime || "00:00",
+        order_index: i + 1,
+      })),
+    }));
   };
+  const handleConfirmTripUpdate = async () => {
+    if (!allDetailsEntered()) return;
+  
+    // Ensure itinerary is enriched
+    console.log(updatedItinerary);
+    if (
+      !updatedItinerary?.[0]?.dayDate ||
+      !updatedItinerary?.[0]?.weekday ||
+      !updatedItinerary?.[0]?.selected_spots?.[0]?.travelTime
+    ) {
+      await handlePreview(); // rebuilds full enriched itinerary
+    }
+  
+    // Re-calculate budgets
+    const totalAccommodationBudget = updatedItinerary.reduce((sum, day) => {
+      return (
+        sum +
+        day.selected_spots.reduce((spotSum, spot) => {
+          return spot.category === "accomodation"
+            ? spotSum + parseFloat(spot.cost || 0)
+            : spotSum;
+        }, 0)
+      );
+    }, 0);
+  
+    const totalActivitiesBudget = updatedItinerary.reduce((sum, day) => {
+      return (
+        sum +
+        day.selected_spots.reduce((spotSum, spot) => {
+          return ["spot", "start", "end"].includes(spot.category)
+            ? spotSum + parseFloat(spot.cost || 0)
+            : spotSum;
+        }, 0)
+      );
+    }, 0);
+  
+    const totalFoodBudget = updatedItinerary.reduce((sum, day) => {
+      return (
+        sum +
+        day.selected_spots.reduce((spotSum, spot) => {
+          return spot.category === "restaurant"
+            ? spotSum + parseFloat(spot.cost || 0)
+            : spotSum;
+        }, 0)
+      );
+    }, 0);
+  
+    const formattedTimeline = formatItineraryForConfirm(updatedItinerary);
+    const lastDay = updatedItinerary[updatedItinerary.length - 1];
+    const lastSpot = lastDay.selected_spots[lastDay.selected_spots.length - 1];
+
+    const requestPayload = {
+      start_date: startDt,
+      end_date: endDt,
+      start_point: updatedItinerary[0].selected_spots[0]?.name || "",
+      destination:lastSpot?.name || "",
+      timeline: formattedTimeline,
+      budget: {
+        food: totalFoodBudget,
+        accommodation: totalAccommodationBudget,
+        activities: totalActivitiesBudget,
+      },
+    };
+  
+    try {
+      const response = await api.put(`/trips/${tripId}`, requestPayload);
+      // const data = await response.json();
+  
+      // if (data.status === "success") {
+      //   alert("Trip updated successfully!");
+      // } else {
+      //   console.error("Error updating trip:", data.error);
+      //   alert("Something went wrong while updating your trip.");
+      // }
+  
+      navigate("/myTrip");
+    } catch (error) {
+      console.log("Update error:", error);
+    }
+  };
+  
+
   const [updatedItinerary, setUpdatedItinerary] = useState(() =>
     itinerary.map((item) => ({
       day_number: item.day_number,
@@ -1975,7 +2045,7 @@ const EditPrompt = ({ itinerary, startDt, endDt, resetDates }) => {
 
         <button
           className="bg-topHeader text-white px-5 py-2 rounded-lg font-semibold hover:cursor-pointer"
-          onClick={handleConfirmUpdates}
+          onClick={() => {handleConfirmTripUpdate()}}
         >
           Confirm
         </button>
