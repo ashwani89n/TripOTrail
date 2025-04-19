@@ -22,6 +22,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { tripContext } from "./context/useTripDataContext";
 import { ToastContainer } from "react-toastify"; // Toast container
 import useTokenExpirationCheck from "./hooks/useTokenExpirationCheck";
+import WhoOwesWhom from "./components/WhoOwesWhom";
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -62,6 +63,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      {/* <Route
+        path="/about"
+        element={
+          <ProtectedRoute>
+            <WhoOwesWhom />
+          </ProtectedRoute>
+        }
+      /> */}
     </Routes>
   );
 };

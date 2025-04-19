@@ -9,19 +9,22 @@ import endTrip from "../images/Remove.png";
 import addStop from "../images/Edit.png";
 import sendEmail from "../images/SendEmail.png";
 import splitMoney from "../images/SplitMoney.png";
+import spend from "../images/Spend.png";
 import api from "../api/api";
 import { CiUser } from "react-icons/ci";
 import EmailPrompt from "../components/EmailPrompt";
 import DeleteTrip from "../components/DeleteTrip";
+import WhoOwesWhom from "../components/WhoOwesWhom";
 
 const TripDetails = () => {
   const [myTripsByIdData, setMyTripsByIdData] = useState({});
   const { tripId } = useParams();
-  const [showSplitPrompt, setShowSplitPrompt] = useState(true);
+  const [showSpendPrompt, setShowSpendPrompt] = useState(true);
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [showAttachPrompt, setShowAttachPrompt] = useState(false);
   const [showEditPrompt, setShowEditPrompt] = useState(false);
+  const [showSplitPrompt, setShowSplitPrompt] = useState(false);
   const [emailBody, setEmailBody] = useState([]);
 
   const getTripById = async () => {
@@ -90,15 +93,16 @@ const TripDetails = () => {
               <div className="relative group w-full">
                 <button
                   onClick={() => {
-                    setShowSplitPrompt(true);
+                    setShowSpendPrompt(true);
                     setShowEditPrompt(false);
                     setShowAttachPrompt(false);
+                    setShowSplitPrompt(false);
                   }}
                   className={`rounded-sm w-7 h-7 p-1 ${
-                    showSplitPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
+                    showSpendPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
                   }`}
                 >
-                  <img src={splitMoney} className="w-full h-full" />
+                  <img src={spend} className="w-full h-full" />
                 </button>
                 <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   Spend Analyzer
@@ -111,6 +115,7 @@ const TripDetails = () => {
                   onClick={() => {
                     setShowAttachPrompt(true);
                     setShowEditPrompt(false);
+                    setShowSpendPrompt(false);
                     setShowSplitPrompt(false);
                   }}
                   className={`rounded-sm w-7 h-7 p-1 ${
@@ -125,12 +130,15 @@ const TripDetails = () => {
               </div>
 
               {/* Add Stop */}
+
+              {myTripsByIdData.runningStatus != "past" && (
               <div className="relative group w-full">
                 <button
                   onClick={() => {
                     setShowEditPrompt(true);
-                    setShowSplitPrompt(false);
+                    setShowSpendPrompt(false);
                     setShowAttachPrompt(false);
+                    setShowSplitPrompt(false);
                   }}
                   className={`rounded-sm w-7 h-7 p-1 ${
                     showEditPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
@@ -140,6 +148,26 @@ const TripDetails = () => {
                 </button>
                 <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   Add Stop
+                </div>
+              </div>
+              )}
+              
+              <div className="relative group w-full">
+                <button
+                  onClick={() => {
+                    setShowEditPrompt(false);
+                    setShowSpendPrompt(false);
+                    setShowAttachPrompt(false);
+                    setShowSplitPrompt(true);
+                  }}
+                  className={`rounded-sm w-7 h-7 p-1 ${
+                    showEditPrompt ? "border-white border bg-topHeader" : "bg-topHeader"
+                  }`}
+                >
+                  <img src={splitMoney} className="w-full h-full" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-10 z-10 w-max bg-calendarView font-inria text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Split Expense
                 </div>
               </div>
 
@@ -204,10 +232,10 @@ const TripDetails = () => {
         <UpcomingMytrip
           tripDetails={myTripsByIdData}
           onClickEmail={setEmailBody}
-          showSplitPrompt={showSplitPrompt}
+          showSpendPrompt={showSpendPrompt}
           showAttachPrompt={showAttachPrompt}
           showEditPrompt={showEditPrompt}
-          runningStatus={myTripsByIdData.runningStatus}
+          showSplitPrompt = {showSplitPrompt}
         />
       </div>
       {showEmailPrompt && (
@@ -220,6 +248,7 @@ const TripDetails = () => {
       {showDeletePrompt && (
         <DeleteTrip showPrompt={setShowDeletePrompt} data={myTripsByIdData} />
       )}
+      
     </div>
   );
 };

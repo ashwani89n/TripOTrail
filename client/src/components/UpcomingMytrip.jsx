@@ -11,13 +11,15 @@ import api from "../api/api";
 import Attachments from "./Attachments";
 import buildItineraryHTML from "../utils/buildItineraryHTML";
 import EditPrompt from "./EditPrompt";
+import WhoOwesWhom from "./WhoOwesWhom";
 
 const UpcomingMytrip = ({
   tripDetails,
   onClickEmail,
-  showSplitPrompt,
+  showSpendPrompt,
   showAttachPrompt,
   showEditPrompt,
+  showSplitPrompt,
 }) => {
   const { tripId } = useParams();
   const [itinerary, setItinerary] = useState([]);
@@ -32,13 +34,16 @@ const UpcomingMytrip = ({
   );
 
   const resetToOriginalDates = () => {
-    console.log("resetting calendar to original dates", tripDetails.start_date, tripDetails.end_date);
+    console.log(
+      "resetting calendar to original dates",
+      tripDetails.start_date,
+      tripDetails.end_date
+    );
     setStartDate(tripDetails.start_date);
     setEndDate(tripDetails.end_date);
     setValidStartDate(tripDetails.start_date);
     setValidEndDate(tripDetails.end_date);
   };
-
 
   // Storing the last valid dates separately to retain them when needed
   const [validStartDate, setValidStartDate] = useState(startDate);
@@ -124,6 +129,7 @@ const UpcomingMytrip = ({
       added_by_name: formData.added_by_name,
       amount: formData.amount,
       comments: formData.comments,
+      added_by_email: selectedMember?.email,
       added_by_profile_picture: selectedMember?.profile_picture || "",
       category: currentCategory,
     };
@@ -208,8 +214,10 @@ const UpcomingMytrip = ({
 
   return (
     <div className="w-full text-white mt-5 h-full flex flex-col space-y-4">
+      {!showSplitPrompt ? (<>
       <div className="w-full flex flex-row gap-4">
         {/* Start Calendar */}
+
         <div className="w-2/5 pr-3">
           <CalendarPicker
             type="start"
@@ -233,7 +241,7 @@ const UpcomingMytrip = ({
             <p className="text-red-400 text-sm text-center mt-1">{error}</p>
           )}
         </div>
-  
+
         {/* End Calendar */}
         <div className="w-3/5 pr-5">
           <CalendarPicker
@@ -259,7 +267,7 @@ const UpcomingMytrip = ({
           )}
         </div>
       </div>
-  
+
       {/*   ROW 2: Timeline + Right Panel (Charts, EditPrompt, Attachments) */}
       <div className="w-full flex flex-row gap-4 flex-1 overflow-hidden">
         {/* TimelineView — hidden when editing */}
@@ -271,12 +279,16 @@ const UpcomingMytrip = ({
             />
           </div>
         )}
-  
+
         {/* Right panel (expands to full if editing) */}
-        <div className={`${showEditPrompt ? "w-full" : "w-3/5"} h-full overflow-y-auto`}>
+        <div
+          className={`${
+            showEditPrompt ? "w-full" : "w-3/5"
+          } h-full overflow-y-auto`}
+        >
           {showAttachPrompt ? (
             <Attachments id={tripDetails.trip_id} />
-          ) : showSplitPrompt ? (
+          ) : showSpendPrompt ? (
             <>
               <SpendAnalyzerChart budgetData={budgetData} />
               <ExpenseCards
@@ -290,11 +302,11 @@ const UpcomingMytrip = ({
               itinerary={itinerary}
               startDt={validStartDate}
               endDt={validEndDate}
-              tripId = {tripDetails.trip_id}
+              tripId={tripDetails.tr}
               resetDates={resetToOriginalDates}
             />
           ) : null}
-  
+
           {openModal && (
             <AddExpenseModal
               open={openModal}
@@ -315,10 +327,11 @@ const UpcomingMytrip = ({
           )}
         </div>
       </div>
+        </> ):(      <div className="w-full flex flex-row gap-4">
+          <WhoOwesWhom/>
+        </div>)}
     </div>
   );
-  
-  
 };
 
 export default UpcomingMytrip;

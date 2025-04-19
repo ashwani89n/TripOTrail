@@ -8,6 +8,7 @@ const buildItineraryHTML = (itinerary) => {
     start: "1UqyPGibpaxLqkU4bBkQ4kXyOLhLzKHZD",
     end: "1UqyPGibpaxLqkU4bBkQ4kXyOLhLzKHZD",
     spot: "1UqyPGibpaxLqkU4bBkQ4kXyOLhLzKHZD",
+    restaurant: "1M4FF1upbFBwxAGWUBUoW9AQtxSLNap4J"
   };
 
   const getCategoryIcon = (category) => {
@@ -16,6 +17,7 @@ const buildItineraryHTML = (itinerary) => {
       ? `https://drive.google.com/uc?export=download&id=${id}`
       : "📍";
   };
+
 
   const getSpotHTML = (spot, index, totalSpots) => {
     const isSpot = spot.category === "spot";

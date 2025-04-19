@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Sum from "../images/Sum.png";
 import addExpAcc from "../images/AddExpenseAccomodation.png";
 import addExpAct from "../images/AddExpenseActivity.png";
@@ -40,19 +40,25 @@ const ExpenseCards = ({ categories, expenses, openExpenseModal }) => {
           </div>
 
           {/* Content Area */}
-          <div className="overflow-y-auto custom-scrollbar pr-2 flex-1 flex m-4 flex-col gap-5 " style={{ maxHeight: '130px' }}>
+          <div
+            className="overflow-y-auto custom-scrollbar pr-2 flex-1 flex m-4 flex-col gap-5 "
+            style={{ maxHeight: "130px" }}
+          >
             {expenses[cat]?.map((e, idx) => (
               <div key={idx} className="flex items-start space-x-3 w-full ">
                 {e.added_by_profile_picture && (
                   <img
-                    src={e.added_by_profile_picture}
+                    src={`http://localhost:5000${e.added_by_profile_picture}`}
                     className="w-10 h-10 rounded-full"
                   />
                 )}
                 <div>
-                  <p className="text-md text-white font-light">{e.added_by_name}</p>
-                  <div className="text-xs text-myTripSearchBGLite">{e.comments}:
-                    <span className="text-xs text-topHeader mt-1">
+                  <p className="text-md text-white font-light">
+                    {e.added_by_name}
+                  </p>
+                  <div className="flex flex-wrap text-xs text-myTripSearchBGLite">
+                    {e.comments}:
+                    <span className="text-xs text-topHeader mt-1 ml-1" style={{ color: CATEGORY_COLORS[cat] || "#333" }}>
                       ${e.amount}
                     </span>
                   </div>
@@ -64,9 +70,15 @@ const ExpenseCards = ({ categories, expenses, openExpenseModal }) => {
           {/* Total */}
           <div className="mt-4 ml-auto w-[60%] p-1 bg-calendarView rounded-md text-white flex items-center justify-between">
             <span>Total:&nbsp;</span>
-            <span className="text-topHeader" style={{ color: CATEGORY_COLORS[cat] || "#333" }}>
+            <span
+              className="text-topHeader"
+              style={{ color: CATEGORY_COLORS[cat] || "#333" }}
+            >
               $
-              {(expenses[cat] || []).reduce((acc, e) => acc + parseFloat(e.amount || 0), 0)}
+              {(expenses[cat] || []).reduce(
+                (acc, e) => acc + parseFloat(e.amount || 0),
+                0
+              )}
             </span>
           </div>
         </div>
