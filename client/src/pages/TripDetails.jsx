@@ -229,14 +229,15 @@ const TripDetails = () => {
         </div>
       </div>
       <div className="mt-10 p-4">
-        <UpcomingMytrip
+        {showSplitPrompt ? <WhoOwesWhom tripId={tripId} />: <UpcomingMytrip
           tripDetails={myTripsByIdData}
           onClickEmail={setEmailBody}
           showSpendPrompt={showSpendPrompt}
           showAttachPrompt={showAttachPrompt}
           showEditPrompt={showEditPrompt}
           showSplitPrompt = {showSplitPrompt}
-        />
+        />}
+        
       </div>
       {showEmailPrompt && (
         <EmailPrompt

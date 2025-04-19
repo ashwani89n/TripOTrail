@@ -58,27 +58,27 @@ exports.getMediaByTrip = async (req, res) => {
 exports.deleteMedia = async (req, res) => {
     try {
         const tripId = parseInt(req.params.tripId, 10);
-        const mediaId = parseInt(req.params.mediaId, 10);
+        const { file_url } = req.query;
 
-        if (!tripId || isNaN(tripId) || !mediaId || isNaN(mediaId)) {
-            return res.status(400).json({ status: "error", message: "Invalid trip ID or media ID" });
-        }
-        const mediaResult = await pool.query(
-            `SELECT file_url FROM media WHERE media_id = $1 AND trip_id = $2`,
-            [mediaId, tripId]
-        );
+        // if (!tripId || isNaN(tripId) || !mediaId || isNaN(mediaId)) {
+        //     return res.status(400).json({ status: "error", message: "Invalid trip ID or media ID" });
+        // }
+        // const mediaResult = await pool.query(
+        //     `SELECT file_url FROM media WHERE media_id = $1 AND trip_id = $2`,
+        //     [mediaId, tripId]
+        // );
 
-        if (mediaResult.rows.length === 0) {
-            return res.status(404).json({ status: "error", message: "Media not found" });
-        }
+        // if (mediaResult.rows.length === 0) {
+        //     return res.status(404).json({ status: "error", message: "Media not found" });
+        // }
 
-        const filePath = path.join(__dirname, "..", mediaResult.rows[0].file_url);
+        // const filePath = path.join(__dirname, "..", mediaResult.rows[0].file_url);
 
-        await pool.query(`DELETE FROM media WHERE media_id = $1 AND trip_id = $2`, [mediaId, tripId]);
+        await pool.query(`DELETE FROM media WHERE file_url = $1 AND trip_id = $2`, [file_url, tripId]);
 
-        fs.unlink(filePath, (err) => {
-            if (err) console.error("Error deleting file:", err);
-        });
+        // fs.unlink(filePath, (err) => {
+        //     if (err) console.error("Error deleting file:", err);
+        // });
 
         res.status(200).json({ status: "success", message: "Media deleted successfully" });
 

@@ -8,10 +8,9 @@ import accom from "../images/AccomSplit.png";
 import dayjs from "dayjs";
 import "../components/styles/PickSpots.css";
 
-export default function WhoOwesWhom() {
+export default function WhoOwesWhom({ tripId }) {
   const [data, setData] = useState([]);
   const [noData, setNoData] = useState(true);
-  const tripId = 10;
 
   const CATEGORY_ICONS = {
     transport,

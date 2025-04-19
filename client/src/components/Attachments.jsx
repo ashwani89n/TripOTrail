@@ -3,6 +3,7 @@ import api from "../api/api";
 import addImg from "../images/AddImage.png";
 import addVideo from "../images/AddVideo.png";
 import addReceipts from "../images/AddReceipt.png";
+import deleteimage from "../images/Delete.png";
 
 const Attachments = ({ id }) => {
   const [fetchedImages, setFetchedImages] = useState([]);
@@ -24,7 +25,9 @@ const Attachments = ({ id }) => {
       setFetchedVideos(videos);
       setFetchedReceipts(receipts);
     } catch (error) {
-      console.log(error.response?.data?.message || "Media Loading Unsuccessful");
+      console.log(
+        error.response?.data?.message || "Media Loading Unsuccessful"
+      );
     }
   };
 
@@ -58,6 +61,7 @@ const Attachments = ({ id }) => {
       }
 
       alert("File uploaded successfully!");
+      getMediaById();
     } catch (error) {
       console.error("Upload failed", error);
       alert("File upload failed");
@@ -88,6 +92,26 @@ const Attachments = ({ id }) => {
     }
   };
 
+  // Handle Remove Media
+  const handleDelete = async (fileUrl) => {
+
+    console.log(fileUrl);
+
+    try {
+      await api.delete(`/trips/${id}/media`, {
+        params: { file_url: fileUrl },
+      });
+  
+      setTimeout(() => {
+        getMediaById(); // Re-fetch fresh data from server
+      }, 500);
+
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("Failed to delete media.");
+    }
+  };
+
   return (
     <div className="min-h-[72vh] mt-5 bg-headerBG pl-10 pt-5 rounded-lg flex flex-col gap-8 text-white">
       {/* Images Row */}
@@ -97,12 +121,19 @@ const Attachments = ({ id }) => {
         </h2>
         <div className="grid grid-cols-4 gap-4 pr-10 ">
           {fetchedImages.map((img, index) => (
-            <img
-              key={index}
-              src={`http://localhost:5000${img.file_url}`}
-              alt={`Image ${index + 1}`}
-              className="w-full h-[15vh] object-cover rounded-lg"
-            />
+            <div key={index} className="relative group">
+              <img
+                src={`http://localhost:5000${img.file_url}`}
+                alt={`Image ${index + 1}`}
+                className="w-full h-[15vh] object-cover rounded-lg"
+              />
+              <button
+                onClick={() => handleDelete(img.file_url, "image")}
+                className="absolute top-1 right-1 bg-topHeader text-white rounded-full text-xs p-1 opacity-0 group-hover:opacity-100 transition"
+              >
+                <img src={deleteimage} className="w-5 h-5"/>
+              </button>
+            </div>
           ))}
           <label
             htmlFor="image-upload"
@@ -130,10 +161,26 @@ const Attachments = ({ id }) => {
         </h2>
         <div className="grid grid-cols-4 gap-4">
           {fetchedVideos.map((vid, index) => (
-            <video key={index} controls className="w-full h-[15vh] object-contain rounded-lg">
-              <source src={`http://localhost:5000${vid.file_url}`} type="video/mp4" />
+            <div key={index} className="relative group">
+            <video
+              key={index}
+              controls
+              className="w-full h-[15vh] object-contain rounded-lg"
+            >
+              <source
+                src={`http://localhost:5000${vid.file_url}`}
+                type="video/mp4"
+              />
               Your browser does not support the video tag.
             </video>
+            <button
+                onClick={() => handleDelete(vid.file_url, "image")}
+                className="absolute top-1 right-1 bg-topHeader text-white rounded-full text-xs p-1 opacity-0 group-hover:opacity-100 transition"
+              >
+                <img src={deleteimage} className="w-5 h-5"/>
+              </button>
+            </div>
+            
           ))}
           <label
             htmlFor="video-upload"
@@ -161,12 +208,20 @@ const Attachments = ({ id }) => {
         </h2>
         <div className="grid grid-cols-4 gap-4">
           {fetchedReceipts.map((receipt, index) => (
+            <div key={index} className="relative group">
             <img
               key={index}
               src={`http://localhost:5000${receipt.file_url}`}
               alt={`Receipt ${index + 1}`}
               className="w-full h-[15vh] object-cover rounded-lg"
             />
+            <button
+            onClick={() => handleDelete(receipt.file_url, "image")}
+            className="absolute top-1 right-1 bg-topHeader text-white rounded-full text-xs p-1 opacity-0 group-hover:opacity-100 transition"
+          >
+            <img src={deleteimage} className="w-5 h-5"/>
+          </button>
+          </div>
           ))}
           <label
             htmlFor="receipt-upload"

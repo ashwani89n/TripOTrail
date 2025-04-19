@@ -21,6 +21,6 @@ router.post("/:tripId/media", authenticateJWT, upload.single("file"), uploadMedi
 
 router.get("/:tripId/media", authenticateJWT, getMediaByTrip);
 
-router.delete("/:tripId/media/:mediaId", authenticateJWT, deleteMedia);
+router.delete("/:tripId/media", authenticateJWT, deleteMedia);
 
 module.exports = router;
