@@ -119,7 +119,7 @@ const Attachments = ({ id }) => {
         <h2 className="text-lg font-normal mb-2 font-aldrich ">
           Travel&nbsp;<span className="text-topHeader">Photos</span>
         </h2>
-        <div className="grid grid-cols-4 gap-4 pr-10 ">
+        <div className="grid grid-cols-4 gap-4 ">
           {fetchedImages.map((img, index) => (
             <div key={index} className="relative group">
               <img

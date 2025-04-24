@@ -635,7 +635,7 @@ const SetSecene = ({ onClickNext }) => {
 
         <div className="flex items-center gap-16 justify-between ">
           <label className="w-[20%]">Outbound Mode of Transport</label>
-          <div className=" h-[31px] w-[30%] flex items-center justify-between  rounded-lg ">
+          <div className=" h-[31px] w-[30%] flex items-center justify-start rounded-lg ">
             <input
               type="radio"
               value="road"
@@ -662,9 +662,9 @@ const SetSecene = ({ onClickNext }) => {
                 setArrivalMinuteOB("");
               }}
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
-            />
+            /> &nbsp;&nbsp;&nbsp;&nbsp;
             <label>Road</label>
-            <input
+            {/* <input
               type="radio"
               value="flight"
               checked={obTransport === "flight"}
@@ -674,10 +674,10 @@ const SetSecene = ({ onClickNext }) => {
               }}
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
             />
-            <label>Flight</label>
+            <label>Flight</label> */}
           </div>
           <label className="w-[20%]">Return Mode of Transport</label>
-          <div className=" h-[31px] w-[30%] flex items-center justify-between  rounded-lg ">
+          <div className=" h-[31px] w-[30%] flex items-center justify-start  rounded-lg ">
             <input
               type="radio"
               value="road"
@@ -704,9 +704,9 @@ const SetSecene = ({ onClickNext }) => {
                 setArrivalMinuteRT("");
               }}
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
-            />
+            />&nbsp;&nbsp;&nbsp;&nbsp;
             <label>Road</label>
-            <input
+            {/* <input
               type="radio"
               value="flight"
               checked={retTransport === "flight"}
@@ -716,7 +716,7 @@ const SetSecene = ({ onClickNext }) => {
               }}
               className="appearance-none h-3 w-3 border-2 border-white rounded-full checked:bg-topHeader focus:outline-none focus:ring-topHeader"
             />
-            <label>Flight</label>
+            <label>Flight</label> */}
           </div>
         </div>
         <div>

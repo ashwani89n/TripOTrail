@@ -170,7 +170,27 @@ exports.addDestination = async (req, res) => {
         [tripId, member.name, member.email, member.photo]
       );
       insertedTeamMembers.push(teamMemberResult.rows[0]);
+      //  Keep entry for the user 
+      
     }
+
+    const userResults = await pool.query(
+      `SELECT name, photo
+             FROM Users
+             WHERE user_id = $1`,
+      [req.user.id]
+    );
+    // Insert the logged-in user into tripmates if found
+    if (userResults.rows.length > 0) {
+      const user = userResults.rows[0];
+
+      const loggedInUserResult = await pool.query(
+        `INSERT INTO tripmates (trip_id, name, email, profile_picture) VALUES ($1, $2, $3, $4) RETURNING *`,
+        [tripId, user.name, req.user.email, user.photo]
+      );
+
+      insertedTeamMembers.push(loggedInUserResult.rows[0]);
+    }     
 
     await pool.query(`UPDATE trips SET status = $1 WHERE trip_id = $2`, [
       status,

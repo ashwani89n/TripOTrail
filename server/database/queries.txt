@@ -6,7 +6,8 @@ CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
+    photo VARCHAR(255)
 );
 
 
@@ -78,20 +79,6 @@ CREATE TABLE tripmates (
 
 
 
-CREATE TABLE expenses (
-    expense_id SERIAL PRIMARY KEY,
-    trip_id INT NOT NULL,
-    category VARCHAR(255) NOT NULL, -- e.g., Food, Transport, Accommodation
-    amount DECIMAL(10,2) NOT NULL, -- Expense amount
-    added_by_name VARCHAR(255) NOT NULL, -- Name of the person who added the expense
-    added_by_profile_picture TEXT, -- Optional profile picture
-    comments TEXT, -- Optional notes about the expense
-    created_at TIMESTAMP DEFAULT NOW(),
-
-    FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
-);
-
-
 CREATE TABLE media (
     media_id SERIAL PRIMARY KEY,
     trip_id INT NOT NULL,
@@ -102,17 +89,32 @@ CREATE TABLE media (
     FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
 );
 
+
+CREATE TABLE expenses (
+    expense_id SERIAL PRIMARY KEY,
+    trip_id INT NOT NULL,
+    category VARCHAR(255) NOT NULL, -- e.g., Food, Transport, Accommodation
+    amount DECIMAL(10,2) NOT NULL, -- Expense amount
+    added_by_name VARCHAR(255) NOT NULL, -- Name of the person who added the expense
+    added_by_email VARCHAR(255) NOT NULL,
+    added_by_profile_picture TEXT, -- Optional profile picture
+    comments TEXT, -- Optional notes about the expense
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE
+);
+
 CREATE TABLE expense_splits (
-    split_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     expense_id INT NOT NULL,
-    owed_by_name VARCHAR(255) NOT NULL,
+    trip_id INT NOT NULL,
+    payer_email VARCHAR(255) NOT NULL,
+    receiver_email VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
+    is_settled BOOLEAN DEFAULT FALSE,
 
     FOREIGN KEY (expense_id) REFERENCES expenses(expense_id) ON DELETE CASCADE
 );
-
-
-
 
 drop table destinations;
 drop table budget;
@@ -120,6 +122,7 @@ drop table media;
 drop table expenses;
 drop table tripmates;
 drop table trips;
+drop table expense_splits;
 
 
 

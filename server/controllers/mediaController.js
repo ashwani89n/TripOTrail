@@ -1,7 +1,4 @@
 const pool = require("../database/db");
-const fs = require("fs");
-const path = require("path");
-
 
 exports.uploadMedia = async (req, res) => {
     try {

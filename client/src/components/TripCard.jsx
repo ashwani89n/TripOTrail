@@ -182,12 +182,12 @@ const TripCard = ({
                 </div>
 
                 {/* Highlights */}
-                <div className="basis-1/2 shrink-0 grow-0 bg-zinc-900 p-2 rounded-lg flex flex-col overflow-hidden h-full">
+                <div className="basis-1/2 shrink-0 grow-0 bg-zinc-900 p-2  rounded-lg flex flex-col overflow-hidden h-full">
                   <div className="font-aldrich text-center mb-1 text-[12px]">
                     Highlights
                   </div>
-                  <div className="flex flex-col items-center justify-center w-full h-full">
-                    <div className="w-full h-full overflow-hidden">
+                  <div className="flex flex-col items-center justify-center text-center w-full h-full">
+                    <div className="w-full h-full overflow-hidden flex justify-center items-center text-center">
                       {trip.media?.length > 0 ? (
                         <HighlightsSlider media={trip.media} />
                       ) : (

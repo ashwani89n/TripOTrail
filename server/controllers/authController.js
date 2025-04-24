@@ -7,9 +7,10 @@ exports.register = async (req, res) => {
     const { name, email, password } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+        const fileUrl = `/uploads/${req.file.filename}`;
         const result = await pool.query(
-            'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id, name, email',
-            [name, email, hashedPassword]
+            'INSERT INTO users (name, email, password_hash, photo) VALUES ($1, $2, $3, $4) RETURNING user_id, name, email',
+            [name, email, hashedPassword, fileUrl]
         );
         res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -30,7 +31,7 @@ exports.login = async (req, res) => {
         const isValid = await bcrypt.compare(password, user.rows[0].password_hash);
         if (!isValid) return res.status(400).json({ message: 'Invalid credentials' });
         const expiresInSeconds = 3 * 60 * 60; // 3 hours
-        const token = jwt.sign({ id: user.rows[0].user_id }, process.env.JWT_SECRET, { expiresIn: expiresInSeconds });
+        const token = jwt.sign({ id: user.rows[0].user_id , email: user.rows[0].email }, process.env.JWT_SECRET, { expiresIn: expiresInSeconds });
         const token_expiry = Date.now() + expiresInSeconds * 1000;
         res.json({ token, token_expiry, user: { id: user.rows[0].user_id, name: user.rows[0].name, email: user.rows[0].email } });
     } catch (error) {

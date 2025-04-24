@@ -104,7 +104,7 @@ const Login = () => {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-topHeader"
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
-                    {showPassword ? (
+                    {!showPassword ? (
                       <AiFillEyeInvisible size={20} />
                     ) : (
                       <AiFillEye size={20} />

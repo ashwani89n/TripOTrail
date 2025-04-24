@@ -24,6 +24,8 @@ function LockJourney({ onClickNextPrev, data }) {
   const [foodBudget, setfoodBudget] = useState(0);
   const navigate = useNavigate();
 
+  console.log("data:", data);
+
   const {
     tripId,
     destinationPoint,
@@ -105,11 +107,25 @@ function LockJourney({ onClickNextPrev, data }) {
                 });
                 continue;
               }
-
+              console.log("duration:",element.duration.value);
               const travelTimeSec = element.duration.value;
               const travelTimeMin = Math.floor(travelTimeSec / 60);
               spots[i + 1].travelTime = element.duration.text;
-              currentTime = currentTime.add(10, "minute").add(travelTimeMin, "minute");
+              // currentTime = currentTime.add(10, "minute").add(travelTimeMin, "minute").add(spots[i].duration);
+              // spots[i + 1].timeLine = currentTime.format("HH:mm");
+
+              // Convert duration "H:mm" or "M:ss" → total minutes
+              const [h, m] = (spots[i].duration || "0:00")
+                .split(":")
+                .map(Number);
+              const durationMins = h * 60 + m;
+
+              // Advance current time
+              currentTime = currentTime
+                .add(durationMins, "minute")
+                .add(10, "minute")
+                .add(travelTimeMin, "minute");
+
               spots[i + 1].timeLine = currentTime.format("HH:mm");
             }
 
@@ -147,6 +163,7 @@ function LockJourney({ onClickNextPrev, data }) {
 
         setAccommodationBudget(totalAccommodationBudget / 2);
         setActivitiesBudget(totalActivitiesBudget);
+        setError("");
       } catch (err) {
         setError("Failed to load Google Maps travel durations.");
         console.error(err);

@@ -1,24 +1,36 @@
 const pool = require("../database/db");
 const dayjs = require("dayjs");
-
 exports.getTrips = async (req, res) => {
   console.log("✅ getTrips called");
   try {
-    console.log("✅ getTrips ty called");
-    const userId = req.user.id;
-  //   const tripResult = await pool.query(
-  //       'SELECT * FROM trips WHERE user_id = $1 AND status = $2',
-  // [userId, 'Confirm']
-  //     );
-    const tripResult = await pool.query(
-      "SELECT * FROM trips WHERE user_id = $1 AND status = $2",
-      [userId, "Confirm"]
-    );
-    const trips = [];
-    console.log("Get:", tripResult.rows, userId);
+    const emailId = req.user.email;
 
-    for (const trip of tripResult.rows) {
-      const { trip_id: tripId } = trip;
+    // Get trip IDs where the user is a team member
+    const userTripsResult = await pool.query(
+      "SELECT trip_id FROM tripmates WHERE email = $1",
+      [emailId]
+    );
+
+    if (userTripsResult.rows.length === 0) {
+      return res.status(200).json([]); // No trips found
+    }
+
+    const trips = [];
+
+    for (const row of userTripsResult.rows) {
+      const tripId = row.trip_id;
+
+      // Get trip details
+      const tripResult = await pool.query(
+        "SELECT * FROM trips WHERE trip_id = $1 AND status = $2",
+        [tripId, "Confirm"]
+      );
+
+      if (tripResult.rows.length === 0) continue;
+
+      const trip = tripResult.rows[0];
+
+      // Get budget summary
       const budgetResult = await pool.query(
         `SELECT category, SUM(amount) AS total
          FROM budget
@@ -26,16 +38,16 @@ exports.getTrips = async (req, res) => {
          GROUP BY category`,
         [tripId]
       );
+
       const budget = {};
       let totalBudget = 0;
       for (const row of budgetResult.rows) {
-        console.log(row);
         const amount = parseFloat(row.total);
         budget[row.category] = amount;
         totalBudget += amount;
       }
 
-      // Get total expense
+      // Get expense summary
       const expenseResult = await pool.query(
         `SELECT category, SUM(amount) AS total
          FROM expenses
@@ -43,27 +55,21 @@ exports.getTrips = async (req, res) => {
          GROUP BY category`,
         [tripId]
       );
-      console.log(tripId);
-      console.log("🧪 expenseResult.rows:", expenseResult.rows);
+
       const expense = {};
       let totalExpense = 0;
       for (const row of expenseResult.rows) {
-        console.log(row);
         const amount = parseFloat(row.total);
         expense[row.category] = amount;
         totalExpense += amount;
       }
 
       // Get media
-      const fileType = "image";
       const mediaResult = await pool.query(
-        `SELECT file_url FROM media WHERE trip_id = $1 AND file_type = $2`,
-        [tripId, fileType]
+        `SELECT file_url FROM media WHERE trip_id = $1 AND file_type = 'image'`,
+        [tripId]
       );
-      const media = mediaResult.rows.map((row) => row.file_url);
-
-      console.log(tripId);
-      console.log("🧪 mediaResult.rows:", mediaResult.rows);
+      const media = mediaResult.rows.map(row => row.file_url);
 
       // Get team members
       const teamResult = await pool.query(
@@ -71,8 +77,9 @@ exports.getTrips = async (req, res) => {
         [tripId]
       );
       const team_members = teamResult.rows;
-      const today = dayjs();
 
+      // Determine running status
+      const today = dayjs();
       const startDate = dayjs(trip.start_date);
       const endDate = dayjs(trip.end_date);
 
@@ -85,6 +92,7 @@ exports.getTrips = async (req, res) => {
         runningStatus = "active";
       }
 
+      // Final trip object
       trips.push({
         ...trip,
         budget,
@@ -99,6 +107,7 @@ exports.getTrips = async (req, res) => {
 
     res.status(200).json(trips);
   } catch (error) {
+    console.error("Error in getTrips:", error);
     res.status(500).json({ error: error.message });
   }
 };

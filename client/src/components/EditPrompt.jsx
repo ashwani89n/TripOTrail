@@ -11,6 +11,7 @@ import { MapPin, Flag, Target } from "lucide-react";
 import TimelineView from "./TimelineView";
 import dayjs from "dayjs";
 import api from "../api/api";
+import { useNavigate } from "react-router-dom";
 
               const EditPrompt = ({ itinerary, startDt, endDt, tripId, resetDates }) => {
   const [startEndValues, setStartEndValues] = useState({});
@@ -30,6 +31,7 @@ import api from "../api/api";
   const [dayMap, setDayMap] = useState([]);
   const [startDate, setStartDate] = useState(startDt);
   const [endDate, setEndDate] = useState(endDt);
+  const navigate = useNavigate();
 
   const originalDayMap = useRef({});
   const originalInputValues = useRef({});
@@ -103,10 +105,14 @@ import api from "../api/api";
   });
 
   const didInitOnce = useRef(false);
-
   useEffect(() => {
-    if (didInitOnce.current) return;
-
+    if (
+      didInitOnce.current ||
+      !Array.isArray(itinerary) ||
+      itinerary.length === 0
+    )
+      return;
+  
     const init = itinerary.reduce((acc, curr, idx) => {
       acc[idx + 1] = (curr.selected_spots || []).map((spot) => ({
         ...spot,
@@ -114,12 +120,12 @@ import api from "../api/api";
       }));
       return acc;
     }, {});
-
+  
     const initInputValues = {};
     const initStartTimes = [];
     const initAccommodations = [];
     const initAccommodationDetails = [];
-
+  
     itinerary.forEach((day, index) => {
       (day.selected_spots || []).forEach((spot) => {
         initInputValues[spot.name] = {
@@ -128,6 +134,7 @@ import api from "../api/api";
           cost: spot.cost ?? "0.00",
         };
       });
+  
       if (day.startHour && day.startMinute) {
         initStartTimes[index] = {
           hour: day.startHour,
@@ -139,7 +146,7 @@ import api from "../api/api";
       } else {
         initStartTimes[index] = { hour: "09", minute: "00" };
       }
-      
+  
       initAccommodations[index] = false;
       initAccommodationDetails[index] = {
         name: "",
@@ -147,8 +154,7 @@ import api from "../api/api";
         coordinates: null,
       };
     });
-
-    // Set state
+  
     setDayMap(init);
     setInputValues(initInputValues);
     setStartTimes(initStartTimes);
@@ -156,8 +162,7 @@ import api from "../api/api";
     setAccommodationDetails(initAccommodationDetails);
     setStartDate(startDt);
     setEndDate(endDt);
-
-    // Store original for undo
+  
     originalDayMap.current = JSON.parse(JSON.stringify(init));
     originalInputValues.current = JSON.parse(JSON.stringify(initInputValues));
     originalStartTimes.current = JSON.parse(JSON.stringify(initStartTimes));
@@ -167,9 +172,12 @@ import api from "../api/api";
     );
     originalStartDateRef.current = startDt;
     originalEndDateRef.current = endDt;
-
-    didInitOnce.current = true; // prevent re-run
+  
+    didInitOnce.current = true;
   }, [itinerary, startDt, endDt]);
+  
+  
+  
 
   const {
     ready: accommodationReady,
