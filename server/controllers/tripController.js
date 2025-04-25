@@ -116,10 +116,11 @@ exports.getTripById = async (req, res) => {
   try {
     let trips ={};
     const { tripId } = req.params;
-    const userId = req.user.id;
+    // const userId = req.user.id;
     const result = await pool.query(
-      "SELECT * FROM trips WHERE trip_id = $1 AND user_id = $2",
-      [tripId, userId]
+      "SELECT * FROM trips WHERE trip_id = $1",
+      // [tripId, userId]
+      [tripId]
     );
 
     const tripResult = result.rows[0]

@@ -927,7 +927,7 @@ import { useNavigate } from "react-router-dom";
       // Ensure all spots have coordinates
       const enrichedSpotsRaw = await enrichDaySpotsWithCoordinates(daySpots);
 
-      // ✅ Inject duration & cost from inputValues
+      // Inject duration & cost from inputValues
       const enrichedSpots = enrichedSpotsRaw.map((spot) => {
         const nameKey = spot.name ?? "unknown";
         return {

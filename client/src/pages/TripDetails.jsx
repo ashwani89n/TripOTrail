@@ -32,7 +32,7 @@ const TripDetails = () => {
       const response = await api.get(`/trips/${tripId}`);
       setMyTripsByIdData(response.data);
     } catch (error) {
-      setError(error.response?.data?.message || "Trips Loading Unsuccessful");
+      // setError(error.response?.data?.message || "Trips Loading Unsuccessful");
       console.log({ error });
     }
   };

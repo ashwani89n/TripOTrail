@@ -236,10 +236,10 @@ export default function WhoOwesWhom({ tripId }) {
                         />
                         <div className="text-sm">
                           <p className="font-light">{summary.name}</p>
-                          <p className={summary.amount > 0 ? "text-splitGreen text-[10px]" : "text-topHeader text-[10px]"}>
+                          <p className={summary.amount > 0 ?  "text-topHeader text-[10px]" : "text-splitGreen text-[10px]"}>
                             {summary.amount > 0
-                              ? `owes you $${summary.amount.toFixed(2)}`
-                              : `you owe $${Math.abs(summary.amount).toFixed(2)}`}
+                              ? `you owe $${summary.amount.toFixed(2)}`
+                              : `owes you $${Math.abs(summary.amount).toFixed(2)}`}
                           </p>
                         </div>
                       </div>

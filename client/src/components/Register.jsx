@@ -126,7 +126,7 @@ const Register = () => {
           )}
           <div className="flex w-full justify-center items-center mb-6">
             <label htmlFor="photo-upload" className="relative cursor-pointer">
-              <div className="w-28 h-28 rounded-full p-2 bg-textInputBG overflow-hidden flex items-center justify-center">
+              <div className="w-28 h-28 rounded-full bg-textInputBG overflow-hidden flex items-center justify-center">
                 {preview ? (
                   <img
                     src={preview}

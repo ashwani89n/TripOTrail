@@ -228,7 +228,7 @@ function LockJourney({ onClickNextPrev, data }) {
         `/trips/${tripId}/destinations`,
         requestPayload
       );
-      navigate("/");
+      navigate("/myTrip");
       console.log(response.data);
     } catch (error) {
       console.log(error);
