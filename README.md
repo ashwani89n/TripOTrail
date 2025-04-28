@@ -30,7 +30,7 @@ Time spent: 20 days spent in total
 
 Here's an overview of Key features of the website:
 
-<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_Overview.pdf' title='Video Walkthrough' width='' alt='Website Walkthrough' />
+<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_Overview.gif' title='Video Walkthrough' width='' alt='Website Walkthrough' />
 
 ## Demo
 
