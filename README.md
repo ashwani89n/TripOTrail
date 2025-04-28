@@ -2,27 +2,41 @@
 
 Submitted by: Ashwani Balakrishnan Neminimadathil
 
-TripOTrail is a comprehensive web application designed to streamline the trip management process for travelers, covering two key phases: Planning and Tracking. In the Planning phase, users can easily add destinations, create timelines, and establish budgets. The platform leverages APIs to help discover attractions, accommodations, and dining options, while also allowing users to upload essential documents and set reminders. Collaborative planning features enable travelers to invite others, ensuring that all preferences are considered. During the Tracking phase, TripOTrail offers real-time monitoring of planned activities and provides a detailed overview of the trip after completion, including locations, accommodations, and expenses. An advanced expense tracking system simplifies bill-splitting among participants. Users can also customize itineraries based on real-time insights and receive notifications about reservation changes and local events. With these integrated features, TripOTrail redefines the travel experience, enabling users to focus on creating unforgettable memories without the stress of planning and budgeting. 
+TripOTrail is an all-in-one travel platform designed to redefine the travel experience by streamlining trip planning, tracking, and collaboration. During the Planning phase, users can add destinations, build day-wise timelines, set budgets, and collaboratively organize trips with co-travelers. The platform integrates multiple APIs to assist in discovering attractions, accommodations, and dining options. Users can also upload important documents and set travel reminders.
+
+During the Tracking phase, TripOTrail offers real-time route modifications, dynamic timeline updates, expense tracking with bill-splitting, and a post-trip summary including locations visited, expenses settled, and media uploads. With seamless collaboration, smart routing, and real-time notifications, TripOTrail empowers users to focus on creating unforgettable memories — stress-free. 
+
+TripOTrail redefines the travel experience, enabling users to focus on creating unforgettable memories without the stress of planning and budgeting. 
+
 
 ## Features: 
 Planning Phase
-* [x] Discovery Tools: The platform facilitates the discovery of attractions, accommodations, and dining options through relevant APIs. 
-* [x] Destination Management: Users can add destinations, create timelines, and establish budgets for effective journey design. 
-* [x] Document Management: Users can upload essential travel documents and set alerts for important reminders. 
-* [x] Collaborative Planning: Travelers can invite others to participate in planning, fostering group input and shared itinerary adjustments. Tracking Phase
-* [x] Real-Time Monitoring: Users can monitor their planned destinations and activities in real-time. 
-* [x] Journey Overview: After the trip, users receive a comprehensive overview detailing all visitedl ocations and experiences. 
-* [x] Expense Tracking: Allows users to track spending and streamline bill-splitting . 
-* [x] Customizable Itineraries: Users can adapt their plans based on real-time insights. 
-* [x] Notifications: Alerts for changes to reservations, local events, or weather updates keep travelers informed. 
- 
-Time spent: 72 hours spent in total
+* [x] Discovery Tools: Find attractions, accommodations, and dining options via Google Maps APIs (Places API, Maps JavaScript API, Distance Matrix API, Geocoding API, Directions API).
+* [x] Destination Management: Add destinations, plan day-wise timelines with drag-and-drop support, and establish trip budgets.
+* [x] Document Management: Upload essential travel documents and set reminders for critical activities or deadlines.
+* [x] Collaborative Planning: Invite co-travelers to contribute to trip planning, edit itineraries, manage expenses, and upload media collaboratively.
+* [x] Smart Routing: Optimize travel paths between multiple stops using the A* pathfinding algorithm for efficient trip routes.
+
+Tracking Phase
+* [x] Journey Overview: After trip completion, receive a comprehensive summary of visited locations, experiences, and expenses.
+* [x] Real-Time Monitoring and Updates: Modify routes, update itineraries, and add new stops or activities dynamically during the trip.
+* [x] Smart Expense Tracking & Bill Splitting: Track trip expenses with a Splitwise-style system that automatically calculates shares and shows a clear "who owes whom" breakdown, synced in real time.
+* [x] Customizable Itineraries: Edit trip plans during the journey based on real-time insights, without needing to restart the trip planning process.
+* [x] Notifications: Receive updates for reservation changes, important local events, and weather alerts to stay informed throughout the trip.
+
+Time spent: 20 days spent in total
+
+## Demo
+
+Here's a walkthrough of the website:
+
+<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail.gif' title='Video Walkthrough' width='' alt='Website Walkthrough' />
 
 ## Wireframes
 
 Here's a walkthrough of implemented features:
 
-<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/ashwani89n/TripOTrail/blob/main/TripOTrail_Figma.gif' title='Video Walkthrough' width='' alt='Figma Walkthrough' />
 
 ## API Documentation
 
